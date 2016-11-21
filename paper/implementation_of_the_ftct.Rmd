@@ -1,0 +1,88 @@
+---
+title: "Implementation of the FCTC"
+author: "many"
+date: "July 7, 2016"
+output: word_document
+header-include: \usepackage{epstopdf, hyperref}
+---
+
+# Introduction
+
+# Complex Policy Making Process
+
+The policy making process can be viewed as a \emph{two-level game} (Putnam, 1988). Countries, and more specific, governments try to concel internal and external preferences and influences in a context in which domestic and international decisions are made jointly. Furthermore, more than simultaneity, domestic and international affairs affect each other, making it necesary to consider both when analyzing a particular policy issue.\footnote{Evidently there are issues in which the cross-effects are lesser than others.}
+
+To increase the complexity of the problem, the way in which the dynamics are unfold depend, as one would expect, on politics and henceforth political motivations of the incumbent parties.
+
+Politicias have roughly two sources of motivation: Office and Policy (Downs, 1957). Office motivated politicias follow the classical median voter theorem in which their political stand will coincide with that of the median voter. On the other hand policy motivated parties do have a particular position on the policy space that may or may not coincide with that of the median voter. The degree in which a party will be balanced between these two will depend on their expectations on the next election process, this is, the probability of re-election.
+
+As the incumbent party's probability of re-election increases, it will be benefited from a wider policy action space, allowing it to be policy motivated. On the other hand, with less a reduced decision making space, low approval levels may lead to more office motivated officials. This turns out on heterogeneous effects of domestic and international issues over political decisions across countries. The following figure illustrates these dynamics:
+
+![Figure 1: Complex Policy Making Process. The evaluation process of a particular policy decision depends, among other things, on three factors, domestic issues, international issues and the incumbent's motivation. Once a decision has been made over the two levels, these affect the factors.](../fig/complex_policy_making.pdf)
+
+In what follows we present a list of some factors, both domestic and international, relevant for the Framework Convention on Tobacco Control (FCTC).
+
+## Domestic factors
+
+a.  __Country income__ Ceteris paribus, higher income countries should have more flexibility for implememting the FCTC, so we should expect a positive relation between both. 
+
+b.  __Popularity level__ Higher popularity gives more space for implementing new policies. We should expect that countries with high popularity levels and high levels of interaction with the international community should be more willing to implement the treaty. As asserted above, popularity may also be related to the incumbents' motivation, so overall we should expect to see a higher probability of implementation associated with it.
+
+c.  __Shift in preferences__ In Grieco, Gelpi, & Warren (2009) it is shown that, under the context of Article VIII of the International Monetary Fund (IMF) Articles of Agreement, shifts in the partisan orientation--understood as national preferences--of a country due to change in office has implications on treaty compliance. They use the World Bank's Database of Political Institutions (DPI) and mark the shifts in partisanship as 0 or 1, avoiding using ordinal categories proposed by the indicator, so it can be compared across countries.
+
+d.  __Cultural Beliefs__  As in Guiso, Sapeinza and Zingales (2006) review, they argue that cultural beliefs affect economic and political outcomes. As the authors did, we can use the World Values Survey\footnote{\url{http://www.worldvaluessurvey.org/wvs.jsp} citation: WVS\_Longitudinal\_1981-2014\_rdata\_v\_2015\_04\_18. See table 3 in p. 43 where they provide evidence for the link between policy and cultural beliefs.} to control for such issues.\footnote{It is important to point out that using religion and ethnicity as instruments is not necesary in this context as, as a difference from the aformentioned paper there is no reason to believe that the implementation of the FCTC has any repercusion over culture, at least in the short term.} to account for cultural effects over the decision making process.
+
+e.  __Indistry influence__ Industry's level of presence in a country certainly affects the decision making process. Higher levels of investment may lead to higher levels of lobbying and, in some cases, higher numbers of national jobs depending on them. Closing factories has never been a popular policy, hence we expect to see negative effects from this variable. This can be measured using two sources: (1) Investemnt as proportion of the GDP and (2) Number of Jobs as a proportion of the working population.
+
+g.  __Public health__ As a proportion of deaths related to tobacco consumption, we should expect that higher levels of mortality lead to a higher probability of adoption/implementation of anti-tobacco policies. For this we use the Tobacco Atlas data from 2010 (\url{http://www.tobaccoatlas.org/topic/cigarette-use-globally/}).
+
+h. __Civil Society__ Overall, if not funded by the industry, lobbying effords from the civil society can have an important effect too. In particular, we use data from the _Bloomberg Initiative To Reduce Tobacco Use_ to control for this. We should expect higher levels of investments to be correlated with higher probability of implementing the policies.
+
+## International factors: networks
+
+In general we observe three different classes of international networks: cooperation, trading and assistance networks. While all three may have an effect on the implementation level of the FCTC, some may be more directly related than others. Since FCTC has direct relation with trading treaties, we use the trading network as the main network in our model, a brief description of the three networks follows:
+
+i.  __Trading__ with direct implicantions over prices and economic regulation, the trading network used here is a direct weighted graph built from the data collected by MIT's Observatory of Economic Complexity\footnote{http://atlas.media.mit.edu/en/}.
+
+j.  __Cooperation__ Neighboring countries are likely to share issues on, for example, their borerds, more concretely, tobacco smuggling can be one of these issues (see Yurekli et al. (2000), Joossens and Raw (1998), Stoklosa and Ross (Tobacco Control 2013) and Joossens et al (2010) for data on tobacco smuggling).
+
+l.  __International assistance__  Simmons (2000) shows evidence towards compliance been higher among countries that are exposed to higher regional compliance, in particular, higher compliance from IMF leads to higher probability of compliance for any of its member.
+
+# Methodology
+
+We assess contagion effects using ABC different country networks. Identifying
+contagion effects is not an easy thing to do ()
+
+We use a spatial autocorrelation (SAR) model especified as follows
+
+\begin{equation}
+y = X \beta + \rho W_1 y + \gamma W_2 z + \omega W_3 v + \varepsilon,\quad\varepsilon\sim N(0, I_n\sigma^2)
+\end{equation}
+
+where $X$ are the domestic factors, and $W_1$, $W_2$ and $W_3$ are the networks described in the previous section.
+
+\clearpage
+  
+ Variables
+
+* Internal factors. These can be either policy or office motivatedm in general we observe the following:
+    - Popularity level: (+) Higher popularity gives more space for implementing new policies.
+    - % of population on tobacco industries: (-) More population on that industry means less jobs, so is unpopular.
+    - Tobacco induestires investment on communities: (-) 
+    - % of deaths related to tobacco consumption: (+) Public health problem.
+    - Country income: (+) More income means more resources to implement this policies.
+    - Shift in preferences (party in the office): (-) The new party may have different priorities.
+    - Investments on programs against tobacco: (+) More influence
+    - Government spending on anti-tobacco: (+)
+    - Culture = Individualism, Western countries, etc.: (?)
+    
+* External factors:
+    - Bilateral or multilateral agreements on trading: (-) Protection of foreign industries because of agreements. e.g. not been able to raise tax levels.
+    - Cigarette smuggling network: (?) There can be contagion effects (see Yurekli et al. (2000), Joossens and Raw (1998), Stoklosa and Ross (Tobacco Control 2013) and Joossens et al (2010) for data on tobacco smuggling)
+    - Trade networks: (?) Rather than positive or negative, we expect to see contagion effects between countries. Reinforcement of behavior. Commencial treaties may reflect deeper interactions between countries.
+    - Well behave for help: It is not as easy as just following internal needs since eventually that may close more doors when asking for international cooperation such as loans.
+    
+# Other papers to review
+
+1.  Aral, Muchnik and Sarara... (2009) using matching
+2.  Bakshy, Rosenn, Marlow and Adamic (2012) compute averate treatment effects.

@@ -1,0 +1,16 @@
+*.docx
+*.tar.gz
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+
+*.pdf
+
+*.Rhistory
+*.dta
+
+*.csv
+*.rda
+*.RData
+*.rdata
