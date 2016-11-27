@@ -1,0 +1,2 @@
+[diff "odf"]
+      textconv=odt2txt
