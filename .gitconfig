@@ -1,2 +1,4 @@
+# This should be in ~/.gitconfig
+
 [diff "odf"]
       textconv=odt2txt
