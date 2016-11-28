@@ -1,0 +1,3 @@
+This data was downloaded from https://en.wikipedia.org/wiki/ISO_3166-2
+on 2016-11-28 10:18:42
+using the script -country_codes.r-
