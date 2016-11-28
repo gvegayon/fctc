@@ -64,11 +64,21 @@ for (obj in arts[-1]) {
     fctc_implementation_sums, get(obj), by=c("Party", "year"))
 }
 
+# Checking countries for which we have network data
+countries <- foreign::read.dta("data-raw/attributes_v3.dta")$countrynameun
+countries <- unique(countries)
+
+imple     <- foreign::read.dta("data-raw/imp_04142015.dta")
+countries <- unique(imple$countrynameun)
+
+countries[which(!(countries %in% fctc_implementation_sums$Party))]
+
 curdate     <- Sys.time()
 description <- "
 This dataset contains the counts of items to which a country marked 'yes' in the
 survey. It was generated using the data at -data-raw/fctc_implementation_db- and
 the script -process_implementation_csv_from_web.r-"
+
 
 save(list = c("fctc_implementation_sums", "curdate", "description"), file = 
        "data/fctc_implementation_sums.rda")
