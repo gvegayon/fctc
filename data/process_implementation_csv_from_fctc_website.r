@@ -11,6 +11,7 @@ process    <- function(x) sum(x)
 
 # Reading keys
 codes <- read.csv("data-raw/fctc_implementation_db/key.csv")
+country_codes <- read.csv("data-raw/country_codes/country_codes.csv")
 
 lvls  <- list()
 for (article in articles) {
@@ -64,14 +65,35 @@ for (obj in arts[-1]) {
     fctc_implementation_sums, get(obj), by=c("Party", "year"))
 }
 
+# Renaming
+colnames(fctc_implementation_sums)[1] <- c("country_name")
+
 # Checking countries for which we have network data
-countries <- foreign::read.dta("data-raw/attributes_v3.dta")$countrynameun
-countries <- unique(countries)
+country_codes <- read.csv("data-raw/country_codes/country_codes.csv", na.strings = NULL)
+country_codes <- subset(country_codes, select= c(-subdivision_assigned_codes))
+dat <- merge(fctc_implementation_sums,
+             country_codes, by="country_name", all.x=TRUE, all.y=FALSE)
 
-imple     <- foreign::read.dta("data-raw/imp_04142015.dta")
-countries <- unique(imple$countrynameun)
+# Not all match, so need some hand coding
+# dat[dat$country_name=="St. Kitts and Nevis",]$entry <- "KN"
+dat[dat$country_name=="Côte d'Ivoire",]$entry <- "CI"
+dat[dat$country_name=="Democratic People's Republic of Korea",]$entry <- "KP"
+dat[dat$country_name=="Republic of Korea",]$entry <- "KR"
+dat[dat$country_name=="Democratic Republic of the Congo",]$entry <- "CD"
+dat[dat$country_name=="European Union",]$entry <- "EU" # Not a country
+dat[dat$country_name=="Republic of Moldova",]$entry <- "MD"
+dat[dat$country_name=="The former Yugoslav Republic of Macedonia",]$entry <- "MK"
+dat[dat$country_name=="United Republic of Tanzania",]$entry <- "TZ"
 
-countries[which(!(countries %in% fctc_implementation_sums$Party))]
+dat[dat$country_name=="Bahrain (Kingdom of)",]$entry <- "BH"
+dat[dat$country_name=="Bolivia",]$entry <- "BO"
+dat[dat$country_name=="Iran (Islamic Republic of)",]$entry <- "IR"
+dat[dat$country_name=="Libyan Arab Jamahiriya",]$entry <- "LY"
+dat[dat$country_name=="Micronesia (Federated States of)",]$entry <- "FM"
+dat[dat$country_name=="Venezuela",]$entry <- "VE"
+dat[dat$country_name=="Czech Republic",]$entry <- "CZ"
+
+fctc_implementation_sums <- dat
 
 curdate     <- Sys.time()
 description <- "

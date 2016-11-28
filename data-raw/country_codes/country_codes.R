@@ -19,6 +19,9 @@ dat  <- rvest::html_table(site, fill=TRUE)
 # We only care about the first table
 country_codes <- dat[[1]]
 colnames(country_codes) <- c("entry", "country_name", "subdivision_assigned_codes")
+country_codes[country_codes$country_name == "Namibia",]$entry <- "NA"
+country_codes$country_name <- stringr::str_replace(country_codes$country_name,
+                                                   "\\[.+", "")
 
 # Saving the results
 write.csv(country_codes, file="data-raw/country_codes/country_codes.csv",
