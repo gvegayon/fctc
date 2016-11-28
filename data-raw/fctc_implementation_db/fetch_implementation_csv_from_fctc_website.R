@@ -11,7 +11,8 @@ library(rvest)
 library(stringr)
 
 # Parameters 
-articles <- c(5, 6, 8, 11, 13)
+articles  <- c(5, 6, 8, 11, 13)
+overwrite <- TRUE
 
 # Generic country url
 url_art_expr <- "http://apps.who.int/fctc/implementation/database/article/article-%d/reports"
@@ -55,7 +56,10 @@ for (art in articles) {
     ind  <- stringr::str_extract(urls[i], "(?<=indicators/)[0-9]+")
     fn   <- sprintf("data-raw/fctc_implementation_db/%s.csv", ind)
     
-    # if (file.exists(fn) & !overwrite)
+    if (file.exists(fn) & !overwrite) {
+      message("File ", fn, " already exists, skipping.")
+      next
+    }
     
     ind_url <- sprintf(url_ind_expr, ind)
     site <- xml2::read_html(ind_url)
@@ -65,7 +69,7 @@ for (art in articles) {
     titl <- xml2::xml_text(titl)
     
     cn  <- xml2::xml_find_all(site, '//*[@id="table-answers"]/thead')
-    cn  <- xml2::xml_text(xml2::xml_contents(cn))
+    cn  <- xml2::xml_text(xml2::xml_contents(cn), trim = TRUE)
     cn  <- cn[nchar(cn) != 0]
     dat <- rvest::html_table(site)[[1]]
     colnames(dat) <- cn
@@ -87,6 +91,6 @@ for (art in articles) {
 cat(sprintf("This dataset has been generated on %s",Sys.time()),
     "Using http://apps.who.int/fctc/implementation/database ",
     "Each file has the form -[indicator id].csv-.",
-    "Details on what does each indicator has can be found at the -key.csv- file",
+    "Details on what does each indicator has can be found at the -key.csv- file.",
     file = "data-raw/fctc_implementation_db/readme.md", sep="\n")
 
