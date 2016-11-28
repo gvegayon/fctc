@@ -1,4 +1,5 @@
 # This script gets the data from the FCTC website
+# This file is ment to be ran from the top folder of the project.
 # doing webscrapping
 
 rm(list=ls())
@@ -18,13 +19,12 @@ url_ind_expr <- "http://apps.who.int/fctc/implementation/database/sites/implemen
 
 # Container (metadata)
 INDICATORS <- structure(
-  list(id=NULL, title=NULL, art=NULL, description=NULL),
+  list(id=NULL, title=NULL, art=NULL, description=NULL, url=NULL),
   class="data.frame"
 )
 
 for (art in articles) {
   # Step 0: Generating the uri and checking if it exists or not
-  art <- 8
   url_art <- sprintf(url_art_expr, art)
   ans     <- httr::GET(url_art)
   
@@ -53,8 +53,12 @@ for (art in articles) {
   for (i in seq_along(urls)) {
     # Getting the name of the indivator
     ind  <- stringr::str_extract(urls[i], "(?<=indicators/)[0-9]+")
-    site <- sprintf(url_ind_expr, ind)
-    site <- xml2::read_html(site)
+    fn   <- sprintf("data-raw/fctc_implementation_db/%s.csv", ind)
+    
+    # if (file.exists(fn) & !overwrite)
+    
+    ind_url <- sprintf(url_ind_expr, ind)
+    site <- xml2::read_html(ind_url)
     
     # Parsing webpage
     titl <- xml2::xml_find_all(site, '//*[@id="indicator-container"]/h2')
@@ -69,13 +73,20 @@ for (art in articles) {
     # Adding name to list
     INDICATORS <- rbind(
       INDICATORS,
-      cbind(id=ind, title=titl, art=art, description=descs[i])
+      cbind(id=ind, title=titl, art=art, description=descs[i],
+            url = ind_url)
     )
     
     # Saving dataset
-    write.csv(dat, sprintf("data-raw/fctc_implementation_db/%s.csv", ind))
+    write.csv(dat, fn)
     write.csv(INDICATORS, "data-raw/fctc_implementation_db/key.csv")
     message("Indicator ",ind, " complete (", titl, ").")
   }
 }
+
+cat(sprintf("This dataset has been generated on %s",Sys.time()),
+    "Using http://apps.who.int/fctc/implementation/database ",
+    "Each file has the form -[indicator id].csv-.",
+    "Details on what does each indicator has can be found at the -key.csv- file",
+    file = "data-raw/fctc_implementation_db/readme.md", sep="\n")
 
