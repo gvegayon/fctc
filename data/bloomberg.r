@@ -76,4 +76,4 @@ dat$bloomberg_fctc_amount <- dplyr::coalesce(dat$bloomberg_fctc_amount, 0)
 
 # Saving the file --------------------------------------------------------------
 bloomberg <- dat
-save(bloomberg, file="data/bloomberg.rda")
+write.csv(bloomberg, file="data/bloomberg.csv", na="<NA>", row.names=FALSE)

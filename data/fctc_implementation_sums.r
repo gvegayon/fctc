@@ -95,12 +95,5 @@ dat[dat$country_name=="Czech Republic",]$entry <- "CZ"
 
 fctc_implementation_sums <- dat
 
-curdate     <- Sys.time()
-description <- "
-This dataset contains the counts of items to which a country marked 'yes' in the
-survey. It was generated using the data at -data-raw/fctc_implementation_db- and
-the script -process_implementation_csv_from_web.r-"
-
-
-save(list = c("fctc_implementation_sums", "curdate", "description"), file = 
-       "data/fctc_implementation_sums.rda")
+write.csv(fctc_implementation_sums, file = "data/fctc_implementation_sums.csv",
+          row.names = FALSE, na="<NA>")

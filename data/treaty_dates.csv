@@ -1,0 +1,283 @@
+"country_name","signature","ratification","acceptance","approval","formal_confirm","accession","succession","entry","subdivision_assigned_codes"
+"Afghanistan",20040629,20100813,<NA>,<NA>,<NA>,<NA>,<NA>,"AF","34 provinces"
+"Albania",20040629,20060426,<NA>,<NA>,<NA>,<NA>,<NA>,"AL","12 counties"
+"Algeria",20030620,20060630,<NA>,<NA>,<NA>,<NA>,<NA>,"DZ","48 provinces"
+"Angola",20040629,20070920,<NA>,<NA>,<NA>,<NA>,<NA>,"AO","18 provinces"
+"Antigua and Barbuda",20040628,20060605,<NA>,<NA>,<NA>,<NA>,<NA>,"AG","6 parishes
+2 dependencies"
+"Argentina",20030925,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"AR","1 city
+23 provinces"
+"Armenia",<NA>,20041129,<NA>,<NA>,<NA>,TRUE,<NA>,"AM","1 city
+10 regions"
+"Australia",20031205,20041027,<NA>,<NA>,<NA>,<NA>,<NA>,"AU","6 states
+2 territories"
+"Austria",20030828,20050915,<NA>,<NA>,<NA>,<NA>,<NA>,"AT","9 states"
+"Azerbaijan",<NA>,20051101,<NA>,<NA>,<NA>,TRUE,<NA>,"AZ","1 autonomous republic
+11 municipalities
+66 rayons"
+"Bahamas",20040629,20091103,<NA>,<NA>,<NA>,<NA>,<NA>,"BS","31 districts"
+"Bahrain",<NA>,20070320,<NA>,<NA>,<NA>,TRUE,<NA>,"BH","4 governorates"
+"Bangladesh",20030616,20040614,<NA>,<NA>,<NA>,<NA>,<NA>,"BD","7 divisions64 districts"
+"Barbados",20040628,20051103,<NA>,<NA>,<NA>,<NA>,<NA>,"BB","11 parishes"
+"Belarus",20040617,20050908,<NA>,<NA>,<NA>,<NA>,<NA>,"BY","6 oblasts
+1 city"
+"Belgium",20040122,20051101,<NA>,<NA>,<NA>,<NA>,<NA>,"BE","3 regions10 provinces"
+"Belize",20030926,20051215,<NA>,<NA>,<NA>,<NA>,<NA>,"BZ","6 districts"
+"Benin",20040618,20051103,<NA>,<NA>,<NA>,<NA>,<NA>,"BJ","12 departments"
+"Bhutan",20031209,20040823,<NA>,<NA>,<NA>,<NA>,<NA>,"BT","20 districts"
+"Bolivia, Plurinational State of",20040227,20050915,<NA>,<NA>,<NA>,<NA>,<NA>,"BO","9 departments"
+"Bosnia and Herzegovina",<NA>,20090710,<NA>,<NA>,<NA>,TRUE,<NA>,"BA","2 entities
+1 district with special status"
+"Botswana",20030616,20050131,<NA>,<NA>,<NA>,<NA>,<NA>,"BW","10 districts
+4 towns
+2 cities"
+"Brazil",20030616,20051103,<NA>,<NA>,<NA>,<NA>,<NA>,"BR","1 federal district
+26 states"
+"Brunei Darussalam",20040603,20040603,<NA>,<NA>,<NA>,<NA>,<NA>,"BN","4 districts"
+"Bulgaria",20031222,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"BG","28 regions"
+"Burkina Faso",20031222,20060731,<NA>,<NA>,<NA>,<NA>,<NA>,"BF","13 regions45 provinces"
+"Burundi",20030616,20051122,<NA>,<NA>,<NA>,<NA>,<NA>,"BI","18 provinces"
+"Cabo Verde",20040217,20051004,<NA>,<NA>,<NA>,<NA>,<NA>,"CV","2 geographical regions22 municipalities"
+"Cambodia",20040525,20051115,<NA>,<NA>,<NA>,<NA>,<NA>,"KH","1 autonomous municipality
+24 provinces"
+"Cameroon",20040513,20060203,<NA>,<NA>,<NA>,<NA>,<NA>,"CM","10 regions"
+"Canada",20030715,20041126,<NA>,<NA>,<NA>,<NA>,<NA>,"CA","10 provinces
+3 territories"
+"Central African Republic",20031229,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"CF","1 commune
+14 prefectures
+2 economic prefectures"
+"Chad",20040622,20060130,<NA>,<NA>,<NA>,<NA>,<NA>,"TD","23 regions"
+"Chile",20030925,20050613,<NA>,<NA>,<NA>,<NA>,<NA>,"CL","15 regions"
+"China",20031110,20051011,<NA>,<NA>,<NA>,<NA>,<NA>,"CN","4 municipalities
+23 provinces
+5 autonomous regions
+2 special administrative regions"
+"Colombia",<NA>,20080410,<NA>,<NA>,<NA>,TRUE,<NA>,"CO","1 capital district
+32 departments"
+"Comoros",20040227,20060124,<NA>,<NA>,<NA>,<NA>,<NA>,"KM","3 islands"
+"Congo",20040323,20070206,<NA>,<NA>,<NA>,<NA>,<NA>,"CG","12 departments"
+"Cook Islands",20040514,20040514,<NA>,<NA>,<NA>,<NA>,<NA>,"CK","—"
+"Costa Rica",20030703,20080821,<NA>,<NA>,<NA>,<NA>,<NA>,"CR","7 provinces"
+"Côte d'Ivoire",20030724,20100813,<NA>,<NA>,<NA>,<NA>,<NA>,"CI",<NA>
+"Croatia",20040602,20080714,<NA>,<NA>,<NA>,<NA>,<NA>,"HR","1 city
+20 counties"
+"Cuba",20040629,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"CU","15 provinces
+1 special municipality"
+"Cyprus",20040524,20051026,<NA>,<NA>,<NA>,<NA>,<NA>,"CY","6 districts"
+"Czechia",20030616,20120601,<NA>,<NA>,<NA>,<NA>,<NA>,"CZ","14 regions91 districts"
+"Democratic People's Republic of Korea",20030617,20050427,<NA>,<NA>,<NA>,<NA>,<NA>,"KP",<NA>
+"Democratic Republic of the Congo",20040628,20051028,<NA>,<NA>,<NA>,<NA>,<NA>,"CD",<NA>
+"Denmark",20030616,20041216,<NA>,<NA>,<NA>,<NA>,<NA>,"DK","5 regions"
+"Djibouti",20040513,20050731,<NA>,<NA>,<NA>,<NA>,<NA>,"DJ","5 regions
+1 city"
+"Dominica",20040629,20060724,<NA>,<NA>,<NA>,<NA>,<NA>,"DM","10 parishes"
+"Ecuador",20040322,20060725,<NA>,<NA>,<NA>,<NA>,<NA>,"EC","24 provinces"
+"Egypt",20030617,20050225,<NA>,<NA>,<NA>,<NA>,<NA>,"EG","27 governorates"
+"El Salvador",20040318,20140721,<NA>,<NA>,<NA>,<NA>,<NA>,"SV","14 departments"
+"Equatorial Guinea",<NA>,20050917,<NA>,<NA>,<NA>,TRUE,<NA>,"GQ","2 regions7 provinces"
+"Estonia",20040608,20050727,<NA>,<NA>,<NA>,<NA>,<NA>,"EE","15 counties"
+"Ethiopia",20040225,20140325,<NA>,<NA>,<NA>,<NA>,<NA>,"ET","2 administrations
+9 states"
+"European Union",20030616,20050630,<NA>,<NA>,TRUE,<NA>,<NA>,<NA>,<NA>
+"Fiji",20031003,20031003,<NA>,<NA>,<NA>,<NA>,<NA>,"FJ","4 divisions
+1 dependency
+14 provinces"
+"Finland",20030616,20050124,<NA>,<NA>,<NA>,<NA>,<NA>,"FI","19 regions"
+"France",20030616,20041019,<NA>,TRUE,<NA>,<NA>,<NA>,"FR","22 metropolitan regions
+5 overseas departments96 metropolitan departments1 dependency
+7 overseas territorial collectivities"
+"Gabon",20030822,20090220,<NA>,<NA>,<NA>,<NA>,<NA>,"GA","9 provinces"
+"Gambia",20030616,20070918,<NA>,<NA>,<NA>,<NA>,<NA>,"GM","1 city
+5 divisions"
+"Georgia",20040220,20060214,<NA>,<NA>,<NA>,<NA>,<NA>,"GE","2 autonomous republics
+1 city
+9 regions"
+"Germany",20031024,20041216,<NA>,<NA>,<NA>,<NA>,<NA>,"DE","16 Länder"
+"Ghana",20030620,20041129,<NA>,<NA>,<NA>,<NA>,<NA>,"GH","10 regions"
+"Greece",20030616,20060127,<NA>,<NA>,<NA>,<NA>,<NA>,"GR","13 administrative regions51 departments
+1 self-governed part"
+"Grenada",20040629,20070814,<NA>,<NA>,<NA>,<NA>,<NA>,"GD","6 parishes
+1 dependency"
+"Guatemala",20030925,20051116,<NA>,<NA>,<NA>,<NA>,<NA>,"GT","22 departments"
+"Guinea",20040401,20071107,<NA>,<NA>,<NA>,<NA>,<NA>,"GN","7 administrative regions
+1 governorate33 prefectures"
+"Guinea-Bissau",<NA>,20081107,<NA>,<NA>,<NA>,TRUE,<NA>,"GW","3 provinces1 autonomous sector
+8 regions"
+"Guyana",<NA>,20050915,<NA>,<NA>,<NA>,TRUE,<NA>,"GY","10 regions"
+"Haiti",20030723,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"HT","10 departments"
+"Honduras",20040618,20050216,<NA>,<NA>,<NA>,<NA>,<NA>,"HN","18 departments"
+"Hungary",20030616,20040407,<NA>,<NA>,<NA>,<NA>,<NA>,"HU","1 capital city
+19 counties
+23 cities of county right"
+"Iceland",20030616,20040614,<NA>,<NA>,<NA>,<NA>,<NA>,"IS","8 regions"
+"India",20030910,20040205,<NA>,<NA>,<NA>,<NA>,<NA>,"IN","29 states
+7 union territories"
+"Iran, Islamic Republic of",20030616,20051106,<NA>,<NA>,<NA>,<NA>,<NA>,"IR","31 provinces"
+"Iraq",20040629,20080317,<NA>,<NA>,<NA>,<NA>,<NA>,"IQ","18 governorates"
+"Ireland",20030916,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"IE","4 provinces26 counties"
+"Israel",20030620,20050824,<NA>,<NA>,<NA>,<NA>,<NA>,"IL","6 districts"
+"Italy",20030616,20080702,<NA>,<NA>,<NA>,<NA>,<NA>,"IT","20 regions110 provinces"
+"Jamaica",20030924,20050707,<NA>,<NA>,<NA>,<NA>,<NA>,"JM","14 parishes"
+"Japan",20040309,20040608,TRUE,<NA>,<NA>,<NA>,<NA>,"JP","47 prefectures"
+"Jordan",20040528,20040819,<NA>,<NA>,<NA>,<NA>,<NA>,"JO","12 governorates"
+"Kazakhstan",20040621,20070122,<NA>,<NA>,<NA>,<NA>,<NA>,"KZ","2 cities
+14 regions"
+"Kenya",20040625,20040625,<NA>,<NA>,<NA>,<NA>,<NA>,"KE","47 counties"
+"Kiribati",20040427,20050915,<NA>,<NA>,<NA>,<NA>,<NA>,"KI","3 groups of islands"
+"Kuwait",20030616,20060512,<NA>,<NA>,<NA>,<NA>,<NA>,"KW","6 governorates"
+"Kyrgyzstan",20040218,20060525,<NA>,<NA>,<NA>,<NA>,<NA>,"KG","2 cities
+7 regions"
+"Lao People's Democratic Republic",20040629,20060906,<NA>,<NA>,<NA>,<NA>,<NA>,"LA","1 prefecture
+17 provinces"
+"Latvia",20040510,20050210,<NA>,<NA>,<NA>,<NA>,<NA>,"LV","110 municipalities
+9 republican cities"
+"Lebanon",20040304,20051207,<NA>,<NA>,<NA>,<NA>,<NA>,"LB","8 governorates"
+"Lesotho",20040623,20050114,<NA>,<NA>,<NA>,<NA>,<NA>,"LS","10 districts"
+"Liberia",20040625,20090915,<NA>,<NA>,<NA>,<NA>,<NA>,"LR","15 counties"
+"Libya",20040618,20050607,<NA>,<NA>,<NA>,<NA>,<NA>,"LY","22 popularates"
+"Lithuania",20030922,20041216,<NA>,<NA>,<NA>,<NA>,<NA>,"LT","10 counties9 municipalities
+7 city municipalities
+44 district municipalities"
+"Luxembourg",20030616,20050630,<NA>,<NA>,<NA>,<NA>,<NA>,"LU","12 cantons"
+"Madagascar",20030924,20040922,<NA>,<NA>,<NA>,<NA>,<NA>,"MG","6 provinces"
+"Malaysia",20030923,20050916,<NA>,<NA>,<NA>,<NA>,<NA>,"MY","3 federal territories
+13 states"
+"Maldives",20040517,20040520,<NA>,<NA>,<NA>,<NA>,<NA>,"MV","7 provinces
+1 capital
+20 administrative atolls"
+"Mali",20030923,20051019,<NA>,<NA>,<NA>,<NA>,<NA>,"ML","1 district
+8 regions"
+"Malta",20030616,20030924,<NA>,<NA>,<NA>,<NA>,<NA>,"MT","68 local councils"
+"Marshall Islands",20030616,20041208,<NA>,<NA>,<NA>,<NA>,<NA>,"MH","2 chains of islands24 municipalities"
+"Mauritania",20040624,20051028,<NA>,<NA>,<NA>,<NA>,<NA>,"MR","15 regions"
+"Mauritius",20030617,20040517,<NA>,<NA>,<NA>,<NA>,<NA>,"MU","3 dependencies9 districts
+5 cities"
+"Mexico",20030812,20040528,<NA>,<NA>,<NA>,<NA>,<NA>,"MX","31 states
+1 federal district"
+"Micronesia, Federated States of",20040628,20050318,<NA>,<NA>,<NA>,<NA>,<NA>,"FM","4 states"
+"Mongolia",20030616,20040127,<NA>,<NA>,<NA>,<NA>,<NA>,"MN","1 capital city
+21 provinces"
+"Montenegro",<NA>,20061023,<NA>,<NA>,<NA>,<NA>,TRUE,"ME","23 municipalities"
+"Morocco",20040416,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"MA","16 regions46 provinces
+17 prefectures"
+"Mozambique",20030618,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"MZ","1 city
+10 provinces"
+"Myanmar",20031023,20040421,<NA>,<NA>,<NA>,<NA>,<NA>,"MM","7 regions
+7 states
+1 union territory"
+"Namibia",20040129,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"NA","14 regions"
+"Nauru",<NA>,20040629,<NA>,<NA>,<NA>,TRUE,<NA>,"NR","14 districts"
+"Nepal",20031203,20061107,<NA>,<NA>,<NA>,<NA>,<NA>,"NP","5 development regions14 zones"
+"Netherlands",20030616,20050127,TRUE,<NA>,<NA>,<NA>,<NA>,"NL","12 provinces3 countries3 special municipalities"
+"New Zealand",20030616,20040127,<NA>,<NA>,<NA>,<NA>,<NA>,"NZ","16 regions
+1 special island authority"
+"Nicaragua",20040607,20080409,<NA>,<NA>,<NA>,<NA>,<NA>,"NI","15 departments
+2 autonomous regions"
+"Niger",20040628,20050825,<NA>,<NA>,<NA>,<NA>,<NA>,"NE","1 urban community
+7 departments"
+"Nigeria",20040628,20051020,<NA>,<NA>,<NA>,<NA>,<NA>,"NG","1 capital territory
+36 states"
+"Niue",20040618,20050603,<NA>,<NA>,<NA>,<NA>,<NA>,"NU","—"
+"Norway",20030616,20030616,<NA>,TRUE,<NA>,<NA>,<NA>,"NO","19 counties2 arctic regions"
+"Oman",<NA>,20050309,<NA>,<NA>,<NA>,TRUE,<NA>,"OM","11 governorates"
+"Pakistan",20040518,20041103,<NA>,<NA>,<NA>,<NA>,<NA>,"PK","1 federal capital territory
+4 provinces
+1 territory
+2 Pakistan administered areas"
+"Palau",20030616,20040212,<NA>,<NA>,<NA>,<NA>,<NA>,"PW","16 states"
+"Panama",20030926,20040816,<NA>,<NA>,<NA>,<NA>,<NA>,"PA","10 provinces
+3 indigenous regions"
+"Papua New Guinea",20040622,20060525,<NA>,<NA>,<NA>,<NA>,<NA>,"PG","1 district
+20 provinces
+1 autonomous region"
+"Paraguay",20030616,20060926,<NA>,<NA>,<NA>,<NA>,<NA>,"PY","1 capital
+17 departments"
+"Peru",20040421,20041130,<NA>,<NA>,<NA>,<NA>,<NA>,"PE","25 regions
+1 municipality"
+"Philippines",20030923,20050606,<NA>,<NA>,<NA>,<NA>,<NA>,"PH","17 regions81 provinces"
+"Poland",20040614,20060915,<NA>,<NA>,<NA>,<NA>,<NA>,"PL","16 provinces"
+"Portugal",20040109,20051108,<NA>,TRUE,<NA>,<NA>,<NA>,"PT","18 districts
+2 autonomous regions"
+"Qatar",20030617,20040723,<NA>,<NA>,<NA>,<NA>,<NA>,"QA","7 municipalities"
+"Republic of Korea",20030721,20050516,<NA>,<NA>,<NA>,<NA>,<NA>,"KR",<NA>
+"Republic of Moldova",20040629,20090203,<NA>,<NA>,<NA>,<NA>,<NA>,"MD",<NA>
+"Romania",20040625,20060127,<NA>,<NA>,<NA>,<NA>,<NA>,"RO","41 departments
+1 municipality"
+"Russian Federation",<NA>,20080603,<NA>,<NA>,<NA>,TRUE,<NA>,"RU","21 republics
+9 administrative territories
+46 administrative regions
+2 autonomous cities
+1 autonomous region
+4 autonomous districts"
+"Rwanda",20040602,20051019,<NA>,<NA>,<NA>,<NA>,<NA>,"RW","1 town council
+4 provinces"
+"Samoa",20030925,20051103,<NA>,<NA>,<NA>,<NA>,<NA>,"WS","11 districts"
+"San Marino",20030926,20040707,<NA>,<NA>,<NA>,<NA>,<NA>,"SM","9 municipalities"
+"Sao Tome and Principe",20040618,20060412,<NA>,<NA>,<NA>,<NA>,<NA>,"ST","2 provinces"
+"Saudi Arabia",20040624,20050509,<NA>,<NA>,<NA>,<NA>,<NA>,"SA","13 provinces"
+"Senegal",20030619,20050127,<NA>,<NA>,<NA>,<NA>,<NA>,"SN","14 regions"
+"Serbia",20040628,20060208,<NA>,<NA>,<NA>,<NA>,<NA>,"RS","2 autonomous provinces1 city
+29 districts"
+"Seychelles",20030911,20031112,<NA>,<NA>,<NA>,<NA>,<NA>,"SC","25 districts"
+"Sierra Leone",<NA>,20090522,<NA>,<NA>,<NA>,TRUE,<NA>,"SL","1 area
+3 provinces"
+"Singapore",20031229,20040514,<NA>,<NA>,<NA>,<NA>,<NA>,"SG","5 districts"
+"Slovakia",20031219,20040504,<NA>,<NA>,<NA>,<NA>,<NA>,"SK","8 regions"
+"Slovenia",20030925,20050315,<NA>,<NA>,<NA>,<NA>,<NA>,"SI","211 communes"
+"Solomon Islands",20040618,20040810,<NA>,<NA>,<NA>,<NA>,<NA>,"SB","1 capital territory
+9 provinces"
+"South Africa",20030616,20050419,<NA>,<NA>,<NA>,<NA>,<NA>,"ZA","9 provinces"
+"Spain",20030616,20050111,<NA>,<NA>,<NA>,<NA>,<NA>,"ES","17 autonomous communities
+2 autonomous cities in North Africa50 provinces"
+"Sri Lanka",20030923,20031111,<NA>,<NA>,<NA>,<NA>,<NA>,"LK","9 provinces25 districts"
+"St. Kitts and Nevis",20040629,20110621,<NA>,<NA>,<NA>,<NA>,<NA>,"KN",<NA>
+"St. Lucia",20040629,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"LC",<NA>
+"St. Vincent and the Grenadines",20040614,20101029,<NA>,<NA>,<NA>,<NA>,<NA>,"VC",<NA>
+"Sudan",20040610,20051031,<NA>,<NA>,<NA>,<NA>,<NA>,"SD","18 states"
+"Suriname",20040624,20081216,<NA>,<NA>,<NA>,<NA>,<NA>,"SR","10 districts"
+"Swaziland",20040629,20060113,<NA>,<NA>,<NA>,<NA>,<NA>,"SZ","4 districts"
+"Sweden",20030616,20050707,<NA>,<NA>,<NA>,<NA>,<NA>,"SE","21 counties"
+"Switzerland",20040625,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"CH","26 cantons"
+"Syrian Arab Republic",20030711,20041122,<NA>,<NA>,<NA>,<NA>,<NA>,"SY","14 provinces"
+"Tajikistan",<NA>,20130621,<NA>,<NA>,<NA>,TRUE,<NA>,"TJ","1 autonomous region
+2 regions
+1 capital territory"
+"Thailand",20030620,20041108,<NA>,<NA>,<NA>,<NA>,<NA>,"TH","1 metropolitan administration
+1 special administrative city
+76 provinces"
+"The former Yugoslav Republic of Macedonia",<NA>,20060630,<NA>,<NA>,<NA>,TRUE,<NA>,"MK",<NA>
+"Timor-Leste",20040525,20041222,<NA>,<NA>,<NA>,<NA>,<NA>,"TL","13 districts"
+"Togo",20040512,20051115,<NA>,<NA>,<NA>,<NA>,<NA>,"TG","5 regions"
+"Tonga",20030925,20050408,<NA>,<NA>,<NA>,<NA>,<NA>,"TO","5 divisions"
+"Trinidad and Tobago",20030827,20040819,<NA>,<NA>,<NA>,<NA>,<NA>,"TT","9 regions
+5 municipalities
+1 ward"
+"Tunisia",20030822,20100607,<NA>,<NA>,<NA>,<NA>,<NA>,"TN","24 governorates"
+"Turkey",20040428,20041231,<NA>,<NA>,<NA>,<NA>,<NA>,"TR","81 provinces"
+"Turkmenistan",<NA>,20110513,<NA>,<NA>,<NA>,TRUE,<NA>,"TM","5 regions
+1 city"
+"Tuvalu",20040610,20050926,<NA>,<NA>,<NA>,<NA>,<NA>,"TV","1 town council
+7 island councils"
+"Uganda",20040305,20070620,<NA>,<NA>,<NA>,<NA>,<NA>,"UG","4 geographical regions111 districts
+1 city"
+"Ukraine",20040625,20060606,<NA>,<NA>,<NA>,<NA>,<NA>,"UA","24 regions
+1 republic
+2 cities"
+"United Arab Emirates",20040624,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"AE","7 emirates"
+"United Kingdom of Great Britain and Northern Ireland",20030616,20041216,<NA>,<NA>,<NA>,<NA>,<NA>,"GB",<NA>
+"United Republic of Tanzania",20040127,20070430,<NA>,<NA>,<NA>,<NA>,<NA>,"TZ",<NA>
+"United States of America",20040510,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"US",<NA>
+"Uruguay",20030619,20040909,<NA>,<NA>,<NA>,<NA>,<NA>,"UY","19 departments"
+"Uzbekistan",<NA>,20120515,<NA>,<NA>,<NA>,TRUE,<NA>,"UZ","1 city
+12 regions
+1 republic"
+"Vanuatu",20040422,20050916,<NA>,<NA>,<NA>,<NA>,<NA>,"VU","6 provinces"
+"Venezuela, Bolivarian Republic of",20030922,20060627,<NA>,<NA>,<NA>,<NA>,<NA>,"VE","1 federal dependency
+1 federal district
+23 states"
+"Viet Nam",20030903,20041217,<NA>,<NA>,<NA>,<NA>,<NA>,"VN","58 provinces
+5 municipalities"
+"Yemen",20030620,20070222,<NA>,<NA>,<NA>,<NA>,<NA>,"YE","1 municipality
+21 governorates"
+"Zambia",<NA>,20080523,<NA>,<NA>,<NA>,TRUE,<NA>,"ZM","10 provinces"
+"Zimbabwe",<NA>,20141204,<NA>,<NA>,<NA>,TRUE,<NA>,"ZW","10 provinces"

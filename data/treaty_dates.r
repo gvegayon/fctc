@@ -54,18 +54,19 @@ dat[dat$country_name=="Côte d'Ivoire",]$entry <- "CI"
 dat[dat$country_name=="Democratic People's Republic of Korea",]$entry <- "KP"
 dat[dat$country_name=="Republic of Korea",]$entry <- "KR"
 dat[dat$country_name=="Democratic Republic of the Congo",]$entry <- "CD"
-dat[dat$country_name=="European Union",]$entry <- "EU" # Not a country
+# dat[dat$country_name=="European Union",]$entry <- "EU" 
 dat[dat$country_name=="Republic of Moldova",]$entry <- "MD"
 dat[dat$country_name=="St. Lucia",]$entry <- "LC"
 dat[dat$country_name=="St. Vincent and the Grenadines",]$entry <- "VC"
 dat[dat$country_name=="The former Yugoslav Republic of Macedonia",]$entry <- "MK"
-dat[dat$country_name=="United Kingdom of Great Britain and Northern Ireland",]$entry <- "UK"
+dat[dat$country_name=="United Kingdom of Great Britain and Northern Ireland",]$entry <- "GB"
 dat[dat$country_name=="United Republic of Tanzania",]$entry <- "TZ"
 dat[dat$country_name=="United States of America",]$entry <- "US"
 
 # Saving
 dat <- dat[order(dat$country_name),]
 treaty_dates <- dat
-save(treaty_dates, file = "data/treaty_dates.rda")
+write.csv(treaty_dates, file = "data/treaty_dates.csv", row.names = FALSE,
+          na = "<NA>")
 
 

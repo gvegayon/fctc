@@ -80,14 +80,14 @@ dat <- dat[with(dat, order(entry, year)),]
 dat$execrlc[dat$execrlc==-999] <- NA
 
 # Merging with treaty dates ----------------------------------------------------
-treaty_dates <- load("data/treaty_dates.rda", verbose = TRUE)
+treaty_dates <- read.csv("data/treaty_dates.csv", na="<NA>")
 treaty_dates$year_ratification <- treaty_dates$ratification %/% 10000
 treaty_dates$year_signature    <- treaty_dates$signature %/% 10000
 
 treaty_dates <- subset(
   treaty_dates, select = c(entry, year_ratification, year_signature))
 
-dat <- merge(dat, treaty_dates, by=c("entry"), all.x=TRUE, all.y = FALSE)
+dat <- merge(dat, treaty_dates, by=c("entry"), all.x=TRUE, all.y = TRUE)
 
 # Creating the political shift variable ----------------------------------------
 # Recall that 1, 2, 3 means left, center, and right. A zero has to do with
@@ -121,4 +121,5 @@ rownames(dat) <- NULL
 dat <- dat[with(dat, order(entry, year)),]
 
 political_shifts <- dat
-save(political_shifts, file="data/political_shifts.rda")
+write.csv(political_shifts, file="data/political_shifts.csv", na="<NA>",
+          row.names = FALSE)

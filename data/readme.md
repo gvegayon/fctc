@@ -20,3 +20,9 @@ following files:
   by the Bloomberg initiative, by country/year. Includes projects especifically
   developed to contribute to the implementation of the FCTC.
 
+All CSV files have NA values represented by <NA>, so, in order to import these
+into R (for example) the user should use the command
+
+```r
+read.csv("file.csv", na="<NA>")
+```
