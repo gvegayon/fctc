@@ -93,7 +93,5 @@ dat[dat$country_name=="Micronesia (Federated States of)",]$entry <- "FM"
 dat[dat$country_name=="Venezuela",]$entry <- "VE"
 dat[dat$country_name=="Czech Republic",]$entry <- "CZ"
 
-fctc_implementation_sums <- dat
-
-write.csv(fctc_implementation_sums, file = "data/fctc_implementation_sums.csv",
+write.csv(dat, file = "data/implementation.csv",
           row.names = FALSE, na="<NA>")

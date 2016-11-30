@@ -1,7 +1,14 @@
 # Processed data
 
-In this folder we store processed data (so no raw anymore). So far, we have the
-following files:
+In this folder we store processed data (so no raw anymore). All CSV files have NA
+values represented by <NA>, so, in order to import these into R (for example) the
+user should use the command.
+
+```r
+read.csv("file.csv", na="<NA>")
+```
+
+So far, we have the following datasets:
 
 * `treaty_dates`: A data frame with 'signature' and 'ratification' dates per party.
 
@@ -12,7 +19,7 @@ following files:
 * `party_attributes`: A data frame with information on GDP, membership, tobacco
   prod, tobacco mortality, etc. per member.
 
-* `fctc_implementation_sums`: Using the implementation data published online
+* `implementation`: Using the implementation data published online
   at the FCTC website, this generates a data frame with counts of how many 
   points have been implemented per country/year for articles 5, 6, 8, 11, and 13.
 
@@ -20,9 +27,11 @@ following files:
   by the Bloomberg initiative, by country/year. Includes projects especifically
   developed to contribute to the implementation of the FCTC.
 
-All CSV files have NA values represented by <NA>, so, in order to import these
-into R (for example) the user should use the command
+The following datasets depend on the previous ones to be built:
 
-```r
-read.csv("file.csv", na="<NA>")
-```
+* `model_data`: A data frame that is the merge between `party_attributes`, `political_shifts`,
+  `implementation`, and `bloomberg`.
+  
+* `adjmat`: Holds `dgCMatrix` objects (sparse matrices), and depends on
+  `party_attributes`.
+  
