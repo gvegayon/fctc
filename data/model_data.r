@@ -1,3 +1,5 @@
+# This file creates the final dataset that will be used to run the models
+# the network data is in a separate file called data/adjmats.rda.
 
 rm(list=ls())
 options(stringsAsFactors=FALSE)

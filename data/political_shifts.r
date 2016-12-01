@@ -28,7 +28,7 @@ country_codes <- subset(country_codes, select=c(-subdivision_assigned_codes))
 dat <- merge(dat, country_codes, by="country_name", all.x=TRUE, all.y = FALSE)
 
 # Manual coding
-dat[dat$country_name=="Yugoslavia", "entry"] <- "MK"
+# dat[dat$country_name=="Yugoslavia", "entry"] <- "MK" Not relevant for the study
 # dat[dat$country_name=="Yemen (PDR)", "entry"] <- Not relevant for our study
 # dat[dat$country_name=="Yemen (AR)", "entry"] <- Not relevant for our study
 dat[dat$country_name=="Vietnam", "entry"] <- "VN"

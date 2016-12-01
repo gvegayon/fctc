@@ -1,15 +1,17 @@
-# Data preprocessing
-#
-# Datasets included (/data-raw):
-# - implementation: Panel dataset with implementation measurements based on articles
-#   of the FCTC.
-# - edgelist: Collection of different networks (some dynamic).
-# - countries: Panel dataset with country covariates.
-# - implementation_key: Varnames in implementation
+# This script creates the adjacency matrices that will be used in the paper
 
-# 0. Cleaning working space and loading packages -------------------------------
+# Cleaning working space and loading packages ----------------------------------
 rm(list = ls())
 options(stringsAsFactors=FALSE)
+
+networks_to_use <- c(
+  # Trading networks
+  "General Trade", "Tobacco Trade", "Bilateral Investment Treaties",
+  # Co-suscription
+  "FCTC INB co-participation (two-mode)","FCTC COP co-participation (two-mode)",
+  # Smuggling
+  "Distance (static)"
+)
 
 library(foreign)
 library(netdiffuseR)
@@ -47,14 +49,6 @@ edgelist$value[is.na(edgelist$value)] <- 1
 edgelist <- edgelist[with(edgelist, order(year, relation)),]
 
 # Creating adjacency matrices --------------------------------------------------
-networks_to_use <- c(
-  # Trading networks
-  "General Trade", "Tobacco Trade", "Bilateral Investment Treaties",
-  # Co-suscription
-  "FCTC INB co-participation (two-mode)","FCTC COP co-participation (two-mode)",
-  # Smuggling
-  "Distance (static)"
-)
 
 # Creating diffnetobjects
 networks        <- vector("list", length(networks_to_use))
