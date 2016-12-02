@@ -1,0 +1,947 @@
+"","ego","alter","value"
+"3","Afghanistan","People's Republic of China",76
+"4","Afghanistan","Iran",936
+"5","Afghanistan","Pakistan",2430
+"6","Afghanistan","Tajikistan",1206
+"7","Afghanistan","Turkmenistan",744
+"8","Afghanistan","Uzbekistan",137
+"10","Albania","Greece",282
+"11","Albania","Kosovo",112
+"12","Albania","Macedonia",151
+"13","Albania","Montenegro",172
+"14","Algeria","Libya",982
+"15","Algeria","Mali",1376
+"16","Algeria","Mauritania",463
+"17","Algeria","Morocco",1559
+"18","Algeria","Niger",956
+"19","Algeria","Tunisia",965
+"20","Algeria","Western Sahara",42
+"21","Andorra","France",56.6
+"22","Andorra","Spain",63.7
+"23","Angola","Democratic Republic of the Congo",2511
+"24","Angola","Republic of the Congo",201
+"25","Angola","Namibia",1376
+"26","Angola","Zambia",1110
+"28","Antártica Chilena Province (Chile)","Argentina",0
+"30","Antártica Chilena Province (Chile)","United Kingdom",0
+"31","Argentina","Bolivia",832
+"32","Argentina","Brazil",1224
+"33","Argentina","Chile",5300
+"34","Argentina","Paraguay",1880
+"35","Argentina","Uruguay",579
+"36","Armenia","Azerbaijan",787
+"37","Armenia","Georgia",164
+"38","Armenia","Iran",35
+"39","Armenia","Turkey",268
+"42","Australian Antarctic Territory (Australia)","France",0
+"44","Australian Antarctic Territory (Australia)","Norway",0
+"47","Austria","Czech Republic",362
+"48","Austria","Germany",784
+"49","Austria","Hungary",366
+"50","Austria","Italy",430
+"51","Austria","Liechtenstein",35
+"52","Austria","Slovakia",91
+"53","Austria","Slovenia",330
+"54","Austria","Switzerland",164
+"55","Azerbaijan","Armenia",787
+"56","Azerbaijan","Georgia",322
+"57","Azerbaijan","Iran",432
+"58","Azerbaijan","Russia",284
+"59","Azerbaijan","Turkey",9
+"60","Bangladesh","India",4053
+"61","Bangladesh","Myanmar",193
+"62","Belarus","Latvia",141
+"63","Belarus","Lithuania",502
+"64","Belarus","Poland",407
+"65","Belarus","Russia",959
+"66","Belarus","Ukraine",891
+"67","Belgium","France",620
+"68","Belgium","Germany",167
+"69","Belgium","Luxembourg",148
+"70","Belgium","Netherlands",450
+"71","Belize","Guatemala",266
+"72","Belize","Mexico",250
+"73","Benin","Burkina Faso",306
+"74","Benin","Niger",266
+"75","Benin","Nigeria",773
+"76","Benin","Togo",644
+"77","Bhutan","People's Republic of China",470
+"78","Bhutan","India",605
+"79","Bolivia","Argentina",832
+"80","Bolivia","Brazil",3400
+"81","Bolivia","Chile",861
+"82","Bolivia","Paraguay",750
+"83","Bolivia","Peru",900
+"84","Bosnia and Herzegovina","Croatia",932
+"85","Bosnia and Herzegovina","Montenegro",225
+"86","Bosnia and Herzegovina","Serbia",302
+"87","Botswana","Namibia",1360
+"88","Botswana","South Africa",1840
+"89","Botswana","Zambia",0.15
+"90","Botswana","Zimbabwe",813
+"91","Brazil","Argentina",1224
+"92","Brazil","Bolivia",3400
+"93","Brazil","Colombia",1643
+"95","Brazil","France",0
+"97","Brazil","Guyana",1119
+"98","Brazil","Paraguay",1290
+"99","Brazil","Peru",1560
+"100","Brazil","Suriname",597
+"101","Brazil","Uruguay",985
+"102","Brazil","Venezuela",2200
+"105","British Antarctic Territory (United Kingdom)","Chile",0
+"107","British Antarctic Territory (United Kingdom)","Argentina",0
+"109","British Antarctic Territory (United Kingdom)","Norway",0
+"110","Brunei","Malaysia",381
+"111","Bulgaria","Greece",494
+"112","Bulgaria","Macedonia",148
+"113","Bulgaria","Romania",608
+"114","Bulgaria","Serbia",318
+"115","Bulgaria","Turkey",240
+"116","Burkina Faso","Benin",306
+"119","Burkina Faso","Ghana",549
+"120","Burkina Faso","Mali",1000
+"121","Burkina Faso","Niger",628
+"122","Burkina Faso","Togo",126
+"123","Burundi","Democratic Republic of the Congo",233
+"124","Burundi","Rwanda",290
+"125","Burundi","Tanzania",451
+"126","Cambodia","Laos",541
+"127","Cambodia","Thailand",803
+"128","Cambodia","Vietnam",1228
+"129","Cameroon","Central African Republic",797
+"130","Cameroon","Chad",1094
+"131","Cameroon","Republic of the Congo",523
+"132","Cameroon","Equatorial Guinea",189
+"133","Cameroon","Gabon",298
+"134","Cameroon","Nigeria",1690
+"135","Canada","United States",8893
+"136","Central African Republic","Cameroon",797
+"137","Central African Republic","Chad",1197
+"138","Central African Republic","Democratic Republic of the Congo",1577
+"139","Central African Republic","Republic of the Congo",467
+"140","Central African Republic","South Sudan",682
+"141","Central African Republic","Sudan",483
+"142","Chad","Cameroon",1094
+"143","Chad","Central African Republic",1197
+"144","Chad","Libya",1055
+"145","Chad","Niger",1175
+"146","Chad","Nigeria",87
+"147","Chad","Sudan",1360
+"148","Chile","Argentina",5300
+"149","Chile","Bolivia",861
+"150","Chile","Peru",160
+"151","People's Republic of China","Afghanistan",76
+"152","People's Republic of China","Bhutan",470
+"156","People's Republic of China","India",3380
+"157","People's Republic of China","Kazakhstan",1533
+"158","People's Republic of China","North Korea",1416
+"159","People's Republic of China","Kyrgyzstan",858
+"160","People's Republic of China","Laos",423
+"164","People's Republic of China","Mongolia",4677
+"165","People's Republic of China","Myanmar",2185
+"166","People's Republic of China","Nepal",1236
+"167","People's Republic of China","Pakistan",523
+"168","People's Republic of China","Russia",3645
+"169","People's Republic of China","Tajikistan",414
+"170","People's Republic of China","Vietnam",1281
+"171","Colombia","Brazil",1643
+"172","Colombia","Ecuador",590
+"173","Colombia","Panama",225
+"174","Colombia","Peru",1496
+"175","Colombia","Venezuela",2050
+"176","Democratic Republic of the Congo","Angola",2511
+"177","Democratic Republic of the Congo","Burundi",233
+"178","Democratic Republic of the Congo","Central African Republic",1577
+"179","Democratic Republic of the Congo","Republic of the Congo",2410
+"180","Democratic Republic of the Congo","Rwanda",217
+"181","Democratic Republic of the Congo","South Sudan",628
+"182","Democratic Republic of the Congo","Tanzania",459
+"183","Democratic Republic of the Congo","Uganda",765
+"184","Democratic Republic of the Congo","Zambia",1930
+"185","Republic of the Congo","Angola",201
+"186","Republic of the Congo","Cameroon",523
+"187","Republic of the Congo","Central African Republic",467
+"188","Republic of the Congo","Democratic Republic of the Congo",2410
+"189","Republic of the Congo","Gabon",1903
+"190","Costa Rica","Nicaragua",309
+"191","Costa Rica","Panama",330
+"192","Côte d'Ivoire","Burkina Faso",584
+"193","Côte d'Ivoire","Ghana",668
+"194","Côte d'Ivoire","Guinea",610
+"195","Côte d'Ivoire","Liberia",716
+"196","Côte d'Ivoire","Mali",532
+"197","Croatia","Bosnia and Herzegovina",932
+"198","Croatia","Hungary",329
+"199","Croatia","Montenegro",25
+"200","Croatia","Serbia",241
+"201","Croatia","Slovenia",670
+"203","Cyprus","United Kingdom",0
+"205","Northern Cyprus","United Kingdom",0
+"206","Northern Cyprus","Cyprus",0
+"207","Czech Republic","Austria",362
+"208","Czech Republic","Germany",815
+"209","Czech Republic","Poland",658
+"210","Czech Republic","Slovakia",215
+"211","Denmark","Germany",68
+"212","Djibouti","Eritrea",109
+"213","Djibouti","Ethiopia",349
+"214","Djibouti","Somalia",58
+"215","Dominican Republic","Haiti",360
+"216","East Timor","Indonesia",228
+"217","Ecuador","Colombia",590
+"218","Ecuador","Peru",1420
+"222","Egypt","Israel",266
+"223","Egypt","Libya",1115
+"224","Egypt","Sudan",1273
+"225","El Salvador","Guatemala",203
+"226","El Salvador","Honduras",342
+"227","Equatorial Guinea","Cameroon",189
+"228","Equatorial Guinea","Gabon",350
+"229","Eritrea","Djibouti",109
+"230","Eritrea","Ethiopia",912
+"231","Eritrea","Sudan",605
+"232","Estonia","Latvia",339
+"233","Estonia","Russia",294
+"234","Ethiopia","Djibouti",349
+"235","Ethiopia","Eritrea",912
+"236","Ethiopia","Kenya",861
+"237","Ethiopia","Somalia",1600
+"238","Ethiopia","South Sudan",883
+"239","Ethiopia","Sudan",723
+"240","European Union","Albania",282
+"241","European Union","Andorra",120.3
+"242","European Union","Belarus",1050
+"243","European Union","Bosnia and Herzegovina",932
+"244","European Union","Brazil",673
+"245","European Union","Liechtenstein",34.9
+"246","European Union","Macedonia",394
+"247","European Union","Moldova",450
+"248","European Union","Monaco",4.4
+"249","European Union","Montenegro",25
+"250","European Union","Morocco",16
+"251","European Union","Norway",2348
+"252","European Union","Russia",2257
+"253","European Union","San Marino",39
+"254","European Union","Serbia",1186
+"255","European Union","Suriname",510
+"256","European Union","Switzerland",1811
+"257","European Union","Turkey",446
+"258","European Union","Ukraine",1257
+"259","European Union","Vatican City",3.2
+"260","Finland","Norway",736
+"261","Finland","Sweden",614
+"262","Finland","Russia",1340
+"263","France","Andorra",56.6
+"264","France","Belgium",620
+"265","France","Germany",451
+"266","France","Italy",488
+"267","France","Luxembourg",73
+"268","France","Monaco",4.4
+"269","France","Spain",623
+"270","France","Switzerland",573
+"271","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Andorra",56.6
+"272","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Belgium",620
+"273","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Brazil",673
+"274","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Germany",451
+"275","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Italy",488
+"276","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Luxembourg",73
+"277","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Monaco",4.4
+"279","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Netherlands",0
+"281","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Spain",623
+"282","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Suriname",510
+"283","France (including French overseas departments, collectivities, and territories)
+
+→includes: 
+→ Clipperton Island
+→ French Guiana
+→ French Polynesia
+→ French Southern and Antarctic Lands
+→ Guadeloupe
+→ Martinique
+→ Mayotte
+→ New Caledonia
+→ Réunion
+→ Saint Barthélemy
+→ Saint Martin
+→ Saint Pierre and Miquelon
+→ Wallis and Futuna","Switzerland",573
+"284","French Guiana (France)","Brazil",673
+"285","French Guiana (France)","Suriname",510
+"286","Gabon","Cameroon",298
+"287","Gabon","Republic of the Congo",1903
+"288","Gabon","Equatorial Guinea",350
+"289","The Gambia","Senegal",740
+"290","Gaza Strip (Palestinian territories)","Egypt",11
+"291","Gaza Strip (Palestinian territories)","Israel",51
+"292","Georgia","Armenia",164
+"293","Georgia","Azerbaijan",322
+"294","Georgia","Russia",723
+"295","Georgia","Turkey",252
+"296","Germany","Austria",784
+"297","Germany","Belgium",167
+"298","Germany","Czech Republic",815
+"299","Germany","Denmark",68
+"300","Germany","France",451
+"301","Germany","Luxembourg",138
+"302","Germany","Netherlands",577
+"303","Germany","Poland",456
+"304","Germany","Switzerland",334
+"305","Ghana","Burkina Faso",549
+"308","Ghana","Togo",877
+"309","Gibraltar (United Kingdom)","Spain",1.2
+"310","Greece","Albania",282
+"311","Greece","Bulgaria",494
+"312","Greece","Turkey",206
+"313","Greece","Macedonia",246
+"314","Guatemala","Belize",266
+"315","Guatemala","El Salvador",203
+"316","Guatemala","Honduras",256
+"317","Guatemala","Mexico",962
+"320","Guinea","Guinea",0
+"322","Guinea","Liberia",563
+"323","Guinea","Mali",858
+"324","Guinea","Senegal",330
+"325","Guinea","Sierra Leone",652
+"326","Guinea-Bissau","Guinea",386
+"327","Guinea-Bissau","Senegal",338
+"328","Guyana","Brazil",1119
+"329","Guyana","Suriname",600
+"330","Guyana","Venezuela",743
+"331","Haiti","Dominican Republic",360
+"332","Honduras","Guatemala",256
+"333","Honduras","El Salvador",342
+"334","Honduras","Nicaragua",922
+"335","Hong Kong (People's Republic of China)","People's Republic of China",30
+"336","Hungary","Austria",366
+"337","Hungary","Croatia",329
+"338","Hungary","Romania",443
+"339","Hungary","Serbia",151
+"340","Hungary","Slovakia",677
+"341","Hungary","Slovenia",102
+"342","Hungary","Ukraine",103
+"343","India","Bangladesh",4053
+"344","India","Bhutan",605
+"345","India","People's Republic of China",3380
+"346","India","Myanmar",1463
+"347","India","Nepal",1690
+"348","India","Pakistan",2912
+"349","India","Sri Lanka",0.1
+"350","Indonesia","East Timor",228
+"351","Indonesia","Malaysia",1782
+"352","Indonesia","Papua New Guinea",820
+"353","Iran","Afghanistan",936
+"354","Iran","Armenia",35
+"355","Iran","Azerbaijan",432
+"356","Iran","Iraq",1458
+"357","Iran","Pakistan",909
+"358","Iran","Turkey",499
+"359","Iran","Turkmenistan",992
+"360","Iraq","Iran",1458
+"361","Iraq","Jordan",181
+"362","Iraq","Kuwait",240
+"363","Iraq","Saudi Arabia",814
+"364","Iraq","Syria",605
+"365","Iraq","Turkey",352
+"366","Ireland","United Kingdom",360
+"367","Israel","Egypt",266
+"371","Israel","Jordan",238
+"372","Israel","Lebanon",79
+"373","Israel","Syria",76
+"377","Italy","Austria",430
+"378","Italy","France",488
+"379","Italy","San Marino",39
+"380","Italy","Slovenia",232
+"381","Italy","Switzerland",740
+"382","Italy","Vatican City",3.2
+"383","Jordan","Iraq",181
+"384","Jordan","Israel",238
+"385","Jordan","Saudi Arabia",744
+"386","Jordan","Syria",375
+"390","Kazakhstan","People's Republic of China",1533
+"391","Kazakhstan","Kyrgyzstan",1051
+"392","Kazakhstan","Russia",6846
+"393","Kazakhstan","Turkmenistan",379
+"394","Kazakhstan","Uzbekistan",2203
+"395","Kenya","Ethiopia",861
+"396","Kenya","Somalia",682
+"397","Kenya","South Sudan",232
+"398","Kenya","Tanzania",769
+"399","Kenya","Uganda",933
+"400","North Korea","People's Republic of China",1416
+"401","North Korea","South Korea",238
+"402","North Korea","Russia",19
+"403","South Korea","North Korea",238
+"404","Kosovo","Albania",112
+"405","Kosovo","Macedonia",159
+"406","Kosovo","Montenegro",79
+"407","Kosovo","Serbia",352
+"408","Kuwait","Iraq",240
+"409","Kuwait","Saudi Arabia",222
+"410","Kyrgyzstan","People's Republic of China",858
+"411","Kyrgyzstan","Kazakhstan",1051
+"412","Kyrgyzstan","Tajikistan",870
+"413","Kyrgyzstan","Uzbekistan",1099
+"414","Laos","Cambodia",541
+"415","Laos","People's Republic of China",423
+"416","Laos","Myanmar",235
+"417","Laos","Thailand",1754
+"418","Laos","Vietnam",2130
+"419","Latvia","Belarus",141
+"420","Latvia","Estonia",339
+"421","Latvia","Lithuania",453
+"422","Latvia","Russia",217
+"423","Lebanon","Israel",79
+"424","Lebanon","Syria",375
+"425","Lesotho","South Africa",909
+"426","Liberia","Guinea",563
+"429","Liberia","Sierra Leone",306
+"430","Libya","Algeria",982
+"431","Libya","Chad",1055
+"432","Libya","Egypt",1115
+"433","Libya","Niger",354
+"434","Libya","Sudan",383
+"435","Libya","Tunisia",459
+"436","Liechtenstein","Austria",34.9
+"437","Liechtenstein","Switzerland",41.1
+"438","Lithuania","Belarus",502
+"439","Lithuania","Latvia",453
+"440","Lithuania","Poland",91
+"441","Lithuania","Russia",227
+"442","Luxembourg","Belgium",148
+"443","Luxembourg","France",73
+"444","Luxembourg","Germany",138
+"445","Macau (People's Republic of China)","People's Republic of China",0.34
+"446","Macedonia","Albania",151
+"447","Macedonia","Bulgaria",148
+"448","Macedonia","Greece",246
+"449","Macedonia","Kosovo",159
+"450","Macedonia","Serbia",62
+"451","Malawi","Mozambique",1569
+"452","Malawi","Tanzania",475
+"453","Malawi","Zambia",837
+"454","Malaysia","Brunei",381
+"455","Malaysia","Indonesia",1782
+"456","Malaysia","Thailand",506
+"457","Mali","Algeria",1376
+"458","Mali","Burkina Faso",1000
+"461","Mali","Guinea",858
+"462","Mali","Mauritania",2237
+"463","Mali","Niger",821
+"464","Mali","Senegal",419
+"465","Mauritania","Algeria",463
+"466","Mauritania","Mali",2237
+"467","Mauritania","Senegal",813
+"468","Mauritania","Western Sahara",1561
+"469","Mexico","Belize",250
+"470","Mexico","Guatemala",962
+"471","Mexico","United States",3141
+"472","Moldova","Romania",450
+"473","Moldova","Ukraine",939
+"474","Monaco","France",4.4
+"475","Mongolia","People's Republic of China",4677
+"476","Mongolia","Russia",3485
+"477","Montenegro","Albania",172
+"478","Montenegro","Bosnia and Herzegovina",225
+"479","Montenegro","Croatia",25
+"480","Montenegro","Kosovo",79
+"481","Montenegro","Serbia",124
+"482","Morocco","Algeria",1559
+"483","Morocco","Western Sahara",443
+"484","Morocco","Spain",17
+"485","Mozambique","Malawi",1569
+"486","Mozambique","South Africa",491
+"487","Mozambique","Swaziland",105
+"488","Mozambique","Tanzania",756
+"489","Mozambique","Zambia",419
+"490","Mozambique","Zimbabwe",1231
+"491","Myanmar","Bangladesh",193
+"492","Myanmar","People's Republic of China",2185
+"493","Myanmar","India",1463
+"494","Myanmar","Laos",235
+"495","Myanmar","Thailand",1800
+"496","Nagorno-Karabakh Republic","Armenia",0
+"497","Nagorno-Karabakh Republic","Azerbaijan",0
+"498","Nagorno-Karabakh Republic","Iran",0
+"499","Namibia","Angola",1376
+"500","Namibia","Botswana",1360
+"501","Namibia","South Africa",967
+"502","Namibia","Zambia",233
+"503","Nepal","People's Republic of China",1236
+"504","Nepal","India",1690
+"505","Netherlands","Belgium",450
+"506","Netherlands","Germany",577
+"507","Netherlands, Kingdom of the
+
+→includes: 
+→ Aruba
+→ Curaçao
+→ Netherlands (including Caribbean Netherlands)
+→ Sint Maarten","Belgium",450
+"508","Netherlands, Kingdom of the
+
+→includes: 
+→ Aruba
+→ Curaçao
+→ Netherlands (including Caribbean Netherlands)
+→ Sint Maarten","Germany",577
+"509","Netherlands, Kingdom of the
+
+→includes: 
+→ Aruba
+→ Curaçao
+→ Netherlands (including Caribbean Netherlands)
+→ Sint Maarten","Saint Martin",0
+"510","Netherlands, Kingdom of the
+
+→includes: 
+→ Aruba
+→ Curaçao
+→ Netherlands (including Caribbean Netherlands)
+→ Sint Maarten","France",0
+"512","Nicaragua","Costa Rica",309
+"513","Nicaragua","Honduras",922
+"514","Niger","Algeria",956
+"515","Niger","Benin",266
+"516","Niger","Burkina Faso",628
+"517","Niger","Chad",1175
+"518","Niger","Libya",354
+"519","Niger","Mali",821
+"520","Niger","Nigeria",1497
+"521","Nigeria","Benin",773
+"522","Nigeria","Cameroon",1690
+"523","Nigeria","Chad",87
+"524","Nigeria","Niger",1497
+"525","Norway","Finland",736
+"526","Norway","Sweden",1619
+"527","Norway","Russia",196
+"528","Oman","Saudi Arabia",676
+"529","Oman","United Arab Emirates",410
+"530","Oman","Yemen",288
+"531","Pakistan","Afghanistan",2430
+"532","Pakistan","People's Republic of China",523
+"533","Pakistan","India",2912
+"534","Pakistan","Iran",909
+"535","Palestine","Egypt",11
+"536","Palestine","Israel",358
+"537","Palestine","Jordan",97
+"538","Panama","Colombia",225
+"539","Panama","Costa Rica",330
+"540","Papua New Guinea","Indonesia",820
+"541","Paraguay","Argentina",1880
+"542","Paraguay","Bolivia",750
+"543","Paraguay","Brazil",1290
+"544","Peru","Bolivia",900
+"545","Peru","Brazil",1560
+"546","Peru","Chile",160
+"547","Peru","Colombia",1496
+"548","Peru","Ecuador",1420
+"549","Poland","Belarus",407
+"550","Poland","Czech Republic",658
+"551","Poland","Germany",456
+"552","Poland","Lithuania",91
+"553","Poland","Russia",206
+"554","Poland","Slovakia",444
+"555","Poland","Ukraine",526
+"556","Portugal","Spain",1214
+"557","Qatar","Saudi Arabia",60
+"558","Qatar","United Arab Emirates",19
+"562","Queen Maud Land (Norway)","United Kingdom",0
+"563","Romania","Bulgaria",608
+"564","Romania","Hungary",443
+"565","Romania","Moldova",450
+"566","Romania","Serbia",476
+"567","Romania","Ukraine",531
+"570","Russia","Azerbaijan",284
+"571","Russia","Belarus",959
+"572","Russia","People's Republic of China",3645
+"573","Russia","Estonia",294
+"574","Russia","Finland",1340
+"575","Russia","Georgia",723
+"576","Russia","Kazakhstan",6846
+"577","Russia","North Korea",19
+"578","Russia","Latvia",217
+"579","Russia","Lithuania",227
+"580","Russia","Mongolia",3485
+"581","Russia","Norway",196
+"582","Russia","Poland",206
+"583","Russia","Ukraine",1576
+"584","Rwanda","Burundi",290
+"585","Rwanda","Democratic Republic of the Congo",217
+"586","Rwanda","Tanzania",217
+"587","Rwanda","Uganda",169
+"589","Saint Martin","Netherlands",0
+"591","San Marino","Italy",39
+"592","Saudi Arabia","Iraq",814
+"593","Saudi Arabia","Jordan",744
+"594","Saudi Arabia","Kuwait",222
+"595","Saudi Arabia","Oman",676
+"596","Saudi Arabia","Qatar",60
+"597","Saudi Arabia","United Arab Emirates",457
+"598","Saudi Arabia","Yemen",1458
+"599","Senegal","The Gambia",740
+"600","Senegal","Guinea",330
+"601","Senegal","Guinea",0
+"603","Senegal","Mali",419
+"604","Senegal","Mauritania",813
+"605","Serbia","Bosnia and Herzegovina",302
+"606","Serbia","Bulgaria",318
+"607","Serbia","Croatia",241
+"608","Serbia","Hungary",151
+"609","Serbia","Kosovo",352
+"610","Serbia","Macedonia",62
+"611","Serbia","Montenegro",124
+"612","Serbia","Romania",476
+"613","Sierra Leone","Guinea",652
+"614","Sierra Leone","Liberia",306
+"615","Sint Maarten (Netherlands)","Saint Martin",0
+"616","Sint Maarten (Netherlands)","France",0
+"618","Slovakia","Austria",91
+"619","Slovakia","Czech Republic",215
+"620","Slovakia","Hungary",677
+"621","Slovakia","Poland",444
+"622","Slovakia","Ukraine",97
+"623","Slovenia","Austria",330
+"624","Slovenia","Croatia",670
+"625","Slovenia","Italy",232
+"626","Slovenia","Hungary",102
+"627","Somalia","Djibouti",58
+"628","Somalia","Ethiopia",1600
+"629","Somalia","Kenya",682
+"630","Somaliland","Djibouti",58
+"631","Somaliland","Ethiopia",0
+"632","Somaliland","Somalia",0
+"633","South Africa","Botswana",1840
+"634","South Africa","Lesotho",909
+"635","South Africa","Mozambique",491
+"636","South Africa","Namibia",967
+"637","South Africa","Swaziland",430
+"638","South Africa","Zimbabwe",225
+"639","South Sudan","Central African Republic",682
+"640","South Sudan","Democratic Republic of the Congo",628
+"641","South Sudan","Ethiopia",883
+"642","South Sudan","Kenya",232
+"643","South Sudan","Sudan",1937
+"644","South Sudan","Uganda",435
+"645","Spain","Andorra",63.7
+"646","Spain","France",623
+"648","Spain","Portugal",1214
+"649","Spain","Morocco",17
+"650","Sri Lanka","India",0.1
+"651","Sudan","Central African Republic",483
+"652","Sudan","Chad",1360
+"653","Sudan","Egypt",1273
+"654","Sudan","Eritrea",605
+"655","Sudan","Ethiopia",723
+"656","Sudan","Libya",383
+"657","Sudan","South Sudan",1937
+"658","Suriname","Brazil",597
+"660","Suriname","France",0
+"662","Suriname","Guyana",600
+"663","Swaziland","Mozambique",105
+"664","Swaziland","South Africa",430
+"665","Sweden","Finland",614
+"666","Sweden","Norway",1619
+"667","Switzerland","Austria",164
+"668","Switzerland","France",573
+"669","Switzerland","Italy",740
+"670","Switzerland","Liechtenstein",41
+"671","Switzerland","Germany",334
+"672","Syria","Iraq",605
+"673","Syria","Israel",76
+"674","Syria","Jordan",375
+"675","Syria","Lebanon",375
+"676","Syria","Turkey",822
+"677","Tajikistan","Afghanistan",1206
+"678","Tajikistan","People's Republic of China",414
+"679","Tajikistan","Kyrgyzstan",870
+"680","Tajikistan","Uzbekistan",1161
+"681","Tanzania","Burundi",451
+"682","Tanzania","Democratic Republic of the Congo",459
+"683","Tanzania","Kenya",769
+"684","Tanzania","Malawi",475
+"685","Tanzania","Mozambique",756
+"686","Tanzania","Rwanda",217
+"687","Tanzania","Uganda",396
+"688","Tanzania","Zambia",338
+"689","Thailand","Cambodia",803
+"690","Thailand","Laos",1754
+"691","Thailand","Malaysia",506
+"692","Thailand","Myanmar",1800
+"693","Togo","Benin",644
+"694","Togo","Burkina Faso",126
+"695","Togo","Ghana",877
+"696","Transnistria","Moldova",0
+"697","Transnistria","Ukraine",0
+"698","Tunisia","Algeria",965
+"699","Tunisia","Libya",459
+"700","Turkey","Armenia",268
+"701","Turkey","Azerbaijan",9
+"702","Turkey","Bulgaria",240
+"703","Turkey","Georgia",252
+"704","Turkey","Greece",206
+"705","Turkey","Iran",499
+"706","Turkey","Iraq",352
+"707","Turkey","Syria",822
+"708","Turkmenistan","Afghanistan",744
+"709","Turkmenistan","Iran",992
+"710","Turkmenistan","Kazakhstan",379
+"711","Turkmenistan","Uzbekistan",1621
+"712","Uganda","Democratic Republic of the Congo",765
+"713","Uganda","Kenya",933
+"714","Uganda","Rwanda",169
+"715","Uganda","South Sudan",435
+"716","Uganda","Tanzania",396
+"717","Ukraine","Belarus",891
+"718","Ukraine","Hungary",103
+"719","Ukraine","Moldova",939
+"720","Ukraine","Poland",526
+"721","Ukraine","Romania",531
+"722","Ukraine","Russia",1576
+"723","Ukraine","Slovakia",97
+"724","United Arab Emirates","Oman",410
+"725","United Arab Emirates","Qatar",19
+"726","United Arab Emirates","Saudi Arabia",457
+"727","United Kingdom","Ireland",360
+"728","United Kingdom (plus British overseas territories and Crown dependencies)
+
+→including: 
+→ Akrotiri and Dhekelia
+→ Anguilla
+→ Bermuda
+→ British Indian Ocean Territory
+→ British Virgin Islands
+→ Cayman Islands
+→ Falkland Islands
+→ Gibraltar
+→ Guernsey
+→ Isle of Man
+→ Jersey
+→ Montserrat
+→ Pitcairn Islands
+→ Saint Helena, Ascension and Tristan da Cunha
+→ South Georgia and the South Sandwich Islands
+→ Turks and Caicos Islands","Cyprus",152
+"729","United Kingdom (plus British overseas territories and Crown dependencies)
+
+→including: 
+→ Akrotiri and Dhekelia
+→ Anguilla
+→ Bermuda
+→ British Indian Ocean Territory
+→ British Virgin Islands
+→ Cayman Islands
+→ Falkland Islands
+→ Gibraltar
+→ Guernsey
+→ Isle of Man
+→ Jersey
+→ Montserrat
+→ Pitcairn Islands
+→ Saint Helena, Ascension and Tristan da Cunha
+→ South Georgia and the South Sandwich Islands
+→ Turks and Caicos Islands","Ireland",360
+"730","United Kingdom (plus British overseas territories and Crown dependencies)
+
+→including: 
+→ Akrotiri and Dhekelia
+→ Anguilla
+→ Bermuda
+→ British Indian Ocean Territory
+→ British Virgin Islands
+→ Cayman Islands
+→ Falkland Islands
+→ Gibraltar
+→ Guernsey
+→ Isle of Man
+→ Jersey
+→ Montserrat
+→ Pitcairn Islands
+→ Saint Helena, Ascension and Tristan da Cunha
+→ South Georgia and the South Sandwich Islands
+→ Turks and Caicos Islands","Spain",1.2
+"731","United States","Canada",8893
+"732","United States","Mexico",3141
+"733","Uruguay","Argentina",579
+"734","Uruguay","Brazil",985
+"735","Uzbekistan","Afghanistan",137
+"736","Uzbekistan","Kazakhstan",2203
+"737","Uzbekistan","Kyrgyzstan",1099
+"738","Uzbekistan","Tajikistan",1161
+"739","Uzbekistan","Turkmenistan",1621
+"740","Vatican City","Italy",3.2
+"741","Venezuela","Brazil",2200
+"742","Venezuela","Colombia",2050
+"743","Venezuela","Guyana",743
+"744","Vietnam","Cambodia",1228
+"745","Vietnam","People's Republic of China",1281
+"746","Vietnam","Laos",2130
+"747","West Bank (Palestinian territories)","Israel",307
+"748","West Bank (Palestinian territories)","Jordan",97
+"749","Western Sahara","Algeria",42
+"750","Western Sahara","Mauritania",1561
+"751","Western Sahara","Morocco",443
+"752","Yemen","Oman",288
+"753","Yemen","Saudi Arabia",1458
+"754","Zambia","Angola",1110
+"755","Zambia","Botswana",0.15
+"756","Zambia","Democratic Republic of the Congo",1930
+"757","Zambia","Malawi",837
+"758","Zambia","Mozambique",419
+"759","Zambia","Namibia",233
+"760","Zambia","Tanzania",338
+"761","Zambia","Zimbabwe",797
+"762","Zimbabwe","Botswana",813
+"763","Zimbabwe","Mozambique",1231
+"764","Zimbabwe","South Africa",225
+"765","Zimbabwe","Zambia",797

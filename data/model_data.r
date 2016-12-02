@@ -64,6 +64,15 @@ dat <- dat[with(dat, order(entry, year)),]
 #     sum_art05, sum_art06, sum_art08)))
 # 
 
+# Rescaling variables ----------------------------------------------------------
+dat$tobac_prod_pp       <- with(dat, tobac_prod/population)
+dat$GDP_pp              <- with(dat, GDP/population)
+dat$bloomberg_amount_pp <- with(dat, bloomberg_amount/population)
+
+for (v in colnames(dat))
+  if (is.double(dat[[v]]))
+    dat[[v]] <- dat[[v]]/sd(dat[[v]])
+
 # Saving the data --------------------------------------------------------------
 write.csv(dat, "data/model_data.csv", row.names = FALSE, na = "<NA>")
 
