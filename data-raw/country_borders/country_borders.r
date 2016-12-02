@@ -76,8 +76,9 @@ valid <- subset(neighbors, alter %in% valid)
 
 # Saving data
 write.csv(valid, file="data-raw/country_borders/country_borders.csv",
-          na="<NA>")
+          na="<NA>", row.names = FALSE)
 
 cat("This file was generated on ", as.character(Sys.time()), " with data\n",
-    "downloaded from:\n", site, file = "data-raw/country_borders/readme.md",
+    "downloaded from:\n", site, file = "data-raw/country_borders/readme.md\n",
+    "The field -value- indicates length of border shared in KM (a zero means NA).",
     sep="")

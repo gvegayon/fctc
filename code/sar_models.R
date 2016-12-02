@@ -13,6 +13,7 @@ library(spdep)
 model_data <- read.csv("data/model_data.csv", na="<NA>")
 model_data <- model_data[with(model_data, order(year, entry)),]
 load("data/adjmats.rda")
+load("data/adjmat_border.rda")
 
 # Function to create formulas
 makeformula <- function(y, x) {
@@ -33,7 +34,7 @@ rm(adjmat_bilateral_investment_treaties)
 # X: party attributes
 
 # Distance network -------------------------------------------------------------
-for (Wname in c("adjmat_tobacco_trade", "adjmat_general_trade", "adjmat_distance_static")) {
+for (Wname in c("adjmat_tobacco_trade", "adjmat_general_trade", "adjmat_distance_static", "adjmat_border")) {
   W <- get(Wname) #adjmat_tobacco_trade # adjmat_general_trade #adjmat_distance_static
   
   # Filtering data: The network must be accomodated to the observed data
@@ -104,39 +105,43 @@ for (Wname in c("adjmat_tobacco_trade", "adjmat_general_trade", "adjmat_distance
                     zero.policy = TRUE)
     
     # Creating the object
-    assign(paste("sar",art,4,sep="_"), ans, envir = .GlobalEnv)
+    assign(paste("sar2",art,4,sep="_"), ans, envir = .GlobalEnv)
   }
   
   # Tabulating results -----------------------------------------------------------
+  
+  Wname_fancy <- gsub("adjmat_", "", Wname)
+  Wname_fancy <- stringr::str_replace_all(Wname_fancy, "_", " ")
+  
   sar_art05 <- lapply(ls(pattern = "sum_art05"), get)
   texreg(sar_art05, file = sprintf("fig/sar_art05_%s.tex", Wname), 
-         caption = "SAR on Number of Items of Art. 5",
+         caption = sprintf("SAR on Number of Items of Art. 5 (%s)", Wname_fancy),
          booktabs=TRUE, use.packages = FALSE,
-         float.pos = "!h")
+         float.pos = "!h", omit.coef = "factor")
   
   sar_art06 <- lapply(ls(pattern = "sum_art06"), get)
   texreg(sar_art06, file = sprintf("fig/sar_art06_%s.tex", Wname),   
-         caption = "SAR on Number of Items of Art. 6",
+         caption = sprintf("SAR on Number of Items of Art. 6 (%s)",Wname_fancy),
          booktabs=TRUE, use.packages = FALSE,
-         float.pos = "!h")
+         float.pos = "!h", omit.coef = "factor")
   
   sar_art08 <- lapply(ls(pattern = "sum_art08"), get)
   texreg(sar_art08, file = sprintf("fig/sar_art08_%s.tex", Wname),  
-         caption = "SAR on Number of Items of Art. 8",
+         caption = sprintf("SAR on Number of Items of Art. 8 (%s)", Wname_fancy),
          booktabs=TRUE, use.packages = FALSE,
-         float.pos = "!h")
+         float.pos = "!h", omit.coef = "factor")
   
   sar_art11 <- lapply(ls(pattern = "sum_art11"), get)
   texreg(sar_art11, file = sprintf("fig/sar_art11_%s.tex", Wname), 
-         caption = "SAR on Number of Items of Art. 11",
+         caption = sprintf("SAR on Number of Items of Art. 11 (%s)", Wname_fancy),
          booktabs=TRUE, use.packages = FALSE,
-         float.pos = "!h")
+         float.pos = "!h", omit.coef = "factor")
   
   sar_art13 <- lapply(ls(pattern = "sum_art13"), get)
   texreg(sar_art13, file = sprintf("fig/sar_art13_%s.tex", Wname),
-         caption = "SAR on Number of Items of Art. 13",
+         caption = sprintf("SAR on Number of Items of Art. 13 (%s)", Wname_fancy),
          booktabs=TRUE, use.packages = FALSE,
-         float.pos = "!h")
+         float.pos = "!h", omit.coef = "factor")
   
   message("Network ", Wname, " done.")
 }
