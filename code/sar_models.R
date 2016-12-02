@@ -87,7 +87,7 @@ for (Wname in c("adjmat_tobacco_trade", "adjmat_general_trade", "adjmat_distance
   # Model 3: Bloomberg amount
   for (art in articles) {
     # Creating and estimating model 
-    mod <- makeformula(art, c(common_covars, "bloomberg_amount_pp"))
+    mod <- makeformula(art, c(common_covars, "bloomberg_amount"))
     ans <- lagsarlm(mod, data = model_data,
                     listw = mat2listw(W, style="W"), 
                     zero.policy = TRUE)
@@ -105,7 +105,31 @@ for (Wname in c("adjmat_tobacco_trade", "adjmat_general_trade", "adjmat_distance
                     zero.policy = TRUE)
     
     # Creating the object
-    assign(paste("sar2",art,4,sep="_"), ans, envir = .GlobalEnv)
+    assign(paste("sar",art,4,sep="_"), ans, envir = .GlobalEnv)
+  }
+  
+  # Model 5: Bloomberg amount
+  for (art in articles) {
+    # Creating and estimating model 
+    mod <- makeformula(art, c(common_covars, "bloomberg_fctc_amount"))
+    ans <- lagsarlm(mod, data = model_data,
+                    listw = mat2listw(W, style="W"), 
+                    zero.policy = TRUE)
+    
+    # Creating the object
+    assign(paste("sar",art,5,sep="_"), ans, envir = .GlobalEnv)
+  }
+  
+  # Model 6: Bloomberg count fctc
+  for (art in articles) {
+    # Creating and estimating model 
+    mod <- makeformula(art, c(common_covars, "bloomberg_fctc_count"))
+    ans <- lagsarlm(mod, data = model_data,
+                    listw = mat2listw(W, style="W"), 
+                    zero.policy = TRUE)
+    
+    # Creating the object
+    assign(paste("sar",art,6,sep="_"), ans, envir = .GlobalEnv)
   }
   
   # Tabulating results -----------------------------------------------------------

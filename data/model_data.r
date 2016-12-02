@@ -67,7 +67,8 @@ dat <- dat[with(dat, order(entry, year)),]
 # Rescaling variables ----------------------------------------------------------
 dat$tobac_prod_pp       <- with(dat, tobac_prod/population)
 dat$GDP_pp              <- with(dat, GDP/population)
-dat$bloomberg_amount_pp <- with(dat, bloomberg_amount/population)
+dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
+dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
 
 for (v in colnames(dat))
   if (is.double(dat[[v]]))

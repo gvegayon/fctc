@@ -66,7 +66,7 @@ dat <- filter(dat, fctc==1) %>%
   group_by(country_name, entry, year) %>%
   summarise(
     bloomberg_fctc_count = n(),
-    bloomberg_fctc_amount   = sum(amount, na.rm=TRUE))
+    bloomberg_fctc_amount= sum(amount, na.rm=TRUE))
 
 dat <- left_join(aux,dat, by=c("country_name", "entry", "year")); rm(aux)
 
