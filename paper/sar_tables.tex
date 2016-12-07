@@ -1,0 +1,84 @@
+\documentclass[10pt]{article}
+
+\usepackage{hyperref}
+\usepackage[margin=1in]{geometry} % landscape, 
+
+\usepackage{amsmath, amssymb}
+
+\title{SAR results for FCTC implementation Articles 5, 6, 8, 11, and 13}
+\date{\today}
+
+\usepackage{booktabs}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+The following document shows preliminary results on the assessment of contagion
+effects in the implementation of the FCTC, where we measure implementation as
+number of items implemented in a particular article of the treaty. The method
+used to evaluate the possibility of contagion effects is Spatial Autocorrelation
+Models (SAR). 
+
+For each combination of network $\times$ article, we estimated the following
+model:
+
+\begin{align}
+Y = & \rho W Y + X\beta + \\
+ & \mbox{\tt pol\_shift } + \\
+ & \mbox{\tt bloomberg\_amount } + \\
+ & \mbox{\tt bloomberg\_count } + \\
+ & \mbox{\tt bloomberg\_fctc\_amount } + \\
+ & \mbox{\tt bloomberg\_fctc\_count }
+\end{align}
+
+Where $X$ are covariates, \texttt{pol\_shift} is an indicator of political shift
+since the ratification of the treaty, \texttt{bloomberg\_amount} is
+amount of money invested from the Bloomberg initiative in that country, 
+\texttt{bloomberg\_count} is the number of bloomberg-funded projects in that 
+country, and the last two have the same definition but relative to FCTC related
+projects only. We are interested in whether (1) the model fits,
+and (2) the autocorrelation effect, if any, is significant.
+
+To ease computation, all continuous variables were standarized by dividing them
+by their respective standard errors. Nevertheless, this doesn't mean that the
+variables are comparable.
+so that 
+
+\pagebreak
+
+\section{Tobacco Trade}
+
+\input{../fig/sar_art05_adjmat_tobacco_trade.tex}
+\input{../fig/sar_art06_adjmat_tobacco_trade.tex}
+\input{../fig/sar_art08_adjmat_tobacco_trade.tex}
+\input{../fig/sar_art11_adjmat_tobacco_trade.tex}
+\input{../fig/sar_art13_adjmat_tobacco_trade.tex}
+
+\clearpage\section{General Trade}
+
+\input{../fig/sar_art05_adjmat_general_trade.tex}
+\input{../fig/sar_art06_adjmat_general_trade.tex}
+\input{../fig/sar_art08_adjmat_general_trade.tex}
+\input{../fig/sar_art11_adjmat_general_trade.tex}
+\input{../fig/sar_art13_adjmat_general_trade.tex}
+
+\clearpage\section{Distance}
+
+\input{../fig/sar_art05_adjmat_distance_static.tex}
+\input{../fig/sar_art06_adjmat_distance_static.tex}
+\input{../fig/sar_art08_adjmat_distance_static.tex}
+\input{../fig/sar_art11_adjmat_distance_static.tex}
+\input{../fig/sar_art13_adjmat_distance_static.tex}
+
+
+\clearpage\section{Borders}
+
+\input{../fig/sar_art05_adjmat_border.tex}
+\input{../fig/sar_art06_adjmat_border.tex}
+\input{../fig/sar_art08_adjmat_border.tex}
+\input{../fig/sar_art11_adjmat_border.tex}
+\input{../fig/sar_art13_adjmat_border.tex}
+
+\end{document}
