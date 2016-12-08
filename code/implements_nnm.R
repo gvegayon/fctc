@@ -87,7 +87,7 @@ netmatch_prepare <- function (
 
 
 model_data <- model_data[with(model_data, order(year, entry)),]
-graph      <- adjmat_border # adjmat_fctc_cop_coparticipation_twomode, adjmat_tobacco_trade
+graph      <- adjmat_fctc_cop_coparticipation_twomode # adjmat_border # , adjmat_tobacco_trade
 
 # Filtering data: The network must be accomodated to the observed data
 ids <- sort(unique(model_data$entry))
@@ -120,13 +120,14 @@ netmatch <- function(dat, graph, timevar, depvar, covars,
   ans   <- netmatch_prepare(dat, graph, timevar, depvar, covars,
                             treat_thr, expo_pcent, expo_lag)
   
+  # print(str(ans[[1]]))
   # Processing the data so we can use it with -matchit-
   dat <- ans[[1]][[2]]
   rownames(dat) <- 1:nrow(dat)
   
   # Matching (with replacement)
   match_obj   <- matchit(ans$match_model, data=dat,
-                         distance="mahalanobis", method="genetic", replace=TRUE)
+                         distance="mahalanobis", replace=TRUE)
   match_index <- match_obj$match.matrix
   
   # Checking balance
@@ -147,6 +148,25 @@ ans <- netmatch(model_data, graph, "year", "sum_art05",
            "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke"),
          treat_thr = .5, expo_pcent = TRUE, expo_lag   = 1L
          )
+
+model_data <- model_data[with(model_data, order(year, entry)),]
+model_data2010 <- subset(model_data, year==2010)
+model_data2012 <- subset(model_data, year==2012)
+
+dimnames(graph[[1]]) <- list(1:nnodes(graph), 1:nnodes(graph))
+dimnames(graph[[2]]) <- list(1:nnodes(graph), 1:nnodes(graph))
+ans <- bootnet(graph, function(g, ...) {
+  ids <- as.integer(nodes(g))
+  # print(summary(ids))
+  dat <- rbind(model_data2010[ids,], model_data2012[ids,])
+  out <- netmatch(dat, g, "year", "sum_art05", 
+                  c("democracy", "GDP_pp", "bloomberg_fctc_count",
+                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke"),
+                  treat_thr = .4, expo_pcent = TRUE, expo_lag   = 1L
+  )
+  
+  mean(out)
+}, R = 1000)
 
 g2 <- resample_graph(graph[[1]], self = FALSE)
 
