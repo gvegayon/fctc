@@ -75,7 +75,7 @@ ans <- netmatch(
   depvar     = "sum_art05",
   covariates = common_covars,
   # Preprocessing parameters
-  treat_thr  = 0.5,
+  treat_thr  = 0.6,
   expo_pcent = TRUE,
   expo_lag   = 1,
   # Matching parameters
