@@ -14,13 +14,14 @@ model_data <- read.csv("data/model_data.csv", na="<NA>")
 model_data <- model_data[with(model_data, order(year, entry)),]
 load("data/adjmats.rda")
 load("data/adjmat_border.rda")
+load("data/adjmat_mindist.rda")
 
 # Function to create formulas
 makeformula <- function(y, x) {
   as.formula(paste(y, paste(x, collapse=" + "), sep=" ~ "))
 }
 
-common_covars <- c("factor(continent)", "democracy", "GDP_pp*tobac_prod_pp",
+common_covars <- c("Asia", "Europe", "Africa", "America", "democracy", "GDP_pp*tobac_prod_pp",
                    "perc_female_smoke", "perc_male_smoke")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
@@ -34,7 +35,7 @@ rm(adjmat_bilateral_investment_treaties)
 # X: party attributes
 
 # Distance network -------------------------------------------------------------
-for (Wname in c("adjmat_tobacco_trade", "adjmat_general_trade", "adjmat_distance_static", "adjmat_border")) {
+for (Wname in c("adjmat_general_trade", "adjmat_mindist", "adjmat_border")) {
   W <- get(Wname) #adjmat_tobacco_trade # adjmat_general_trade #adjmat_distance_static
   
   # Filtering data: The network must be accomodated to the observed data

@@ -50,6 +50,14 @@ dat$sum_art13[is.na(dat$sum_art13)] <- 0
 # Pasting names
 dat <- left_join(dat, country_codes, by="entry")
 
+# Creating dummies -------------------------------------------------------------
+for (cont in unique(dat$continent))
+  dat[[cont]] <- ifelse(dat$continent == cont, 1L, 0L)
+
+for (who in unique(dat$who_region))
+  dat[[who]] <- ifelse(dat$who_region == who, 1L, 0L)
+
+
 # Filtering --------------------------------------------------------------------
 dat <- filter(dat, year %in% years_reported)
 dat <- filter(dat, !is.na(ratification))
