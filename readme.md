@@ -9,3 +9,8 @@ The paper includes the following:
 * log           : Code logfiles
 * paper         : Paper itself (word, TeX, etc.)
 * presentations : Presentations
+
+This depends on the following packages:
+
+"netdiffuseR", "MatchIt", "spdep", "stringr", "rvest", "httr", "cshapes", "texreg",
+"dplyr", "xml2", "foreign", "parallel"

@@ -4,6 +4,7 @@
 \usepackage[margin=1in]{geometry} % landscape, 
 
 \usepackage{amsmath, amssymb}
+\usepackage{longtable}
 
 \title{SAR results for FCTC implementation Articles 5, 6, 8, 11, and 13}
 \date{\today}
@@ -44,7 +45,39 @@ and (2) the autocorrelation effect, if any, is significant.
 To ease computation, all continuous variables were standarized by dividing them
 by their respective standard errors. Nevertheless, this doesn't mean that the
 variables are comparable.
-so that 
+
+Finally, only party members that ratified were used in the models. A complete
+list of signature and ratification dates in provided in the appendix \autoref{sec:dates}.
+
+\input{../fig/networks_descriptive_stats.tex}
+
+% latex table generated in R 3.3.2 by xtable 1.8-2 package
+% Fri Dec  9 13:00:25 2016
+\begin{table}[ht]
+\centering
+\begin{tabular}{rrrrrrr}
+  \toprule
+&  \multicolumn{6}{l}{Number of items implemented}\\
+ &  0 &  1 &  2 &  3 &  4 & $>$=5 \\ 
+  \midrule
+\multicolumn{6}{l}{2010}\\
+Art. 5 & 0.30 & 0.01 & 0.01 & 0.02 & 0.07 & 0.09 \\ 
+  Art. 6 & 0.30 & 0.01 & 0.03 & 0.06 & 0.04 & 0.07 \\ 
+  Art. 8 & 0.29 & 0.03 & 0.15 & 0.00 & 0.01 & 0.01 \\ 
+  Art. 11 & 0.30 & 0.00 & 0.01 & 0.01 & 0.01 & 0.18 \\ 
+  Art. 13 & 0.30 & 0.01 & 0.01 & 0.00 & 0.01 & 0.17 \\ 
+   \midrule
+\multicolumn{6}{l}{2012}\\
+Art. 5 & 0.10 & 0.01 & 0.05 & 0.06 & 0.12 & 0.16 \\ 
+  Art. 6 & 0.12 & 0.06 & 0.06 & 0.08 & 0.07 & 0.11 \\ 
+  Art. 8 & 0.10 & 0.03 & 0.02 & 0.07 & 0.16 & 0.12 \\ 
+  Art. 11 & 0.15 & 0.01 & 0.01 & 0.02 & 0.01 & 0.31 \\ 
+  Art. 13 & 0.15 & 0.01 & 0.01 & 0.01 & 0.01 & 0.31 \\ 
+   \bottomrule
+\multicolumn{6}{l}{}\\
+\end{tabular}
+\caption{Distribution of number of items implemented per article. Row-sums are equal to 1.} 
+\end{table}
 
 \pagebreak
 
@@ -64,7 +97,6 @@ so that
 \input{../fig/sar_art11_adjmat_mindist.tex}
 \input{../fig/sar_art13_adjmat_mindist.tex}
 
-
 \clearpage\section{Borders}
 
 \input{../fig/sar_art05_adjmat_border.tex}
@@ -72,5 +104,20 @@ so that
 \input{../fig/sar_art08_adjmat_border.tex}
 \input{../fig/sar_art11_adjmat_border.tex}
 \input{../fig/sar_art13_adjmat_border.tex}
+
+\clearpage\section{Centroid Distance}
+
+\input{../fig/sar_art05_adjmat_centroid_dist.tex}
+\input{../fig/sar_art06_adjmat_centroid_dist.tex}
+\input{../fig/sar_art08_adjmat_centroid_dist.tex}
+\input{../fig/sar_art11_adjmat_centroid_dist.tex}
+\input{../fig/sar_art13_adjmat_centroid_dist.tex}
+
+
+\appendix
+
+\clearpage\section{Important dates}\label{sec:dates}
+
+\input{../fig/signature_ratification_dates.tex}
 
 \end{document}

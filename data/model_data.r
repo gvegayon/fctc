@@ -41,11 +41,11 @@ dat$bloomberg_fctc_amount <- coalesce(dat$bloomberg_fctc_amount, 0)
 
 # Implementation data should be filled with zeros instead of NAs
 # we will assume that they did not implemented
-dat$sum_art05[is.na(dat$sum_art05)] <- 0
-dat$sum_art06[is.na(dat$sum_art06)] <- 0
-dat$sum_art08[is.na(dat$sum_art08)] <- 0
-dat$sum_art11[is.na(dat$sum_art11)] <- 0
-dat$sum_art13[is.na(dat$sum_art13)] <- 0
+dat$sum_art05[is.na(dat$sum_art05)] <- 0L
+dat$sum_art06[is.na(dat$sum_art06)] <- 0L
+dat$sum_art08[is.na(dat$sum_art08)] <- 0L
+dat$sum_art11[is.na(dat$sum_art11)] <- 0L
+dat$sum_art13[is.na(dat$sum_art13)] <- 0L
 
 # Pasting names
 dat <- left_join(dat, country_codes, by="entry")

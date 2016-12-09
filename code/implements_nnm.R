@@ -9,12 +9,12 @@ library(MatchIt)
 # Loading data
 load("data/adjmats.rda")
 load("data/adjmat_border.rda")
+load("data/adjmat_mindist.rda")
 model_data <- read.csv("data/model_data.csv", na="<NA>")
 
 # Sorting the data appropiately
-model_data <- model_data[with(model_data, order(year, entry)),]
-
-common_covars <- c("Asia", "Europe", "Africa", "America", "democracy", "GDP_pp", "tobac_prod_pp",
+model_data    <- model_data[with(model_data, order(year, entry)),]
+common_covars <- c("democracy", "GDP_pp", "tobac_prod_pp",
                    "perc_female_smoke", "perc_male_smoke")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
@@ -61,8 +61,8 @@ model_data2012 <- subset(model_data, year==2012)
 # FCTC cop network -------------------------------------------------------------
 
 # Step 1: set and adjust the graph
-graph <- adjmat_fctc_cop_coparticipation_twomode
-graph <- prepare_graph(graph, model_data, as_bool = TRUE)
+graph <- adjmat_mindist # adjmat_fctc_cop_coparticipation_twomode # adjmat_bilateral_investment_treaties$`2010`#
+graph <- prepare_graph(graph, model_data, as_bool = FALSE)
 
 # Step 2: Calibrate (define the right parameters)
 # change: expo_pcent, expo_lag, method, distance
@@ -75,7 +75,7 @@ ans <- netmatch(
   depvar     = "sum_art05",
   covariates = common_covars,
   # Preprocessing parameters
-  treat_thr  = 0.6,
+  treat_thr  = .4,
   expo_pcent = TRUE,
   expo_lag   = 1,
   # Matching parameters
@@ -83,12 +83,13 @@ ans <- netmatch(
 )
 
 ans
+summary(ans$match_obj)
 
 # stop()
 # Setting up parallel
 library(parallel)
 cl <- makeCluster(7)
-clusterExport(cl, c("model_data2010", "model_data2012"))
+clusterExport(cl, c("model_data2010", "model_data2012", "common_covars"))
 clusterEvalQ(cl, library(netdiffuseR))
 
 # Generating standard errors using bootstrapping
@@ -104,8 +105,7 @@ booted_nnm <- function(tt, expolag, cl, nreps) {
       # Variable names
       timevar    = "year",
       depvar     = "sum_art05",
-      covariates = c("democracy", "GDP_pp", "bloomberg_fctc_count",
-                     "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke"),
+      covariates = common_covars,
       # Preprocessing parameters
       treat_thr  = tt,
       expo_pcent = TRUE,
@@ -117,14 +117,14 @@ booted_nnm <- function(tt, expolag, cl, nreps) {
     )
     
     c(
-      fATT = mean(out$fATT, na.rm=TRUE) ,
+      fATT = out$fATT,
       n1   = out$match_obj$nn["Matched","Treated"],
       n0   = out$match_obj$nn["Matched","Control"]
     )
   }, R = nreps, cl=cl, parallel="multicore", ncpus=length(cl), tt=tt, expolag=expolag)
 }
 
-threshold_levels <- c(.4,.5,.6)
+threshold_levels <- c(.3,.4,.5)
 expolag          <- c(0L, 1L)
 ans <- NULL
 
@@ -132,7 +132,7 @@ for (i in threshold_levels)
   for (j in expolag) {
     suppressMessages({
       ans[[as.character(i)]][[as.character(j)]] <- tryCatch({
-        booted_nnm(i, j, cl, 100)
+        booted_nnm(i, j, cl, 1000)
       }, error=function(e) e)
     })
     message("Threshold level: ", i, ", and expolag:", j," done.")
@@ -147,19 +147,13 @@ stop()
 # Setting up parallel
 library(parallel)
 cl <- makeCluster(7)
-clusterExport(cl, "model_data")
+clusterExport(cl, c("model_data", "common_covars"))
 clusterEvalQ(cl, library(netdiffuseR))
 
 # Running the test
 ans <- struct_test(graph, function(g) {
-  out <- netmatch(model_data, g, "year", "sum_art05", 
-                  c("democracy", "GDP_pp", "bloomberg_fctc_count",
-                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke"),
-                  treat_thr = .4, expo_pcent = TRUE, expo_lag = 1L,
-                  distance=""
-  )
-  
-  mean(out)
-}, R = 4000, cl=cl, parallel="multicore", ncpus=length(cl))
+  netmatch(model_data, g, "year", "sum_art05", common_covars,
+           treat_thr = .4, expo_pcent = TRUE, expo_lag = 1L, method="cem")$fATT
+}, R = 1000, cl=cl, parallel="multicore", ncpus=length(cl))
 
 stopCluster(cl)

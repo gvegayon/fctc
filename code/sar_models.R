@@ -15,14 +15,15 @@ model_data <- model_data[with(model_data, order(year, entry)),]
 load("data/adjmats.rda")
 load("data/adjmat_border.rda")
 load("data/adjmat_mindist.rda")
+load("data/adjmat_centroid_dist.rda")
 
 # Function to create formulas
 makeformula <- function(y, x) {
   as.formula(paste(y, paste(x, collapse=" + "), sep=" ~ "))
 }
 
-common_covars <- c("Asia", "Europe", "Africa", "America", "democracy", "GDP_pp*tobac_prod_pp",
-                   "perc_female_smoke", "perc_male_smoke")
+common_covars <- c("Asia", "Europe", "Africa", "America", "democracy", "GDP_pp",
+                   "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # We will only work with static networs, this is, we will exclude the
@@ -35,7 +36,7 @@ rm(adjmat_bilateral_investment_treaties)
 # X: party attributes
 
 # Distance network -------------------------------------------------------------
-for (Wname in c("adjmat_general_trade", "adjmat_mindist", "adjmat_border")) {
+for (Wname in c("adjmat_general_trade", "adjmat_mindist", "adjmat_centroid_dist", "adjmat_border")) {
   W <- get(Wname) #adjmat_tobacco_trade # adjmat_general_trade #adjmat_distance_static
   
   # Filtering data: The network must be accomodated to the observed data
@@ -58,8 +59,8 @@ for (Wname in c("adjmat_general_trade", "adjmat_mindist", "adjmat_border")) {
     
   }
   W <- W[ids,ids]
-  W <- netdiffuseR::diag_expand(list(W,W)) # This generates a square mat with struct zeros
-  
+  W <- netdiffuseR::diag_expand(list(W,W), valued=TRUE) # This generates a square mat with struct zeros
+
   # Model 1: Only characteristics
   for (art in articles) {
     # Creating and estimating model 
@@ -69,6 +70,7 @@ for (Wname in c("adjmat_general_trade", "adjmat_mindist", "adjmat_border")) {
     
     # Creating the object
     assign(paste("sar",art,1,sep="_"), ans, envir = .GlobalEnv)
+    # stop()
   }
   
   
@@ -168,6 +170,23 @@ for (Wname in c("adjmat_general_trade", "adjmat_mindist", "adjmat_border")) {
          booktabs=TRUE, use.packages = FALSE,
          float.pos = "!h", omit.coef = "factor")
   
+  # Fancy, altogether table: rho + significance, bloomberg count
+  # Should be Article
+  fetch_values <- function(x) {
+    data.frame(
+    `\\rho`                 = coef(x)["rho"],
+    `\\rho pval`            = summary(x)$LR1$p.value[1],
+    `Bloomberg FCTC count`  = coef(x)["bloomberg_fctc_count"],
+    `Bloomberg pval`        = summary(x)$Coef["bloomberg_fctc_count","Pr(>|z|)"],
+    check.names = FALSE
+    )
+  }
+  
+  
+  model06 <- lapply(ls(pattern="_6$"), get)
+  model06 <- do.call(rbind, lapply(model06, fetch_values))
+  
+  # stop()
   message("Network ", Wname, " done.")
 }
 

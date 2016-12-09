@@ -50,7 +50,7 @@ for (article in articles) {
     year  = newdat$time,
     count = rowSums(subset(newdat, select=c(-Party, -time)))
   )
-  
+    
   colnames(newdat)[3] <- sprintf("sum_art%02d", article)
   
   # Saving the object
@@ -92,6 +92,9 @@ dat[dat$country_name=="Libyan Arab Jamahiriya",]$entry <- "LY"
 dat[dat$country_name=="Micronesia (Federated States of)",]$entry <- "FM"
 dat[dat$country_name=="Venezuela",]$entry <- "VE"
 dat[dat$country_name=="Czech Republic",]$entry <- "CZ"
+
+for (v in which(grepl("sum_art",colnames(dat))))
+  dat[,v] <- as.integer(dat[,v])
 
 write.csv(dat, file = "data/implementation.csv",
           row.names = FALSE, na="<NA>")

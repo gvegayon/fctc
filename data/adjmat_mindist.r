@@ -17,7 +17,13 @@ newnames <- lapply(newnames, function(x) with(country_names,entry[match(x, code)
 dimnames(adjmat_mindist) <- newnames
 
 # Coercing to dgCMatrix
+adjmat_mindist <- 1/(round(adjmat_mindist))
+diag(adjmat_mindist) <- 0
+adjmat_mindist[is.infinite(adjmat_mindist)] <- NA
+adjmat_mindist[is.na(adjmat_mindist)] <- max(adjmat_mindist, na.rm = TRUE)
 adjmat_mindist <- methods::as(adjmat_mindist, "dgCMatrix")
+
+summary(adjmat_mindist@x)
 
 # saving
 save(adjmat_mindist, file="data/adjmat_mindist.rda")
