@@ -21,6 +21,32 @@ common_covars <- c("democracy", "GDP_pp", "tobac_prod_pp",
                    "perc_female_smoke", "perc_male_smoke")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 nboot         <- 1000L
+networks      <- c("adjmat_centroid_dist",
+                   "adjmat_tobacco_trade",
+                   "adjmat_gl_posts" # , "adjmat_referrals"
+                   )
+
+# Preprocessing networks gl_posts and referrals
+graph <- adjmat_gl_posts[c("2008", "2009","2010", "2011")] # 
+graph <- graph[[1]] + graph[[2]] + graph[[3]] + graph[[4]]  
+adjmat_gl_posts <- graph %*% graph # 
+
+# graph <- adjmat_referrals[c("2008", "2009","2010", "2011")] # 
+# graph <- graph[[1]] + graph[[2]] + graph[[3]] + graph[[4]]  
+# adjmat_referrals <- graph %*% graph # 
+
+# Options for each network
+thresholds <- list(
+  c(.35, .40, .45),
+  c(.30, .40, .50),
+  c(.30, .40, .50) #,  c(.30, .40, .50)
+)
+
+# True if the data must be processed as boolean (0-1 graph)
+boolnets   <- list(FALSE, FALSE, FALSE) #, TRUE)
+
+names(thresholds) <- networks
+names(boolnets)   <- networks
 
 # Filtering data: The network must be accomodated to the observed data
 # removing(adding) the extra(missing) nodes in the graph.
@@ -60,7 +86,7 @@ prepare_graph <- function(graph, dat, as_bool) {
 #' @param expolag Number of lags for exposure
 #' @param cl      A cluster object
 #' @param nreps   Number of reps
-booted_nnm <- function(tt, expolag, cl, nreps, art) {
+booted_nnm <- function(tt, expolag, cl, nreps, art, expo_pcent=TRUE) {
   # clusterExport(cl, c("tt", "expolag"))
   bootnet(graph, function(g, idx,...) {
     # Subsetting the data
@@ -75,7 +101,7 @@ booted_nnm <- function(tt, expolag, cl, nreps, art) {
       covariates = common_covars,
       # Preprocessing parameters
       treat_thr  = tt,
-      expo_pcent = TRUE,
+      expo_pcent = expo_pcent,
       expo_lag   = expolag,
       # Matching parameters
       # distance = "mahalanobis",
@@ -97,7 +123,45 @@ model_data <- model_data[with(model_data, order(year, entry)),]
 model_data2010 <- subset(model_data, year==2010)
 model_data2012 <- subset(model_data, year==2012)
 
-# FCTC centroid network -------------------------------------------------------------
+for (net in networks) {
+  # Step 0: get the options
+  threshold_levels <- thresholds[[net]]
+  as_bool          <- boolnets[[net]]
+  
+  
+  # Step 1: set and adjust the graph
+  graph <- get(net, .GlobalEnv)
+  graph <- prepare_graph(graph, model_data, as_bool = !as_bool)
+  
+  # Step 3: Setting up parallel
+  cl <- makeCluster(2)
+  clusterExport(cl, c("model_data2010", "model_data2012", "common_covars", "nboot"))
+  clusterEvalQ(cl, library(netdiffuseR))
+  
+  # Step 4: Computing the standard errors for each level
+  for (a in articles) {
+    
+    ans <- NULL
+    for (i in threshold_levels) {
+      suppressMessages({
+        ans[[as.character(i)]] <- tryCatch({
+          booted_nnm(i, 1L, cl, nreps = nboot, art=a, expo_pcent = as_bool)
+        }, error=function(e) e)
+      })
+      message("Threshold level: ", i, " article:", a," done.")
+    }
+    
+    # Coercing data
+    dat <- lapply(lapply(ans, "[[", "boot"), "[[", "t")
+    dat <- lapply(dat, "[", i=1:nboot,j=1)
+    dat <- do.call(cbind, dat)
+    
+    assign(sprintf("bs_%s_%s",net, a), dat, envir = .GlobalEnv)
+  }
+  
+  stopCluster(cl)
+}
+
 
 # Step 1: set and adjust the graph
 graph <- adjmat_centroid_dist # 
@@ -114,7 +178,7 @@ ans <- netmatch(
   depvar     = "sum_art05",
   covariates = common_covars,
   # Preprocessing parameters
-  treat_thr  = .35,
+  treat_thr  = .45,
   expo_pcent = TRUE,
   expo_lag   = 1,
   # Matching parameters
@@ -152,343 +216,56 @@ for (a in articles) {
 
 stopCluster(cl)
 
-# Step 5: Reporting
-graphics.off()
-pdf("fig/matching_bloxplot_centroid.pdf", width = 7, height = 10)
-oldpar <- par(no.readonly = TRUE)
-par(mfrow=c(3,2), oma=c(5,5,1,1))
-
-s <- .25
-S <- .5
-labcex <- 1.5
-labpos <- "topright"
-ylim <- c(-6,8)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_centroid_sum_art05, ylim=ylim)
-legend(labpos, legend = "Art. 5", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_centroid_sum_art06, ylim=ylim)
-legend(labpos, legend = "Art. 6", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_centroid_sum_art08, ylim=ylim)
-legend(labpos, legend = "Art. 8", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_centroid_sum_art11, ylim=ylim)
-legend(labpos, legend = "Art. 11", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_centroid_sum_art13, ylim=ylim)
-legend(labpos, legend = "Art. 13", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mfrow=c(1,1))
-mtext(side = 1, text = "Exposure", outer = TRUE, line=2)
-mtext(side = 2, text = "Feasible Average Treatment Effect", outer = TRUE, line=2)
-par(oldpar)
-dev.off()
-
-# FCTC border network -------------------------------------------------------------
-
-# Step 1: set and adjust the graph
-graph <- adjmat_border # 
-graph <- prepare_graph(graph, model_data, as_bool = FALSE)
-
-# Step 2: Calibrate (define the right parameters)
-# change: expo_pcent, expo_lag, method, distance
-ans <- netmatch(
-  # Actual data
-  dat   = model_data,
-  graph = graph,
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art05",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = .6,
-  expo_pcent = TRUE,
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem" # Coarsened Exact Matching
-)
-
-ans
-threshold_levels <- c(.4,.5,.6)
-
-# Step 3: Setting up parallel
-cl <- makeCluster(2)
-clusterExport(cl, c("model_data2010", "model_data2012", "common_covars", "nboot"))
-clusterEvalQ(cl, library(netdiffuseR))
-
-# Step 4: Computing the standard errors for each level
-for (a in articles) {
+# This function creates a fancy plot for each group
+grouped_boxplot <- function(net) {
   
-  ans <- NULL
-  for (i in threshold_levels) {
-    suppressMessages({
-      ans[[as.character(i)]] <- tryCatch({
-        booted_nnm(i, 1L, cl, nreps = nboot, art=a)
-      }, error=function(e) e)
-    })
-    message("Threshold level: ", i, " article:", a," done.")
+  # Getting the data
+  ANS <- ls(pattern = paste0("bs_", net,".+"), envir = .GlobalEnv)
+  
+  oldpar <- par(no.readonly = TRUE)
+  par(mfrow=c(3,2), oma=c(5,5,1,1))
+  
+  # Parameters
+  s <- .25
+  S <- .5
+  labcex <- 1.5
+  labpos <- "topright"
+  ylim <- c(-6,8)
+  
+  i <- 1
+  for (ans in ANS) {
+    x   <- get(ans, .GlobalEnv)
+    lab <- gsub(".+_art0?", "Art. ", ans)
+    
+    # Adjusting margin
+    if (i %% 2) par(mai=oldpar$mai*c(s,S,s,s))
+    else par(mai=oldpar$mai*c(s,s,s,S))
+    
+    boxplot(x, ylim=ylim)
+    legend(labpos, legend = lab, bty = "n", cex=labcex)
+    abline(h=0, lty=2)
+    
+    # Incrementing
+    i <- 1+1
   }
   
-  # Coercing data
-  dat <- lapply(lapply(ans, "[[", "boot"), "[[", "t")
-  dat <- lapply(dat, "[", i=1:nboot,j=1)
-  dat <- do.call(cbind, dat)
+  # Adding legends
+  par(mfrow=c(1,1))
+  mtext(side = 1, text = "Exposure", outer = TRUE, line=2)
+  mtext(side = 2, text = "Feasible Average Treatment Effect", outer = TRUE, line=2)
+  par(oldpar)
   
-  assign(paste0("bs_border_",a), dat, envir = .GlobalEnv)
+  return(ANS)
 }
-
-stopCluster(cl)
 
 # Step 5: Reporting
 graphics.off()
-pdf("fig/matching_bloxplot_border.pdf", width = 7, height = 10)
-oldpar <- par(no.readonly = TRUE)
-par(mfrow=c(3,2), oma=c(5,5,1,1))
-
-s <- .25
-S <- .5
-labcex <- 1.5
-labpos <- "topright"
-ylim <- c(-6,8)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_border_sum_art05, ylim=ylim)
-legend(labpos, legend = "Art. 5", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_border_sum_art06, ylim=ylim)
-legend(labpos, legend = "Art. 6", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_border_sum_art08, ylim=ylim)
-legend(labpos, legend = "Art. 8", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_border_sum_art11, ylim=ylim)
-legend(labpos, legend = "Art. 11", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_border_sum_art13, ylim=ylim)
-legend(labpos, legend = "Art. 13", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mfrow=c(1,1))
-mtext(side = 1, text = "Exposure", outer = TRUE, line=2)
-mtext(side = 2, text = "Feasible Average Treatment Effect", outer = TRUE, line=2)
-par(oldpar)
-dev.off()
-
-# FCTC cop network -------------------------------------------------------------
-
-# Step 1: set and adjust the graph
-graph <- adjmat_fctc_cop_coparticipation_twomode # 
-graph <- prepare_graph(graph, model_data, as_bool = FALSE)
-
-# Step 2: Calibrate (define the right parameters)
-# change: expo_pcent, expo_lag, method, distance
-ans <- netmatch(
-  # Actual data
-  dat   = model_data,
-  graph = graph,
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art05",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = .8,
-  expo_pcent = TRUE,
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem" # Coarsened Exact Matching
-)
-
-ans
-threshold_levels <- c(.6,.7,.8)
-
-# Step 3: Setting up parallel
-cl <- makeCluster(2)
-clusterExport(cl, c("model_data2010", "model_data2012", "common_covars", "nboot"))
-clusterEvalQ(cl, library(netdiffuseR))
-
-# Step 4: Computing the standard errors for each level
-for (a in articles) {
+for (net in networks) {
   
-  ans <- NULL
-  for (i in threshold_levels) {
-    suppressMessages({
-      ans[[as.character(i)]] <- tryCatch({
-        booted_nnm(i, 1L, cl, nreps = nboot, art=a)
-      }, error=function(e) e)
-    })
-    message("Threshold level: ", i, " article:", a," done.")
-  }
-  
-  # Coercing data
-  dat <- lapply(lapply(ans, "[[", "boot"), "[[", "t")
-  dat <- lapply(dat, "[", i=1:nboot,j=1)
-  dat <- do.call(cbind, dat)
-  
-  assign(paste0("bs_cop_",a), dat, envir = .GlobalEnv)
+  pdf(sprintf("fig/matching_bloxplot_%s.pdf", net), width = 7, height = 10)
+  grouped_boxplot(net)
+  dev.off()
 }
-
-stopCluster(cl)
-
-# Step 5: Reporting
-graphics.off()
-pdf("fig/matching_bloxplot_fctc_cop.pdf", width = 7, height = 10)
-oldpar <- par(no.readonly = TRUE)
-par(mfrow=c(3,2), oma=c(5,5,1,1))
-
-s <- .25
-S <- .5
-labcex <- 1.5
-labpos <- "topright"
-ylim <- c(-6,8)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_cop_sum_art05, ylim=ylim)
-legend(labpos, legend = "Art. 5", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_cop_sum_art06, ylim=ylim)
-legend(labpos, legend = "Art. 6", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_cop_sum_art08, ylim=ylim)
-legend(labpos, legend = "Art. 8", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_cop_sum_art11, ylim=ylim)
-legend(labpos, legend = "Art. 11", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_cop_sum_art13, ylim=ylim)
-legend(labpos, legend = "Art. 13", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mfrow=c(1,1))
-mtext(side = 1, text = "Exposure", outer = TRUE, line=2)
-mtext(side = 2, text = "Feasible Average Treatment Effect", outer = TRUE, line=2)
-par(oldpar)
-dev.off()
-
-# FCTC inb network -------------------------------------------------------------
-
-# Step 1: set and adjust the graph
-graph <- adjmat_fctc_inb_coparticipation_twomode # 
-graph <- prepare_graph(graph, model_data, as_bool = FALSE)
-
-# Step 2: Calibrate (define the right parameters)
-# change: expo_pcent, expo_lag, method, distance
-ans <- netmatch(
-  # Actual data
-  dat   = model_data,
-  graph = graph,
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art06",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = .6,
-  expo_pcent = TRUE,
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem" # Coarsened Exact Matching
-)
-
-ans
-threshold_levels <- c(.6,.7,.8)
-
-# Step 3: Setting up parallel
-cl <- makeCluster(2)
-clusterExport(cl, c("model_data2010", "model_data2012", "common_covars", "nboot"))
-clusterEvalQ(cl, library(netdiffuseR))
-
-# Step 4: Computing the standard errors for each level
-for (a in articles) {
-  
-  ans <- NULL
-  for (i in threshold_levels) {
-    suppressMessages({
-      ans[[as.character(i)]] <- tryCatch({
-        booted_nnm(i, 1L, cl, nreps = nboot, art=a)
-      }, error=function(e) e)
-    })
-    message("Threshold level: ", i, " article:", a," done.")
-  }
-  
-  # Coercing data
-  dat <- lapply(lapply(ans, "[[", "boot"), "[[", "t")
-  dat <- lapply(dat, "[", i=1:nboot,j=1)
-  dat <- do.call(cbind, dat)
-  
-  assign(paste0("bs_inb_",a), dat, envir = .GlobalEnv)
-}
-
-stopCluster(cl)
-
-# Step 5: Reporting
-graphics.off()
-pdf("fig/matching_bloxplot_inb.pdf", width = 7, height = 10)
-oldpar <- par(no.readonly = TRUE)
-par(mfrow=c(3,2), oma=c(5,5,1,1))
-
-s <- .25
-S <- .5
-labcex <- 1.5
-labpos <- "topright"
-ylim <- c(-6,8)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_inb_sum_art05, ylim=ylim)
-legend(labpos, legend = "Art. 5", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_inb_sum_art06, ylim=ylim)
-legend(labpos, legend = "Art. 6", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_inb_sum_art08, ylim=ylim)
-legend(labpos, legend = "Art. 8", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,s,s,S))
-boxplot(bs_inb_sum_art11, ylim=ylim)
-legend(labpos, legend = "Art. 11", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mai=oldpar$mai*c(s,S,s,s))
-boxplot(bs_inb_sum_art13, ylim=ylim)
-legend(labpos, legend = "Art. 13", bty = "n", cex=labcex)
-abline(h=0, lty=2)
-
-par(mfrow=c(1,1))
-mtext(side = 1, text = "Exposure", outer = TRUE, line=2)
-mtext(side = 2, text = "Feasible Average Treatment Effect", outer = TRUE, line=2)
-par(oldpar)
-dev.off()
-
 
 
 # Structural test --------------------------------------------------------------

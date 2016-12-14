@@ -10,7 +10,10 @@ networks_to_use <- c(
   # Co-suscription
   "FCTC INB co-participation (two-mode)","FCTC COP co-participation (two-mode)",
   # Smuggling
-  "Distance (static)"
+  "Distance (static)",
+  "Referrals",
+  "GL Posts",
+  "Interest Group co-membership (two-mode)"
 )
 
 library(foreign)
