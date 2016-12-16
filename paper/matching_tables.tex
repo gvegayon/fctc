@@ -28,7 +28,7 @@ Roughly, the method can be described as follows:
 if individual $i$ is exposed to at least some percentage or number of neighbors
 in the network that implemented at least one item of a particular article,
 \item With $Z$ defined, via the MatchIt R package, we use the Coarsened
-Exact Matching method. This returns a vector of weights $W$ that indicate whether
+Exact Matching method (which maximizes balance). This returns a vector of weights $W$ that indicate whether
 an individual $j$ was matched, hence $w_j>0$, or not, in which case $w_j=0$ and
 compute an Average Treatment Effect on the Treated (ATT).
 \item Finally, we estimated distributions for the ATT using bootstrapping
