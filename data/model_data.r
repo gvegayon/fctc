@@ -82,6 +82,20 @@ for (v in colnames(dat))
   if (is.double(dat[[v]]))
     dat[[v]] <- dat[[v]]/sd(dat[[v]])
 
+# Including interest on policy (subscribed to GL posts) ------------------------
+
+load("data/adjmats.rda")
+graph <- adjmat_gl_posts[c("2008", "2009", "2010")] # 
+graph <- graph[[1]] + graph[[2]] + graph[[3]]
+adjmat_gl_posts <- graph # 
+
+posts <- dgr(adjmat_gl_posts)
+posts <- data.frame(subscribed = posts, entry = rownames(posts))
+posts$subscribed <- as.integer(posts$subscribed)
+
+dat <- merge(dat, posts, by="entry", all.x=TRUE, all.y=FALSE)
+dat$subscribed[is.na(dat$subscribed)] <- 0L
+
 # Saving the data --------------------------------------------------------------
 write.csv(dat, "data/model_data.csv", row.names = FALSE, na = "<NA>")
 

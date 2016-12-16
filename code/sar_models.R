@@ -25,7 +25,8 @@ makeformula <- function(y, x) {
 
 common_covars <- c("Asia", "Europe", "Africa", "America", "democracy", "GDP_pp",
                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
-                   "year2012")
+                   "year2012", "labor", "womens_rights", "population",
+                   "subscribed")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # List of networks (with pretty names) that will be used
