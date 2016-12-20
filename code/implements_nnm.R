@@ -24,30 +24,52 @@ nboot         <- 2000L
 ncores        <- 20L
 networks      <- c("adjmat_centroid_dist",
                    "adjmat_tobacco_trade",
-                   "adjmat_gl_posts" # , "adjmat_referrals"
+                   "adjmat_gl_posts",
+                   "adjmat_referrals",
+                   "adjmat_interest_group_comembership_twomode"
                    )
 
 dummy_net     <- "adjmat_centroid_dist"
 
 # Preprocessing networks gl_posts and referrals
-graph <- adjmat_gl_posts[c("2009", "2010")] # 
-graph <- graph[[1]] + graph[[2]]
-adjmat_gl_posts <- graph # 
+g0 <- adjmat_gl_posts[as.character(2008:2010)] # 
+adjmat_gl_posts <- g0[[1]]
+for (g in g0[-1])
+  adjmat_gl_posts <- adjmat_gl_posts + g
 
-# graph <- adjmat_referrals[c("2008", "2009","2010", "2011")] # 
-# graph <- graph[[1]] + graph[[2]] + graph[[3]] + graph[[4]]  
-# adjmat_referrals <- graph %*% graph # 
+image(adjmat_gl_posts)
+nlinks(adjmat_gl_posts)/(nnodes(adjmat_gl_posts)*(nnodes(adjmat_gl_posts)-1))
 
+g0 <- adjmat_referrals # 
+adjmat_referrals <- g0[[1]]
+for (g in g0[-1])
+  adjmat_referrals <- adjmat_referrals + g
+
+image(adjmat_referrals)
+nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
+
+g0 <- adjmat_interest_group_comembership_twomode[as.character(2008:2010)] # 
+adjmat_interest_group_comembership_twomode <- g0[[1]]
+for (g in g0[-1])
+  adjmat_interest_group_comembership_twomode <- 
+  adjmat_interest_group_comembership_twomode + g
+
+image(adjmat_interest_group_comembership_twomode)
+nlinks(adjmat_interest_group_comembership_twomode)/
+  (nnodes(adjmat_interest_group_comembership_twomode)*
+     (nnodes(adjmat_interest_group_comembership_twomode)-1))
 
 # Options for each network
 thresholds <- list(
   c(.35, .40, .45),
   c(.30, .40, .50),
-  c(1L, 2L, 3L) #,  c(.30, .40, .50)
+  c(1L, 2L, 3L),
+  c(1L, 2L, 3L),
+  c(1L, 2L, 3L)
 )
 
 # True if the data must be processed as boolean (0-1 graph)
-boolnets   <- list(FALSE, FALSE, TRUE) #, TRUE)
+boolnets   <- list(FALSE, FALSE, TRUE, TRUE, TRUE)
 
 names(thresholds) <- c(networks)
 names(boolnets)   <- c(networks)
@@ -144,7 +166,7 @@ model_data2012 <- subset(model_data, year==2012)
 
 
 # Step 1: set and adjust the graph
-testnet <- "adjmat_gl_posts"
+testnet <- "adjmat_interest_group_comembership_twomode"
 graph <- get(testnet) # 
 # graph[] <- ifelse(graph[] > 2.5e-4, 1, 0)
 graph <- prepare_graph(graph, model_data, as_bool = boolnets[[testnet]])
@@ -158,7 +180,7 @@ ans<-netmatch(
   depvar     = "sum_art05",
   covariates = common_covars,
   # Preprocessing parameters
-  treat_thr  = thresholds[[testnet]][3],
+  treat_thr  = thresholds[[testnet]][2],
   expo_pcent = !boolnets[[testnet]],
   expo_lag   = 1,
   # Matching parameters
