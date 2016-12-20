@@ -23,7 +23,8 @@ makeformula <- function(y, x) {
   as.formula(paste(y, paste(x, collapse=" + "), sep=" ~ "))
 }
 
-common_covars <- c("Asia", "Europe", "Africa", "America", "democracy", "GDP_pp",
+common_covars <- c("`Eastern Mediterranean`", "European", "African", "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
+                   "democracy", "GDP_pp",
                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
                    "year2012", "labor", "womens_rights", "population",
                    "subscribed")

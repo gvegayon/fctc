@@ -4,6 +4,7 @@
 rm(list=ls())
 options(stringsAsFactors=FALSE)
 library(dplyr)
+library(netdiffuseR)
 
 # parameter
 years_reported <- c(2010, 2012) # 2014 (need to extend data)
@@ -16,7 +17,7 @@ political_shifts <- read.csv("data/political_shifts.csv", na = "<NA>")
 political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 
 party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
-party_attributes <- subset(party_attributes, select=c(-country_name))
+party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
 
 bloomberg        <- read.csv("data/bloomberg.csv", na = "<NA>")
 bloomberg        <- subset(bloomberg, select=c(-country_name))
