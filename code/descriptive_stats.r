@@ -3,6 +3,8 @@ rm(list=ls())
 options(stringsAsFactors = FALSE)
 
 library(xtable)
+library(netdiffuseR)
+library(dplyr)
 
 # ------------------------------------------------------------------------------
 #
@@ -73,41 +75,79 @@ load("data/adjmat_centroid_dist.rda")
 # 3. Valued
 # 4. Degree distribution
 
+implemented <- group_by(model_data, entry) %>%
+  summarize(one_or_more=
+              (max(sum_art05 + sum_art06 + sum_art08 + 
+                     sum_art11 + sum_art13) > 0L) + 0L
+  )
+
 graph_stats <- function(g, valued=TRUE) {
+  
   if (is.list(g)) g <- g[[1]]
+  
+  # Checking whether directed or not
+  gm         <- as.matrix(g)
+  undirected <- all((gm - t(gm)) == 0)
+  
   data.frame(
     Description     = "",
     Homophily       = "",
-    Density         = nlinks(g)/nnodes(g)/nnodes(g),
+    Density         = nlinks(g)/(nnodes(g)-1)/nnodes(g),
     Size            = nnodes(g),
-    `Avg Degree`    = mean(dgr(g)),
-    `Mode Degree`   = quantile(dgr(g), probs = .5),
-    Valued          = ifelse(valued, 1L, 0L),
+    #`Avg Degree`    = mean(dgr(g, cmode = "degree")),
+    `Modal Degree`  = quantile(dgr(g, cmode = "degree"), probs = .5),
+    Valued          = ifelse(valued, "Yes", "No"),
+    Uirected        = ifelse(undirected, "Yes", "No"),
+    `% Implemented` = with(implemented,sum(one_or_more[entry %in% nodes(g)]))/nnodes(g),
     #`# communities` = 0,
     check.names = FALSE
   )
 }
 
-# Networks to analyzie
-nets <- list(adjmat_general_trade, adjmat_mindist, adjmat_border,
-             adjmat_centroid_dist, adjmat_fctc_cop_coparticipation_twomode,
-             adjmat_fctc_inb_coparticipation_twomode)
+# Preprocessing networks gl_posts and referrals
+g0 <- adjmat_gl_posts[as.character(2008:2010)] # 
+adjmat_gl_posts <- g0[[1]]
+for (g in g0[-1])
+  adjmat_gl_posts <- adjmat_gl_posts + g
 
-valued      <- c("Yes", "Yes", "Yes", "Yes", "No", "No")
+g0 <- adjmat_referrals # 
+adjmat_referrals <- g0[[1]]
+for (g in g0[-1])
+  adjmat_referrals <- adjmat_referrals + g
+
+# Networks to analyzie
+nets <- list(adjmat_general_trade, 
+             adjmat_tobacco_trade,
+             adjmat_mindist, 
+             # adjmat_border,
+             adjmat_centroid_dist, 
+             adjmat_gl_posts,
+             adjmat_referrals)
+
+valued      <- c(
+  "Yes",
+  "Yes",
+  "Yes",
+  # "Yes",
+  "Yes",
+  "No",
+  "No")
 
 fancy_names <- c(
-  "Trade",
+  "General Trade",
+  "Tobacco Trade",
   "Minimum Distance",
-  "Shared borders (Wiki)",
+  # "Shared borders (Wiki)",
   "Centroid Distance",
-  "COP co-participation",
-  "INB co-participation"
+  "GL co-subscription",
+  "GL Referrals "
 )
 
 homophilous <- c(
-  "No (*)",
   "No",
   "No",
+  "No",
+  # "No",
   "No",
   "Yes",
   "Yes"
@@ -127,10 +167,9 @@ stats_mat
 
 stats_mat <- xtable::xtable(stats_mat)
 xtable::caption(stats_mat) <- paste(
-  "Networks descriptive stats. In the case of the Trade network,",
-  "while trading is homophilous indeed, we have no reason to belive that",
-  "the implementation of the FCTC can change it significantly, hence",
-  "we consider it to be exogenous to our analysis."
+  "Networks descriptive statistics. The last column shows what portion of",
+  "the nodes in the network implemented at least one part of the treaty,",
+  "whereas a full article or part of it."
   )
   
   
