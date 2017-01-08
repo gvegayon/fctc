@@ -73,6 +73,21 @@ dat <- dat[with(dat, order(entry, year)),]
 #     sum_art05, sum_art06, sum_art08)))
 # 
 
+# Updating year of ratification and signature ----------------------------------
+dat$year_ratification <- dat$ratification %/% 10000
+dat$year_signature    <- dat$signature %/% 10000
+
+# Fixing some NAs
+dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
+                                       year_signature))
+
+# Truncating to 2010
+dat$`Years since Ratif.` <- with(dat, 2010 - year_ratification)
+dat$`Years since Sign.`  <- with(dat, 2010 - year_signature)
+
+dat$`Years since Ratif.`[dat$`Years since Ratif.` < 0] <- 0
+dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0
+
 # Rescaling variables ----------------------------------------------------------
 dat$tobac_prod_pp       <- with(dat, tobac_prod/population)
 dat$GDP_pp              <- with(dat, GDP/population)

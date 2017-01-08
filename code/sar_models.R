@@ -10,7 +10,7 @@ library(texreg)
 library(Matrix)
 library(spdep)
 
-model_data <- read.csv("data/model_data.csv", na="<NA>")
+model_data <- read.csv("data/model_data.csv", na="<NA>", check.names = FALSE)
 model_data <- model_data[with(model_data, order(year, entry)),]
 model_data$`year2012` <- as.integer(model_data$year == 2012)
 load("data/adjmats.rda")
@@ -24,7 +24,7 @@ makeformula <- function(y, x) {
 }
 
 common_covars <- c("`Eastern Mediterranean`", "European", "African", "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
-                   "democracy", "GDP_pp",
+                   "democracy", "GDP_pp", "`Years since Sign.`", "`Years since Ratif.`",
                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
                    "year2012", "labor", "womens_rights", "population",
                    "subscribed")
@@ -90,6 +90,7 @@ for (Wnum in 1:nrow(networks)) {
   
   for (art in articles) {
     # Creating and estimating model 
+    # stop()
     mod <- makeformula(art, common_covars)
     ans <- lagsarlm(mod, data = model_data, listw = mat2listw(W, style="W"), 
                     zero.policy = TRUE)
@@ -230,18 +231,18 @@ for (Wnum in 1:nrow(networks)) {
   
   print(tmp, file=sprintf("fig/sar_%s_summary.tex", Wname), booktabs=TRUE,
         hline.after=-1:nrow(tmp))
-  # fetch_values <- function(x) {
-  #   data.frame(
-  #   `\\rho`                 = coef(x)["rho"],
-  #   `\\rho pval`            = summary(x)$LR1$p.value[1],
-  #   `Bloomberg FCTC count`  = coef(x)["bloomberg_fctc_count"],
-  #   `Bloomberg pval`        = summary(x)$Coef["bloomberg_fctc_count","Pr(>|z|)"],
-  #   check.names = FALSE
-  #   )
-  # }
-  # 
 
-  # stop()
+  # Summary table (only model 1)
+  artnames <- ls(pattern = "_1$")
+  sar_all_articles <- lapply(artnames, get)
+  artnames <- gsub("_1$", "", artnames)
+  texreg(sar_all_articles, file = sprintf("fig/sar_all_articles_%s.tex", Wname), 
+         caption = sprintf("SAR on Number of Items per Article (%s)", Wname_fancy),
+         booktabs=TRUE, use.packages = FALSE,
+         float.pos = "!h", omit.coef = "factor",
+         custom.model.names = sprintf("Art. %s", gsub(".+art0?", "", artnames)))
+  
+  
   message("Network ", Wname, " done.")
 }
 

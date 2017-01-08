@@ -3,6 +3,7 @@ rm(list=ls())
 options(stringsAsFactors = FALSE)
 
 library(xtable)
+library(netdiffuseR)
 
 # ------------------------------------------------------------------------------
 #
@@ -21,7 +22,7 @@ dat <- reshape(model_data, varying = l, direction = "long", v.names="sum_art",
 dat <- subset(dat, select=c(year, sum_art, Article))
 dat$sum_art <- ifelse(dat$sum_art >= 5, ">=5", sprintf("% 2d",dat$sum_art))
 dat <- with(dat, table(Article, sum_art, year))
-dat <- prop.table(dat,1)
+dat <- prop.table(dat,c(1,3))
 
 # Preparing for xtable
 dat <- list(dat[,,1], dat[,,2])
@@ -30,6 +31,12 @@ dat <- lapply(dat, function(x) {
   x
 })
 attr(dat, "subheadings") <- c(2010, 2012)
+
+# Storing data as CSV
+write.table(
+  rbind(cbind(year=2010,dat[[1]]), cbind(year=2012,dat[[2]])),
+  file = "fig/dist_of_items_implemented.csv")
+
 
 cap <- paste(
   "Distribution of number of items implemented per article.",
