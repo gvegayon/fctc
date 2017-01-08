@@ -1,18 +1,22 @@
 % latex table generated in R 3.3.2 by xtable 1.8-2 package
+<<<<<<< HEAD
 % Fri Jan  6 12:18:04 2017
+=======
+% Tue Dec 27 21:21:44 2016
+>>>>>>> 583dd331ea49769a802df1c1544c130a21e5d752
 \begin{table}[ht]
 \centering
-\begin{tabular}{llrrrrl}
+\begin{tabular}{llrrrllr}
   \toprule
-Description & Homophily & Density & Size & Avg Degree & Mode Degree & Valued \\ 
+Description & Homophily & Density & Size & Modal Degree & Valued & Uirected & \% Implemented \\ 
   \midrule
-Trade & No (*) & 0.36 & 191 & 136.60 & 119.00 & Yes \\ 
-  Minimum Distance & No & 0.99 & 170 & 338.00 & 338.00 & Yes \\ 
-  Shared borders (Wiki) & No & 0.03 & 159 & 8.00 & 8.00 & Yes \\ 
-  Centroid Distance & No & 0.99 & 170 & 338.00 & 338.00 & Yes \\ 
-  COP co-participation & Yes & 0.30 & 177 & 105.76 & 78.00 & No \\ 
-  INB co-participation & Yes & 0.32 & 171 & 110.76 & 90.00 & No \\ 
+General Trade & No & 0.36 & 191 & 119.00 & Yes & No & 0.76 \\ 
+  Tobacco Trade & No & 0.13 & 188 & 33.50 & Yes & No & 0.76 \\ 
+  Minimum Distance & No & 1.00 & 170 & 338.00 & Yes & Yes & 0.76 \\ 
+  Centroid Distance & No & 1.00 & 170 & 338.00 & Yes & Yes & 0.76 \\ 
+  GL co-subscription & Yes & 0.18 & 100 & 22.00 & No & Yes & 0.87 \\ 
+  GL Referrals  & Yes & 0.02 & 142 & 3.00 & No & No & 0.85 \\ 
    \bottomrule
 \end{tabular}
-\caption{Networks descriptive stats. In the case of the Trade network, while trading is homophilous indeed, we have no reason to belive that the implementation of the FCTC can change it significantly, hence we consider it to be exogenous to our analysis.} 
+\caption{Networks descriptive statistics. The last column shows what portion of the nodes in the network implemented at least one part of the treaty, whereas a full article or part of it.} 
 \end{table}
