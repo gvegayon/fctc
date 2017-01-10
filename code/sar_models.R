@@ -24,7 +24,7 @@ makeformula <- function(y, x) {
 }
 
 common_covars <- c("`Eastern Mediterranean`", "European", "African", "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
-                   "democracy", "GDP_pp", "`Years since Sign.`", "`Years since Ratif.`",
+                   "democracy", "GDP", "`Years since Sign.`", "`Years since Ratif.`",
                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
                    "year2012", "labor", "womens_rights", "population",
                    "subscribed")
@@ -36,8 +36,33 @@ networks      <- c(
   "adjmat_tobacco_trade", "Tobacco Trade",
   "adjmat_mindist", "Minimal distance",
   "adjmat_centroid_dist", "Centroid Distance",
-  "adjmat_border", "Country Borders"
+  "adjmat_border", "Country Borders",
+  "adjmat_gl_posts", "GlobalLink Posts",
+  "adjmat_referrals", "GlobalLink Referrals",
+  "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
+  "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation"
   )
+
+# Preprocessing networks gl_posts and referrals
+g0 <- adjmat_gl_posts[as.character(2008:2010)] # 
+adjmat_gl_posts <- g0[[1]]
+for (g in g0[-1])
+  adjmat_gl_posts <- adjmat_gl_posts + g
+
+image(adjmat_gl_posts)
+nlinks(adjmat_gl_posts)/(nnodes(adjmat_gl_posts)*(nnodes(adjmat_gl_posts)-1))
+
+g0 <- adjmat_referrals # 
+adjmat_referrals <- g0[[1]]
+for (g in g0[-1])
+  adjmat_referrals <- adjmat_referrals + g
+
+image(adjmat_referrals)
+nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
+
+# If i referred j, then i has an influence over j, hence we transpose to compute
+# exposures.
+adjmat_referrals <- t(adjmat_referrals)
 
 networks      <- matrix(networks, byrow = TRUE, ncol=2)
 
@@ -54,6 +79,7 @@ rm(adjmat_bilateral_investment_treaties)
 # X: party attributes
 
 # Distance network -------------------------------------------------------------
+SIGNIFICANCE_MODEL1 <- NULL
 for (Wnum in 1:nrow(networks)) {
   Wname <- networks[Wnum, 1]
   W <- get(Wname) #adjmat_tobacco_trade # adjmat_general_trade #adjmat_distance_static
@@ -208,17 +234,27 @@ for (Wnum in 1:nrow(networks)) {
          booktabs=TRUE, use.packages = FALSE,
          float.pos = "!h", omit.coef = "factor")
   
+  # Pasting it to the Overall resutls of Model 1
+  SIGNIFICANCE_MODEL1 <- rbind(SIGNIFICANCE_MODEL1, rho_asterisk_table[,1,drop=TRUE])
+  
   # Fancy, altogether table: rho + significance, bloomberg count
   # Should be Article
   tmp <- rho_asterisk_table
-  tmp[] <- ifelse(tmp[] <= asterisks[3], "***",
-                  ifelse(tmp[] <= asterisks[2], "**",
-                         ifelse(tmp <= asterisks[1], "*", " ")))
+  tmp[] <- paste(
+    sprintf("%0.2f", tmp),
+    ifelse(tmp[] <= asterisks[3], "***",
+           ifelse(tmp[] <= asterisks[2], "**",
+                  ifelse(tmp <= asterisks[1], "*", " ")))
+  )
   
   # Column/row names and alignment
   rownames(tmp) <- gsub(".+art0?", "Art. ",rownames(tmp))
   colnames(tmp) <- paste("Model", 1:ncol(tmp))
+  
+  # Creating the xtable object
   tmp <- xtable::xtable(tmp)
+  
+  
   
   xtable::align(tmp) <- rep("c", ncol(tmp) + 1)
   xtable::caption(tmp) <- paste0(
@@ -231,6 +267,8 @@ for (Wnum in 1:nrow(networks)) {
   
   print(tmp, file=sprintf("fig/sar_%s_summary.tex", Wname), booktabs=TRUE,
         hline.after=-1:nrow(tmp))
+  
+  
 
   # Summary table (only model 1)
   artnames <- ls(pattern = "_1$")
@@ -246,3 +284,29 @@ for (Wnum in 1:nrow(networks)) {
   message("Network ", Wname, " done.")
 }
 
+# Neat table with all Rho ------------------------------------------------------
+
+rownames(SIGNIFICANCE_MODEL1) <- networks[,2]
+
+dat <- SIGNIFICANCE_MODEL1
+dat[] <- paste(
+  sprintf("%0.2f", dat),
+  ifelse(dat[] <= asterisks[3], "***",
+         ifelse(dat[] <= asterisks[2], "**",
+                ifelse(dat <= asterisks[1], "*", " ")))
+)
+
+# Column/row names and alignment
+colnames(dat) <- gsub(".+art0?", "Art. ",colnames(dat))
+
+dat <- xtable::xtable(dat)
+
+xtable::align(dat) <- rep("l", ncol(dat) + 1)
+xtable::caption(dat) <- paste0(
+  "Significance level of $\\rho$ per network/article in terms of p-values of the SAR models.", 
+  "*** $p < ", asterisks[3],"$, ",
+  "** $p < ", asterisks[2],"$, and ",
+  "* $p < ", asterisks[1],"$."
+)
+
+print(dat, file="fig/sar_rho_summary.tex", booktabs=TRUE)

@@ -7,6 +7,8 @@
 \usepackage{amsmath, amssymb}
 \usepackage{longtable}
 
+\def\nreps{3,000}
+
 \title{SAR results for FCTC implementation Articles 5, 6, 8, 11, and 13}
 \date{\today}
 
@@ -34,6 +36,22 @@ compute an Average Treatment Effect on the Treated (ATT).
 \item Finally, we estimated distributions for the ATT using bootstrapping
 as described in Snijders and Borgatti (1999).
 \end{enumerate}
+
+\section{INB Co-participation network}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.8\linewidth]{../fig/matching_bloxplot_adjmat_fctc_inb_coparticipation_twomode.pdf}
+	\caption{Distribution of Feasible Average Treatment Effect on the Treated using the INB co/participation network. Each box represents \nreps bootstrap versions of the estimator.}
+\end{figure}
+
+\section{COP Co-participation network}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=.8\linewidth]{../fig/matching_bloxplot_adjmat_fctc_cop_coparticipation_twomode.pdf}
+	\caption{Distribution of Feasible Average Treatment Effect on the Treated using the COP co/participation network. Each box represents \nreps bootstrap versions of the estimator.}
+\end{figure}
 
 \section{GL Co-subscription network}
 

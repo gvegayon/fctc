@@ -17,13 +17,19 @@ model_data <- read.csv("data/model_data.csv", na="<NA>", check.names = FALSE)
 # Sorting the data appropiately
 model_data    <- model_data[with(model_data, order(year, entry)),]
 model_data$years_since_ratif <- model_data$`Years since Ratif.`
-model_data$zero_or_more      <- as.integer(model_data$years_since_ratif > 0)
+model_data$ratified <- with(
+  model_data, ifelse(years_since_ratif > 5, 2, ifelse(years_since_ratif == 5, 1, 0))
+)
 
-common_covars <- c("GDP_pp", "democracy", "subscribed", "zero_or_more")
+model_data$subscribed <- ifelse(model_data$subscribed > 0, 1, 0)
+
+common_covars <- c("GDP", "subscribed", "ratified")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
-nboot         <- 3000L
+nboot         <- 1000L
 ncores        <- 18L
-networks      <- c("adjmat_centroid_dist", "adjmat_gl_posts", "adjmat_referrals")
+networks      <- c("adjmat_centroid_dist", "adjmat_gl_posts", "adjmat_referrals",
+                   "adjmat_fctc_cop_coparticipation_twomode",
+                   "adjmat_fctc_inb_coparticipation_twomode")
 
 dummy_net     <- "adjmat_centroid_dist"
 
@@ -44,19 +50,9 @@ for (g in g0[-1])
 image(adjmat_referrals)
 nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
 
-
-# Options for each network
-thresholds <- list(
-  c(.35, .40, .45),
-  c(1L, 2L, 3L),
-  c(1L, 2L, 3L)
-)
-
-# True if the data must be processed as boolean (0-1 graph)
-boolnets   <- list(FALSE, TRUE, TRUE)
-
-names(thresholds) <- c(networks)
-names(boolnets)   <- c(networks)
+# If i referred j, then i has an influence over j, hence we transpose to compute
+# exposures.
+adjmat_referrals <- t(adjmat_referrals)
 
 # Filtering data: The network must be accomodated to the observed data
 # removing(adding) the extra(missing) nodes in the graph.
@@ -148,54 +144,89 @@ model_data2012 <- subset(model_data, year==2012)
 
 # Calibration ------------------------------------------------------------------
 
+# Options for each network
+thresholds <- list(
+  c(.35, .40, .45),
+  c(.4, .5, .6)+.1,
+  c(.4, .5, .6),
+  c(.70, .75, .80),
+  c(25, 30, 35)
+)
 
-# Step 1: set and adjust the graph
-testnet <- "adjmat_gl_posts"
-graph <- get(testnet) # 
-# graph[] <- ifelse(graph[] > 2.5e-4, 1, 0)
-graph <- prepare_graph(graph, model_data, as_bool = boolnets[[testnet]])
+# True if the data must be processed as boolean (0-1 graph)
+boolnets   <- list(FALSE, FALSE, FALSE, FALSE, TRUE)
 
-ans<-netmatch(
-  # Actual data
-  dat   = model_data,
-  graph = graph, #graph, #rewire_graph(graph, p = n_rewires(graph), algorithm = "swap"),
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art05",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = thresholds[[testnet]][1],
-  expo_pcent = !boolnets[[testnet]],
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem", # Coarsened Exact Matching
-  distance = "mahalanobis"
-);ans[-3] # ;with(ans$dat[[2]], cor(Y, treat))
+names(thresholds) <- c(networks)
+names(boolnets)   <- c(networks)
 
+# Computes balance
+get_balance_stats <- function(x) {
+  x <- summary(x$match_obj)
+  x$sum.all$Type     <- "Pre-Match"
+  x$sum.matched$Type <- "Post-Match"
+  
+  return(with(x,rbind(sum.all, sum.matched)))
+}
 
-# Step 2: Calibrate (define the right parameters)
-# change: expo_pcent, expo_lag, method, distance
-g <- resample_graph(graph);{
-  d0 <- rbind(
-    model_data2010[attr(g, "sample_indices"),],
-    model_data2012[attr(g, "sample_indices"),]
+# Computes balance L1()
+get_imbalance <- function(x) {
+  dat0 <- as.data.frame(with(x$match_obj, cbind(w=weights, X, treat)))
+  dat1 <- dat0[dat0[,1] >0,,drop=FALSE]
+  dat0$w <- 1
+  ans  <- list(dat0, dat1)
+  
+  
+  ans  <- lapply(ans, function(y) imbalance(y$treat, y, c("w", "treat"), weights=y$w))
+  names(ans) <- c("Pre-Match", "Post-Match")
+  ans
+}
+
+# Looping through networks
+IMBALANCE <- vector("list", length(networks))
+BALANCES  <- vector("list", length(networks))
+SAMPSIZES <- matrix(ncol=2, nrow=length(networks), 
+                    dimnames = list(networks, c("Control", "Treated")))
+names(BALANCES) <- networks
+names(IMBALANCE) <- networks
+for (net in networks) {
+  
+  # Step 0: get the options
+  threshold_levels <- thresholds[[net]]
+  as_bool          <- boolnets[[net]]
+  
+  # Step 1: set and adjust the graph
+  graph <- get(net, .GlobalEnv)
+  graph <- prepare_graph(graph, model_data, as_bool = as_bool)
+  
+  ans<-netmatch(
+    # Actual data
+    dat   = model_data,
+    graph = graph, #graph, #rewire_graph(graph, p = n_rewires(graph), algorithm = "swap"),
+    # Variable names
+    timevar    = "year",
+    depvar     = "sum_art05",
+    covariates = common_covars,
+    # Preprocessing parameters
+    treat_thr  = thresholds[[net]][2],
+    expo_pcent = !boolnets[[net]],
+    expo_lag   = 1,
+    # Matching parameters
+    method   = "cem", # Coarsened Exact Matching
+    distance = "mahalanobis",
+    grouping = list(subscribed=list(0,1))
   )
-};ans<-netmatch(
-  # Actual data
-  dat   = d0,
-  graph = g,
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art05",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = .35,
-  expo_pcent = TRUE,
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem", # Coarsened Exact Matching
-  distance = "mahalanobis"
-);ans
+  
+  # Computing stats
+  IMBALANCE[[net]] <- get_imbalance(ans)
+  BALANCES[[net]]  <- get_balance_stats(ans)
+  SAMPSIZES[net,]  <- ans$match_obj$nn["Matched",,drop=TRUE]
+}
+
+# Overall imbalance
+ans <- t(sapply(IMBALANCE, function(x) c(x$`Pre-Match`$L1$L1, x$`Post-Match`$L1$L1)))
+colnames(ans) <- c("Pre-Imbalance", "Post-Imbalance")
+ans <- cbind(ans, SAMPSIZES)
+ans
 
 
 # Main part of the code --------------------------------------------------------
@@ -464,7 +495,7 @@ labcex <- 1.5
 labpos <- "topright"
 
 i <- 1
-netcolors <- c("red","blue","darkred","purple")
+netcolors <- c("red","blue","darkred","purple", "darkgreen", "darkred")
 
 for (art in unique(PVALS$`Art.`)) {
   
