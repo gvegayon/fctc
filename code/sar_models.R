@@ -40,7 +40,8 @@ networks      <- c(
   "adjmat_gl_posts", "GlobalLink Posts",
   "adjmat_referrals", "GlobalLink Referrals",
   "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
-  "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation"
+  "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation",
+  "adjmat_interest_group_comembership_twomode", " Interest Group co-membership"
   )
 
 # Preprocessing networks gl_posts and referrals
@@ -56,6 +57,9 @@ g0 <- adjmat_referrals #
 adjmat_referrals <- g0[[1]]
 for (g in g0[-1])
   adjmat_referrals <- adjmat_referrals + g
+
+adjmat_interest_group_comembership_twomode <-
+  adjmat_interest_group_comembership_twomode$`2011`
 
 image(adjmat_referrals)
 nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))

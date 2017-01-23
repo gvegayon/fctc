@@ -15,7 +15,7 @@ model_data <- read.csv("data/model_data.csv", na="<NA>")
 # On Smoking
 summary(model_data[,c("tobac_prod","perc_female_smoke", "perc_male_smoke")])
 
-# On the treaty and the bloomberg iniciaitive
+# Distribution of number of items implemented
 l <- c("sum_art05","sum_art06", "sum_art08", "sum_art11", "sum_art13")
 dat <- reshape(model_data, varying = l, direction = "long", v.names="sum_art",
                times = c(5,6,8,11,13), timevar="Article")
@@ -46,6 +46,35 @@ cap <- paste(
 dat <- xtable::xtableList(dat, caption=cap)
 
 xtable::print.xtableList(dat, booktabs = TRUE, file="fig/implementation_dist.tex")
+
+# Average number of items implemented per article/year
+l <- c("sum_art05","sum_art06", "sum_art08", "sum_art11", "sum_art13")
+dat <- reshape(model_data, varying = l, direction = "long", v.names="sum_art",
+               times = c(5,6,8,11,13), timevar="Article")
+dat <- subset(dat, select=c(year, sum_art, Article))
+# dat$sum_art <- ifelse(dat$sum_art >= 5, ">=5", sprintf("% 2d",dat$sum_art))
+dat <- group_by(dat, Article, year) %>%
+  summarize(Mean = mean(sum_art))
+
+dat <- as.data.frame(dat)
+
+dat <-
+  reshape(
+    dat,
+    timevar = "year",
+    v.names = "Mean",
+    direction = "wide",
+    idvar = c("Article")
+  )
+
+# Preparing for xtable
+rownames(dat) <- paste("Art.", dat$Article)
+dat <- dat[,-1]
+colnames(dat) <- paste("Mean", c("2010", "2012"))
+                       
+
+# Storing data as CSV
+write.table(dat,  file = "fig/mean_of_items_implemented.csv")
   
 # Ratifying countries ----------------------------------------------------------
 dat <- read.csv("data/treaty_dates.csv", na="<NA>")
