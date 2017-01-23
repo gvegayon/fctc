@@ -22,7 +22,7 @@ for (article in articles) {
   for (ind in ss$id) {
     dat  <- read.csv(sprintf("data-raw/fctc_implementation_db/%s.csv", ind))
     test <- which(grepl("^X[0-9]+$", colnames(dat)))
-    lvls[[as.character(ind)]] <- sapply(dat[,test], nlevels)
+    lvls[[as.character(ind)]] <- sapply(dat[,test], function(x) length(unique(x)))
     
     # If this is an indicator var, then keep it
     if (max(lvls[[as.character(ind)]]) > 3) next

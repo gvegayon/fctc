@@ -23,31 +23,7 @@ number of items implemented in a particular article of the treaty. The method
 used to evaluate the possibility of contagion effects is Spatial Autocorrelation
 Models (SAR). 
 
-For each combination of network $\times$ article, we estimated the following
-model:
-
-\begin{align}
-Y = & \rho W Y + X\beta + \\
- & \mbox{\tt pol\_shift } + \\
- & \mbox{\tt bloomberg\_amount } + \\
- & \mbox{\tt bloomberg\_count } + \\
- & \mbox{\tt bloomberg\_fctc\_amount } + \\
- & \mbox{\tt bloomberg\_fctc\_count }
-\end{align}
-
-Where $X$ are covariates, \texttt{pol\_shift} is an indicator of political shift
-since the ratification of the treaty, \texttt{bloomberg\_amount} is
-amount of money invested from the Bloomberg initiative in that country, 
-\texttt{bloomberg\_count} is the number of bloomberg-funded projects in that 
-country, and the last two have the same definition but relative to FCTC related
-projects only. We are interested in whether (1) the model fits,
-and (2) the autocorrelation effect, if any, is significant.
-
-To ease computation, all continuous variables were standarized by dividing them
-by their respective standard errors. Nevertheless, this doesn't mean that the
-variables are comparable.
-
-Finally, only party members that ratified were used in the models. A complete
+Only party members that ratified were used in the models. A complete
 list of signature and ratification dates in provided in the appendix \autoref{sec:dates}.
 
 \input{../fig/networks_descriptive_stats.tex}
@@ -58,22 +34,21 @@ list of signature and ratification dates in provided in the appendix \autoref{se
 \centering
 \begin{tabular}{rrrrrrr}
   \toprule
-&  \multicolumn{6}{l}{Number of items implemented}\\
  &  0 &  1 &  2 &  3 &  4 & $>$=5 \\ 
   \midrule
 \multicolumn{6}{l}{2010}\\
-Art. 5 & 0.30 & 0.01 & 0.01 & 0.02 & 0.07 & 0.09 \\ 
-  Art. 6 & 0.30 & 0.01 & 0.03 & 0.06 & 0.04 & 0.07 \\ 
-  Art. 8 & 0.29 & 0.03 & 0.15 & 0.00 & 0.01 & 0.01 \\ 
-  Art. 11 & 0.30 & 0.00 & 0.01 & 0.01 & 0.01 & 0.18 \\ 
-  Art. 13 & 0.30 & 0.01 & 0.01 & 0.00 & 0.01 & 0.17 \\ 
+Art. 5 & 0.59 & 0.03 & 0.02 & 0.03 & 0.14 & 0.19 \\ 
+  Art. 6 & 0.59 & 0.02 & 0.05 & 0.12 & 0.07 & 0.14 \\ 
+  Art. 8 & 0.58 & 0.07 & 0.31 & 0.01 & 0.03 & 0.01 \\ 
+  Art. 11 & 0.60 & 0.01 & 0.01 & 0.02 & 0.01 & 0.36 \\ 
+  Art. 13 & 0.60 & 0.02 & 0.01 & 0.00 & 0.03 & 0.34 \\ 
    \midrule
 \multicolumn{6}{l}{2012}\\
-Art. 5 & 0.10 & 0.01 & 0.05 & 0.06 & 0.12 & 0.16 \\ 
-  Art. 6 & 0.12 & 0.06 & 0.06 & 0.08 & 0.07 & 0.11 \\ 
-  Art. 8 & 0.10 & 0.03 & 0.02 & 0.07 & 0.16 & 0.12 \\ 
-  Art. 11 & 0.15 & 0.01 & 0.01 & 0.02 & 0.01 & 0.31 \\ 
-  Art. 13 & 0.15 & 0.01 & 0.01 & 0.01 & 0.01 & 0.31 \\ 
+Art. 51 & 0.20 & 0.02 & 0.10 & 0.11 & 0.24 & 0.32 \\ 
+  Art. 61 & 0.25 & 0.12 & 0.12 & 0.16 & 0.14 & 0.21 \\ 
+  Art. 81 & 0.20 & 0.05 & 0.04 & 0.13 & 0.33 & 0.25 \\ 
+  Art. 111 & 0.30 & 0.02 & 0.01 & 0.03 & 0.01 & 0.62 \\ 
+  Art. 131 & 0.30 & 0.03 & 0.02 & 0.01 & 0.03 & 0.61 \\ 
    \bottomrule
 \multicolumn{6}{l}{}\\
 \end{tabular}
@@ -82,58 +57,20 @@ Art. 5 & 0.10 & 0.01 & 0.05 & 0.06 & 0.12 & 0.16 \\
 
 \pagebreak
 
-\clearpage\section{General Trade}
+\clearpage\section{Results}
 
-\input{../fig/sar_adjmat_general_trade_summary.tex}
+\input{../fig/sar_rho_summary.tex}
 
-\input{../fig/sar_art05_adjmat_general_trade.tex}
-\input{../fig/sar_art06_adjmat_general_trade.tex}
-\input{../fig/sar_art08_adjmat_general_trade.tex}
-\input{../fig/sar_art11_adjmat_general_trade.tex}
-\input{../fig/sar_art13_adjmat_general_trade.tex}
-
-\clearpage\section{Tobacco Trade}
-
-\input{../fig/sar_adjmat_tobacco_trade_summary.tex}
-
-\input{../fig/sar_art05_adjmat_tobacco_trade.tex}
-\input{../fig/sar_art06_adjmat_tobacco_trade.tex}
-\input{../fig/sar_art08_adjmat_tobacco_trade.tex}
-\input{../fig/sar_art11_adjmat_tobacco_trade.tex}
-\input{../fig/sar_art13_adjmat_tobacco_trade.tex}
-
-
-\clearpage\section{Minimum Distance}
-
-\input{../fig/sar_adjmat_mindist_summary.tex}
-
-\input{../fig/sar_art05_adjmat_mindist.tex}
-\input{../fig/sar_art06_adjmat_mindist.tex}
-\input{../fig/sar_art08_adjmat_mindist.tex}
-\input{../fig/sar_art11_adjmat_mindist.tex}
-\input{../fig/sar_art13_adjmat_mindist.tex}
-
-\clearpage\section{Borders}
-
-\input{../fig/sar_adjmat_border_summary.tex}
-
-\input{../fig/sar_art05_adjmat_border.tex}
-\input{../fig/sar_art06_adjmat_border.tex}
-\input{../fig/sar_art08_adjmat_border.tex}
-\input{../fig/sar_art11_adjmat_border.tex}
-\input{../fig/sar_art13_adjmat_border.tex}
-
-\clearpage\section{Centroid Distance}
-
-\input{../fig/sar_adjmat_centroid_dist_summary.tex}
-
-\input{../fig/sar_art05_adjmat_centroid_dist.tex}
-\input{../fig/sar_art06_adjmat_centroid_dist.tex}
-\input{../fig/sar_art08_adjmat_centroid_dist.tex}
-\input{../fig/sar_art11_adjmat_centroid_dist.tex}
-\input{../fig/sar_art13_adjmat_centroid_dist.tex}
-
-
+\input{../fig/sar_all_articles_adjmat_general_trade.tex}
+\input{../fig/sar_all_articles_adjmat_tobacco_trade.tex}
+\input{../fig/sar_all_articles_adjmat_mindist.tex}
+\input{../fig/sar_all_articles_adjmat_centroid_dist.tex}
+\input{../fig/sar_all_articles_adjmat_border.tex}
+\input{../fig/sar_all_articles_adjmat_gl_posts.tex}
+\input{../fig/sar_all_articles_adjmat_referrals.tex}
+\input{../fig/sar_all_articles_adjmat_fctc_cop_coparticipation_twomode.tex}
+\input{../fig/sar_all_articles_adjmat_fctc_inb_coparticipation_twomode.tex}
+\input{../fig/sar_all_articles_adjmat_interest_group_comembership_twomode.tex}
 
 \appendix
 

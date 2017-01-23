@@ -12,22 +12,24 @@ load("data/adjmats.rda")
 load("data/adjmat_border.rda")
 load("data/adjmat_mindist.rda")
 load("data/adjmat_centroid_dist.rda")
-model_data <- read.csv("data/model_data.csv", na="<NA>")
+model_data <- read.csv("data/model_data.csv", na="<NA>", check.names = FALSE)
 
 # Sorting the data appropiately
 model_data    <- model_data[with(model_data, order(year, entry)),]
+model_data$years_since_ratif <- model_data$`Years since Ratif.`
+model_data$ratified <- with(
+  model_data, ifelse(years_since_ratif > 5, 2, ifelse(years_since_ratif == 5, 1, 0))
+)
 
-common_covars <- c("democracy", "GDP_pp", "tobac_prod_pp", "labor", "bloomberg_fctc_count",
-                   "subscribed")
+model_data$subscribed <- ifelse(model_data$subscribed > 0, 1, 0)
+
+common_covars <- c("GDP", "subscribed", "ratified")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
-nboot         <- 2000L
-ncores        <- 20L
-networks      <- c("adjmat_centroid_dist",
-                   "adjmat_tobacco_trade",
-                   "adjmat_gl_posts",
-                   "adjmat_referrals",
-                   "adjmat_interest_group_comembership_twomode"
-                   )
+nboot         <- 1000L
+ncores        <- 18L
+networks      <- c("adjmat_centroid_dist", "adjmat_gl_posts", "adjmat_referrals",
+                   "adjmat_fctc_cop_coparticipation_twomode",
+                   "adjmat_fctc_inb_coparticipation_twomode")
 
 dummy_net     <- "adjmat_centroid_dist"
 
@@ -48,31 +50,9 @@ for (g in g0[-1])
 image(adjmat_referrals)
 nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
 
-g0 <- adjmat_interest_group_comembership_twomode[as.character(2008:2010)] # 
-adjmat_interest_group_comembership_twomode <- g0[[1]]
-for (g in g0[-1])
-  adjmat_interest_group_comembership_twomode <- 
-  adjmat_interest_group_comembership_twomode + g
-
-image(adjmat_interest_group_comembership_twomode)
-nlinks(adjmat_interest_group_comembership_twomode)/
-  (nnodes(adjmat_interest_group_comembership_twomode)*
-     (nnodes(adjmat_interest_group_comembership_twomode)-1))
-
-# Options for each network
-thresholds <- list(
-  c(.35, .40, .45),
-  c(.30, .40, .50),
-  c(1L, 2L, 3L),
-  c(1L, 2L, 3L),
-  c(1L, 2L, 3L)
-)
-
-# True if the data must be processed as boolean (0-1 graph)
-boolnets   <- list(FALSE, FALSE, TRUE, TRUE, TRUE)
-
-names(thresholds) <- c(networks)
-names(boolnets)   <- c(networks)
+# If i referred j, then i has an influence over j, hence we transpose to compute
+# exposures.
+adjmat_referrals <- t(adjmat_referrals)
 
 # Filtering data: The network must be accomodated to the observed data
 # removing(adding) the extra(missing) nodes in the graph.
@@ -164,57 +144,95 @@ model_data2012 <- subset(model_data, year==2012)
 
 # Calibration ------------------------------------------------------------------
 
+# Options for each network
+thresholds <- list(
+  c(.35, .40, .45),
+  c(.4, .5, .6)+.1,
+  c(.4, .5, .6),
+  c(.70, .75, .80),
+  c(25, 30, 35)
+)
 
-# Step 1: set and adjust the graph
-testnet <- "adjmat_interest_group_comembership_twomode"
-graph <- get(testnet) # 
-# graph[] <- ifelse(graph[] > 2.5e-4, 1, 0)
-graph <- prepare_graph(graph, model_data, as_bool = boolnets[[testnet]])
+# True if the data must be processed as boolean (0-1 graph)
+boolnets   <- list(FALSE, FALSE, FALSE, FALSE, TRUE)
 
-ans<-netmatch(
-  # Actual data
-  dat   = model_data,
-  graph = graph, #graph, #rewire_graph(graph, p = n_rewires(graph), algorithm = "swap"),
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art05",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = thresholds[[testnet]][2],
-  expo_pcent = !boolnets[[testnet]],
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem", # Coarsened Exact Matching
-  distance = "mahalanobis"
-);ans[-3] # ;with(ans$dat[[2]], cor(Y, treat))
+names(thresholds) <- c(networks)
+names(boolnets)   <- c(networks)
 
+# Computes balance
+get_balance_stats <- function(x) {
+  x <- summary(x$match_obj)
+  x$sum.all$Type     <- "Pre-Match"
+  x$sum.matched$Type <- "Post-Match"
+  
+  return(with(x,rbind(sum.all, sum.matched)))
+}
 
-# Step 2: Calibrate (define the right parameters)
-# change: expo_pcent, expo_lag, method, distance
-g <- resample_graph(graph);{
-  d0 <- rbind(
-    model_data2010[attr(g, "sample_indices"),],
-    model_data2012[attr(g, "sample_indices"),]
+# Computes balance L1()
+get_imbalance <- function(x) {
+  dat0 <- as.data.frame(with(x$match_obj, cbind(w=weights, X, treat)))
+  dat1 <- dat0[dat0[,1] >0,,drop=FALSE]
+  dat0$w <- 1
+  ans  <- list(dat0, dat1)
+  
+  
+  ans  <- lapply(ans, function(y) imbalance(y$treat, y, c("w", "treat"), weights=y$w))
+  names(ans) <- c("Pre-Match", "Post-Match")
+  ans
+}
+
+# Looping through networks
+IMBALANCE <- vector("list", length(networks))
+BALANCES  <- vector("list", length(networks))
+SAMPSIZES <- matrix(ncol=2, nrow=length(networks), 
+                    dimnames = list(networks, c("Control", "Treated")))
+names(BALANCES) <- networks
+names(IMBALANCE) <- networks
+for (net in networks) {
+  
+  # Step 0: get the options
+  threshold_levels <- thresholds[[net]]
+  as_bool          <- boolnets[[net]]
+  
+  # Step 1: set and adjust the graph
+  graph <- get(net, .GlobalEnv)
+  graph <- prepare_graph(graph, model_data, as_bool = as_bool)
+  
+  ans<-netmatch(
+    # Actual data
+    dat   = model_data,
+    graph = graph, #graph, #rewire_graph(graph, p = n_rewires(graph), algorithm = "swap"),
+    # Variable names
+    timevar    = "year",
+    depvar     = "sum_art05",
+    covariates = common_covars,
+    # Preprocessing parameters
+    treat_thr  = thresholds[[net]][2],
+    expo_pcent = !boolnets[[net]],
+    expo_lag   = 1,
+    # Matching parameters
+    method   = "cem", # Coarsened Exact Matching
+    distance = "mahalanobis",
+    grouping = list(subscribed=list(0,1))
   )
-};ans<-netmatch(
-  # Actual data
-  dat   = d0,
-  graph = g,
-  # Variable names
-  timevar    = "year",
-  depvar     = "sum_art05",
-  covariates = common_covars,
-  # Preprocessing parameters
-  treat_thr  = .35,
-  expo_pcent = TRUE,
-  expo_lag   = 1,
-  # Matching parameters
-  method   = "cem", # Coarsened Exact Matching
-  distance = "mahalanobis"
-);ans
+  
+  # Computing stats
+  IMBALANCE[[net]] <- get_imbalance(ans)
+  BALANCES[[net]]  <- get_balance_stats(ans)
+  SAMPSIZES[net,]  <- ans$match_obj$nn["Matched",,drop=TRUE]
+}
+
+# Overall imbalance
+ans <- t(sapply(IMBALANCE, function(x) c(x$`Pre-Match`$L1$L1, x$`Post-Match`$L1$L1)))
+colnames(ans) <- c("Pre-Imbalance", "Post-Imbalance")
+ans <- cbind(ans, SAMPSIZES)
+ans
 
 
+# Main part of the code --------------------------------------------------------
 
+# Loop through netwrorks/articles/threshold levels to generate distributions
+# of the matching estimators
 for (net in networks) {
   # Step 0: get the options
   threshold_levels <- thresholds[[net]]
@@ -258,7 +276,8 @@ for (net in networks) {
     assign(sprintf("bs_%s_%s",net, art), dat, envir = .GlobalEnv)
     
   }
-  # stop()
+  
+  
   stopCluster(cl)
 }
 
@@ -276,7 +295,6 @@ graph <- prepare_graph(graph, model_data, as_bool = as_bool)
 cl <- makeCluster(ncores)
 clusterExport(cl, c("model_data", "common_covars", "graph"))
 clusterEvalQ(cl, library(netdiffuseR))
-
 
 
 # Running the test
@@ -321,47 +339,7 @@ for (art in articles) {
         ))
       }
     })
-    # clusterExport(cl, c("thrlvl", "art", "as_bool"))
-    # suppressMessages({
-    #   ans[[as.character(thrlvl)]] <- struct_test(graph, function(g) {
-    #     
-    #     out <- tryCatch({
-    #       netmatch(
-    #         # Actual data
-    #         dat   = model_data,
-    #         graph = g,
-    #         # Variable names
-    #         timevar    = "year",
-    #         depvar     = art,
-    #         covariates = common_covars,
-    #         # Preprocessing parameters
-    #         treat_thr  = thrlvl,
-    #         expo_pcent = !as_bool,
-    #         expo_lag   = 1L,
-    #         # Matching parameters
-    #         distance       = "mahalanobis",
-    #         method         = "cem" #,
-    #         # baseline.group = "1"
-    #         # replace  = FALSE
-    #       )
-    #     }, error=function(e) e)
-    #     
-    #     if (inherits(out, "error")) {
-    #       return(c(
-    #         fATT = NA,
-    #         n1   = NA,
-    #         n0   = NA
-    #       ))
-    #     } else {
-    #       return(c(
-    #         fATT = out$fATT,
-    #         n1   = out$match_obj$nn["Matched","Treated"],
-    #         n0   = out$match_obj$nn["Matched","Control"]
-    #       ))
-    #     }
-    #     },
-    #     R = nboot, cl=cl, parallel="multicore", ncpus=length(cl))
-    # })
+    
     message("Threshold level: ", thrlvl, " article:", art," done.")
   }
   
@@ -382,6 +360,16 @@ for (art in articles) {
 }
 
 stopCluster(cl)
+
+# Saving all the relevant data -------------------------------------------------
+save(
+  list = c(
+    ls(pattern = "^bs_.+"), "articles", "common_covars", "boolnets",
+    "dummy_net", "nboot", "ncores", "network_is_undirected", "threshold_levels",
+    "thresholds"
+  ),
+  file = "data/bs_networks.rda"
+)
 
 # Plotting ---------------------------------------------------------------------
 
@@ -457,19 +445,122 @@ for (net in c("dummy", networks)) {
   dev.off()
 }
 
+# Summary table (pvalues) ------------------------------------------------------
 
-# Structural test --------------------------------------------------------------
-# stop()
-# # Setting up parallel
-# library(parallel)
-# cl <- makeCluster(7)
-# clusterExport(cl, c("model_data", "common_covars"))
-# clusterEvalQ(cl, library(netdiffuseR))
-# 
-# # Running the test
-# ans <- struct_test(graph, function(g) {
-#   netmatch(model_data, g, "year", "sum_art05", common_covars,
-#            treat_thr = .4, expo_pcent = TRUE, expo_lag = 1L, method="cem")$fATT
-# }, R = 1000, cl=cl, parallel="multicore", ncpus=length(cl))
-# 
-# stopCluster(cl)
+# Computes the probability of X = 0
+pvalfun <- function(x) {
+  x <- x[!is.na(x)]
+  ans <- sum(0 < x)/length(x)
+  ifelse(ans > 0.5, 1-ans, ans)*2
+}
+
+PVALS <- matrix(ncol=5, nrow=0)
+PVALS <- as.data.frame(PVALS)
+for (net in c("dummy", networks)) {
+  
+  # Getting the limits for plotting
+  nets <- ls(pattern = paste0("bs_", net,".+"), envir = .GlobalEnv)
+  
+  for (n in nets) {
+    art <- as.integer(gsub(".+_art(?=[0-9])", "", n, perl = TRUE))
+    PVALS <- rbind(
+      PVALS,
+      data.frame(
+        net, art, 
+        t(unname(apply(get(n, envir = .GlobalEnv), 2, pvalfun))))
+    )
+  }
+  
+}
+
+# Adding column names
+colnames(PVALS) <- c("Network", "Art.", "Low Thr.", "Mid.  Thr.", "High  Thr.")
+
+cat(as.character(
+  knitr::kable(PVALS, format="latex", caption = "p-values of NetMatching",
+               booktabs=TRUE)),
+    file = "fig/matching_summary.tex")
+
+# Creates plot per article -----------------------------------------------------
+
+# Graph parameters
+graphics.off()
+pdf(sprintf("fig/matching_summary.pdf", net), width = 7, height = 10)
+oldpar <- par(no.readonly = TRUE)
+par(mfrow=c(3,2), oma=c(5,5,1,1))
+
+s <- .25
+S <- .5
+labcex <- 1.5
+labpos <- "topright"
+
+i <- 1
+netcolors <- c("red","blue","darkred","purple", "darkgreen", "darkred")
+
+for (art in unique(PVALS$`Art.`)) {
+  
+  # Getting the article
+  pvals <- subset(PVALS, `Art.` == art)
+  
+  # Plotting
+  
+  # Adjusting margin
+  if (i %% 2) par(mai=oldpar$mai*c(s,S,s,s))
+  else        par(mai=oldpar$mai*c(s,s,s,S))
+  
+  plot.new()
+  plot.window(xlim = c(1-.25,3.25), ylim = c(0,1))
+  
+  # Adding rectangle
+  rect(-1,-1,4,2, col="gray")
+  
+  # 5% Level
+  abline(h=.05, lwd=2, col=adjustcolor("black", alpha.f =.9))
+  
+  # Adding lines
+  for (l in 1:nrow(pvals)) {
+    lines(y=pvals[l,-c(1,2),drop=FALSE], x=1:3, 
+          col = adjustcolor(netcolors[l], alpha.f =.9),
+          lty = l, lwd=2)
+  }
+  
+  # Adding names
+  box()
+  axis(1, at=1:3, labels=c("Low","Mid","High"))
+  axis(2, at=seq(0,1,by=.2), las=1)
+  legend(labpos, legend = paste("Art.", art), bty = "n", cex=labcex)
+  
+  i <- i + 1
+  
+  
+}
+
+# Adding legend
+
+# Adjusting margin
+if (i %% 2) {
+  par(mai=oldpar$mai*c(s,S,s,s))
+} else {
+  par(mai=oldpar$mai*c(s,s,s,S))
+}
+
+plot.new()
+plot.window(c(0,1),c(0,1))
+legend(
+  x      = "center",
+  legend = gsub("adjmat_","", pvals$Network),
+  col    = adjustcolor(netcolors, alpha.f =.9),
+  lty    = 1:nrow(pvals),
+  lwd    = 2,
+  bty    = "n",
+  title  = "Legend" 
+  
+)
+
+# Adding legends
+par(mfrow=c(1,1))
+mtext(side = 1, text = "Exposure Threshold Level", outer = TRUE, line=2)
+mtext(side = 2, text = "p-values (Probability of Effect equal to 0)", outer = TRUE, line=2)
+par(oldpar)
+dev.off()
+

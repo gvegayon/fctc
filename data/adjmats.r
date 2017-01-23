@@ -16,17 +16,6 @@ networks_to_use <- c(
   "Interest Group co-membership (two-mode)"
 )
 
-network_is_undirected <- list(
-  FALSE, FALSE, FALSE,
-  TRUE, TRUE,
-  TRUE,
-  FALSE,
-  TRUE,
-  TRUE
-)
-
-names(network_is_undirected) <- networks_to_use
-
 library(foreign)
 library(netdiffuseR)
 library(stringr)
@@ -68,7 +57,6 @@ edgelist <- edgelist[with(edgelist, order(year, relation)),]
 networks        <- vector("list", length(networks_to_use))
 names(networks) <- networks_to_use
 
-
 for (net in networks_to_use) {
   E <- subset(edgelist, relation == net)
   
@@ -89,7 +77,7 @@ for (net in networks_to_use) {
     edgelist   = E[,c("ego","alter")],
     t0         = t0,
     t1         = t1,
-    undirected = network_is_undirected[[net]],
+    undirected = FALSE,
     w          = E$value
   )
 }
