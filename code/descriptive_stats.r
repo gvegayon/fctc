@@ -174,7 +174,7 @@ fancy_names <- c(
   # "Shared borders (Wiki)",
   "Centroid Distance",
   "GL co-subscription",
-  "GL Referrals "
+  "GL Referrals ",
 )
 
 homophilous <- c(
