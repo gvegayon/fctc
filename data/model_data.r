@@ -88,6 +88,8 @@ dat$`Years since Sign.`  <- with(dat, 2010L - year_signature)
 dat$`Years since Ratif.`[dat$`Years since Ratif.` < 0] <- 0L
 dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
 
+write.csv(dat, "data/model_data_unscaled.csv", row.names = FALSE, na = "<NA>")
+
 # Rescaling variables ----------------------------------------------------------
 dat$tobac_prod_pp       <- with(dat, tobac_prod/population)
 dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)

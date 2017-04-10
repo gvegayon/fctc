@@ -4,79 +4,33 @@ options(stringsAsFactors = FALSE)
 
 library(xtable)
 library(netdiffuseR)
+library(magrittr)
+library(dplyr)
 
-# ------------------------------------------------------------------------------
-#
-# Part 1: Party attributes
-#
-# ------------------------------------------------------------------------------
-model_data <- read.csv("data/model_data.csv", na="<NA>")
+# Part 1: Party attributes -----------------------------------------------------
 
-# On Smoking
-summary(model_data[,c("tobac_prod","perc_female_smoke", "perc_male_smoke")])
+model_data <- read.csv("data/model_data_unscaled.csv", na="<NA>", check.names = FALSE)
 
-# Distribution of number of items implemented
-l <- c("sum_art05","sum_art06", "sum_art08", "sum_art11", "sum_art13")
-dat <- reshape(model_data, varying = l, direction = "long", v.names="sum_art",
-               times = c(5,6,8,11,13), timevar="Article")
-dat <- subset(dat, select=c(year, sum_art, Article))
-dat$sum_art <- ifelse(dat$sum_art >= 5, ">=5", sprintf("% 2d",dat$sum_art))
-dat <- with(dat, table(Article, sum_art, year))
-dat <- prop.table(dat,c(1,3))
+ans <- group_by(model_data, year) %>%
+  summarise(
+    Americas                = mean(Americas)*100,
+    `Eastern Mediterranean` = mean(`Eastern Mediterranean`)*100,
+    Europe                  = mean(Europe)*100,
+    Africa                  = mean(Africa)*100,
+    `Western Pacific`       = mean(`Western Pacific`)*100,
+    `Southeast Asia`        = mean(`South-East Asia`)*100,
+    `Democracy`             = mean(democracy),
+    `GDP per capita`        = mean(GDP)
+  );print(t(ans), digits=4)
 
-# Preparing for xtable
-dat <- list(dat[,,1], dat[,,2])
-dat <- lapply(dat, function(x) {
-  rownames(x) <- paste("Art.", rownames(x))
-  x
-})
-attr(dat, "subheadings") <- c(2010, 2012)
-
-# Storing data as CSV
-write.table(
-  rbind(cbind(year=2010,dat[[1]]), cbind(year=2012,dat[[2]])),
-  file = "fig/dist_of_items_implemented.csv")
+# Number of years since ratification -------------------------------------------
+dat <- subset(model_data, year == 2012)
+apply(dat[, c("Years since Sign.", "Years since Ratif.")], 2, mean, na.rm=TRUE)
+apply(dat[, c("Years since Sign.", "Years since Ratif.")], 2, sd, na.rm=TRUE)
 
 
-cap <- paste(
-  "Distribution of number of items implemented per article.",
-  "Row-sums are equal to 1."
-)
+# Part 2: Ratifying countries --------------------------------------------------
 
-dat <- xtable::xtableList(dat, caption=cap)
-
-xtable::print.xtableList(dat, booktabs = TRUE, file="fig/implementation_dist.tex")
-
-# Average number of items implemented per article/year
-l <- c("sum_art05","sum_art06", "sum_art08", "sum_art11", "sum_art13")
-dat <- reshape(model_data, varying = l, direction = "long", v.names="sum_art",
-               times = c(5,6,8,11,13), timevar="Article")
-dat <- subset(dat, select=c(year, sum_art, Article))
-# dat$sum_art <- ifelse(dat$sum_art >= 5, ">=5", sprintf("% 2d",dat$sum_art))
-dat <- group_by(dat, Article, year) %>%
-  summarize(Mean = mean(sum_art))
-
-dat <- as.data.frame(dat)
-
-dat <-
-  reshape(
-    dat,
-    timevar = "year",
-    v.names = "Mean",
-    direction = "wide",
-    idvar = c("Article")
-  )
-
-# Preparing for xtable
-rownames(dat) <- paste("Art.", dat$Article)
-dat <- dat[,-1]
-colnames(dat) <- paste("Mean", c("2010", "2012"))
-                       
-
-# Storing data as CSV
-write.table(dat,  file = "fig/mean_of_items_implemented.csv")
-  
-# Ratifying countries ----------------------------------------------------------
 dat <- read.csv("data/treaty_dates.csv", na="<NA>")
 dat <- subset(dat, select=c(entry, country_name, signature, ratification))
 colnames(dat) <- c("Code", "Name", "Signature date", "Ratification Date")
@@ -90,11 +44,8 @@ xtable::caption(dat) <- paste(
 print(dat, file="fig/signature_ratification_dates.tex", booktabs=TRUE,
       tabular.environment="longtable")
 
-# ------------------------------------------------------------------------------
-#
-# Part 2: Network attributes
-#
-# ------------------------------------------------------------------------------
+# Part 3: Network attributes ---------------------------------------------------
+
 
 rm(list=ls())
 model_data <- read.csv("data/model_data.csv", na="<NA>")
@@ -174,7 +125,7 @@ fancy_names <- c(
   # "Shared borders (Wiki)",
   "Centroid Distance",
   "GL co-subscription",
-  "GL Referrals ",
+  "GL Referrals "
 )
 
 homophilous <- c(
