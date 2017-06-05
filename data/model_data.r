@@ -4,6 +4,7 @@
 rm(list=ls())
 options(stringsAsFactors=FALSE)
 library(dplyr)
+library(readxl)
 library(netdiffuseR)
 
 # parameter
@@ -28,11 +29,14 @@ treaty_dates     <- subset(treaty_dates, select=c(entry, signature, ratification
 implementation   <- read.csv("data/implementation.csv", na = "<NA>")
 implementation   <- subset(implementation, select=c(-country_name))
 
+govtown          <- read.csv("data/govtown.csv", na = "<NA>")
+
 # Merging ----------------------------------------------------------------------
 dat <- left_join(party_attributes, political_shifts, by=c("year", "entry"))
 dat <- left_join(dat, treaty_dates, by="entry")
 dat <- left_join(dat, implementation)
 dat <- left_join(dat, bloomberg, by=c("year", "entry"))
+dat <- left_join(dat, govtown, by = "entry")
 
 # Bloomberg data should be filled with zeros instead of NAs
 dat$bloomberg_amount      <- coalesce(dat$bloomberg_amount, 0)

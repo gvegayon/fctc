@@ -6,6 +6,7 @@
 options(stringsAsFactors = FALSE)
 rm(list=ls())
 
+library(netdiffuseR)
 library(texreg)
 library(Matrix)
 library(spdep)
@@ -26,8 +27,8 @@ makeformula <- function(y, x) {
 common_covars <- c("`Eastern Mediterranean`", "European", "African", "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
                    "democracy", "GDP", "`Years since Sign.`", "`Years since Ratif.`",
                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
-                   "year2012", "labor", "womens_rights", "population",
-                   "subscribed")
+                   "year2012", "labor", "womens_rights", "population", "govtown")
+                   # "subscribed", "govtown")
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # List of networks (with pretty names) that will be used
