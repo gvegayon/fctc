@@ -131,7 +131,7 @@ for (Wnum in 1:nrow(networks)) {
     mod <- makeformula(art, common_covars)
 
     ans <- sartobit(mod, W = W, data=model_data,
-                    computeMarginalEffects=TRUE)
+                    ndraw = 5e3, burn.in = 1e3)
     
     # Creating the object
     assign(paste("sar_tobit",art,1,sep="_"), ans, envir = .GlobalEnv)
@@ -147,7 +147,7 @@ for (Wnum in 1:nrow(networks)) {
     mod <- makeformula(art, c(common_covars, "pol_shift"))
     
     ans <- sartobit(mod, W = W[ids,ids], data=model_data[ids,],
-                    computeMarginalEffects=TRUE)
+                    ndraw = 5e3, burn.in = 1e3)
     
     # Creating the object
     assign(paste("sar_tobit",art,2,sep="_"), ans, envir = .GlobalEnv)
@@ -159,7 +159,7 @@ for (Wnum in 1:nrow(networks)) {
     # Creating and estimating model 
     mod <- makeformula(art, c(common_covars, "bloomberg_amount"))
     ans <- sartobit(mod, W = W, data=model_data,
-                    computeMarginalEffects=TRUE)
+                    ndraw = 5e3, burn.in = 1e3)
     
     # Creating the object
     assign(paste("sar_tobit",art,3,sep="_"), ans, envir = .GlobalEnv)
@@ -171,7 +171,7 @@ for (Wnum in 1:nrow(networks)) {
     # Creating and estimating model 
     mod <- makeformula(art, c(common_covars, "bloomberg_count"))
     ans <- sartobit(mod, W = W, data=model_data,
-                    computeMarginalEffects=TRUE)
+                    ndraw = 5e3, burn.in = 1e3)
     
     # Creating the object
     assign(paste("sar_tobit",art,4,sep="_"), ans, envir = .GlobalEnv)
@@ -183,7 +183,7 @@ for (Wnum in 1:nrow(networks)) {
     # Creating and estimating model 
     mod <- makeformula(art, c(common_covars, "bloomberg_fctc_amount"))
     ans <- sartobit(mod, W = W, data=model_data,
-                     computeMarginalEffects=TRUE)
+                     ndraw = 5e3, burn.in = 1e3)
     
     # Creating the object
     assign(paste("sar_tobit",art,5,sep="_"), ans, envir = .GlobalEnv)
@@ -195,7 +195,7 @@ for (Wnum in 1:nrow(networks)) {
     # Creating and estimating model 
     mod <- makeformula(art, c(common_covars, "bloomberg_fctc_count"))
     ans <- sartobit(mod, W = W, data=model_data,
-                    computeMarginalEffects=TRUE)
+                    ndraw = 5e3, burn.in = 1e3)
     
     # Creating the object
     assign(paste("sar_tobit",art,6,sep="_"), ans, envir = .GlobalEnv)
@@ -204,7 +204,7 @@ for (Wnum in 1:nrow(networks)) {
   
   
   # Saving results -----------------------------------------------------------
-  save.image(sprintf("code/sar_tobit_%s.rda", Wname))
+  save(Wname, list = ls(pattern = "sar_tobit_sum.+[0-9]$"), file = sprintf("code/sar_tobit_%s.rda", Wname))
   
   message("Network ", Wname, " done.")
 }
