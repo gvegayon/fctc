@@ -2,6 +2,7 @@ rm(list = ls())
 
 library(spatialprobit)
 
+# List of networks
 networks      <- c(
   "adjmat_general_trade", "General Trade",
   "adjmat_tobacco_trade", "Tobacco Trade",
@@ -17,61 +18,124 @@ networks      <- c(
 
 networks <- matrix(networks, ncol = 2, byrow = TRUE)
 
-# Finding files
-files <- list.files(path = "code/", pattern = "sar_tobit_.+.rda", full.names = TRUE)
-
-# Program to fetch the alphas
-
-get_rho <- function(object, art) {
-  # Calling the summary
+# Function to get coefficients
+get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
+  env <- new.env()
+  
+  # Fetching the estimates
+  load(sprintf("code/sar_tobit_%s.rda", netname), envir = env)
+  estimates <- env[[sprintf("sar_tobit_%s_%i", depvar, modelnum)]]
+  
+  # Retrieving the betas and sds
   sink(tempfile())
-  ans <- summary(object)
+  nobs <- estimates$nobs
+  estimates <- summary(estimates)
   sink()
-  ans <- ans["rho", c("Estimate", "Std. Dev", "Pr(>|z|)"), drop=FALSE]
-  rownames(ans) <- art
+  
+  # Getting the 
+  ans <- estimates[varnames,,drop=FALSE]
+  
+  pvals <- ans[,"Pr(>|z|)"]
+  pvals <- ifelse(pvals > .1, "", ifelse(pvals >.05, "*", ifelse(pvals >.01, "**", "***")))
+  
+  ans <- matrix(
+    sprintf(sprintf("%%.%if (%%.%if) %%s", digits, digits),
+            ans[,"Estimate"],
+            ans[,"Std. Dev"],
+            pvals),
+    ncol = 1,
+    dimnames = list(names(varnames), netname)
+  )
+  
+  # # Number of observations
+  # ans <- rbind(ans, matrix(nobs, ncol = 1, dimnames = list("N", netname)))
+  
   ans
 }
 
-bigtable <- NULL
-for (fn in networks[,1]) {
-  # Trying to clean up
-  tryCatch(rm(list = ls(pattern = "^sar_tobit_sum.+", envir = .GlobalEnv)))
-  load(sprintf("code/sar_tobit_%s.rda", fn))
+# Variables to include in the table
+varnames <- list(
+  c(
+  rho = "rho", 
+  `Gov. Ownership` = "govtown",
+  `Tobacco Prod. PP` = "tobac_prod_pp",
+  `Years since Sign.` = "`Years since Sign.`", 
+  `Years since Ratif.` = "`Years since Ratif.`",
+  `GDP pp` = "GDP",
+  Democracy = "democracy"
+  )
+)
+
+varnames[[2]] <- c(varnames[[1]], PolShift = "pol_shift")
+varnames[[3]] <- c(varnames[[1]], `Bloomberg Amount` = "bloomberg_amount")
+varnames[[4]] <- c(varnames[[1]], `Bloomberg Count` = "bloomberg_count")
+varnames[[5]] <- c(varnames[[1]], `Bloomberg FCTC Amount` = "bloomberg_fctc_amount")
+varnames[[6]] <- c(varnames[[1]], `Bloomberg FCTC Count` = "bloomberg_fctc_count")
+
+articles <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
+
+# Loop through model number
+for (m in 1:6) {
   
+  # Creating new environment
+  env <- new.env()
   
-  # Listing models
-  ans_model_1 <- ls(pattern = "sar_tobit_sum.+1$")
-  ans_model_2 <- ls(pattern = "sar_tobit_sum.+2$")
-  ans_model_3 <- ls(pattern = "sar_tobit_sum.+3$")
-  ans_model_4 <- ls(pattern = "sar_tobit_sum.+4$")
-  ans_model_5 <- ls(pattern = "sar_tobit_sum.+5$")
-  ans_model_6 <- ls(pattern = "sar_tobit_sum.+6$")
+  # Looping through depvars
+  for (a in articles) {
+    
+    ans <- NULL
+    
+    # Looping throught networks
+    for (net in networks[,1]) {
+      
+      # Fetching the data and rowbinding
+      ans <- cbind(
+        ans, get_coefs(
+          netname  = net,
+          depvar   = a,
+          varnames = varnames[[m]],
+          modelnum = m, 
+          digits   = 2
+        )
+      )
+      
+      # Are we there yet?
+      message("Network: ", net, " variable: ", a, " done.")
+    }
+    
+    # Pretty dimnames
+    colnames(ans) <- networks[,2]
+    
+    # Saving
+    assign(a, ans, envir = env)
+    
+  }
   
-  # Extracting coefficients
-  rho_model_1 <- do.call(rbind, Map(get_rho, lapply(ans_model_1, get), c(5, 6, 8, 11, 13)))
-  rho_model_2 <- do.call(rbind, Map(get_rho, lapply(ans_model_2, get), c(5, 6, 8, 11, 13)))
-  rho_model_3 <- do.call(rbind, Map(get_rho, lapply(ans_model_3, get), c(5, 6, 8, 11, 13)))
-  rho_model_4 <- do.call(rbind, Map(get_rho, lapply(ans_model_4, get), c(5, 6, 8, 11, 13)))
-  rho_model_5 <- do.call(rbind, Map(get_rho, lapply(ans_model_5, get), c(5, 6, 8, 11, 13)))
-  rho_model_6 <- do.call(rbind, Map(get_rho, lapply(ans_model_6, get), c(5, 6, 8, 11, 13)))
+  # Putting all tables together
+  fn <- sprintf("code/sar_tobit_tabulate_model=%i.csv", m)
+  for (a in articles) {
+    
+    # Article number
+    write.table(
+      gsub("sum_art0?", "Art. ", a),
+      fn, row.names = FALSE, col.names = FALSE, quote = FALSE,
+      append = ifelse(a == articles[1], FALSE, TRUE)
+    )
+    
+    # Writing values
+    write.table(
+      get(a, envir = env), fn, append = TRUE, row.names = TRUE, sep = ",",
+      col.names = ifelse(a == articles[1], TRUE, FALSE),
+      quote=FALSE)
+  }
   
-  # Assingning to the overall tab
-  bigtable <- rbind(bigtable, rho_model_1[,3])
-  
+  # Adding note
+  write.table(
+    "Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'",
+    fn, append = TRUE, row.names = FALSE, col.names = FALSE, quote=FALSE)
+
+  # Cleaning everything 
+  message("Model ", m, " done ----------------------------------------------------")
+  rm(env)
 }
 
-# Adding fancy names
-rownames(bigtable) <- networks[,2]
-print(bigtable, digits=1)
-
-formatted_bigtable <- bigtable
-formatted_bigtable[] <- 
-  ifelse(formatted_bigtable > .1, sprintf("%.2f", formatted_bigtable),
-         ifelse(formatted_bigtable > .05, sprintf("%.2f*", formatted_bigtable),
-                sprintf("%.2f**", formatted_bigtable)
-  ))
-
-formatted_bigtable[,ncol(formatted_bigtable)] <-
-  sprintf("%s\n", formatted_bigtable[,ncol(formatted_bigtable)])
-
-cat(formatted_bigtable)

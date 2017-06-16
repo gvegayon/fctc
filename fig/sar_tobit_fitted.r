@@ -1,3 +1,6 @@
+# This script takes the results from the SAR Tobit models and compares the fitted values with
+# observed ones on distribution. It generates the file 'fig/sar_tobit_fitted.pdf'.
+
 rm(list = ls())
 
 model_data <- read.csv("data/model_data.csv", na="<NA>", check.names = FALSE)
@@ -65,8 +68,9 @@ histoplot <- function(
 }
 
 graphics.off()
-pdf("fig/sar_tobit_fitted.pdf", width = 7.92, height = 8.42)
-# jpeg("fig/sar_tobit_fitted.jpeg", width = 761, height = 809)
+setEPS()
+# postscript("fig/sar_tobit_fitted.eps", width = 7.92, height = 8.42)
+tiff("fig/sar_tobit_fitted.tiff", width = 761, height = 809)
 oldpar <- par(no.readonly = TRUE)
 par(mfrow = c(4, 2), mai = c(0,0,0,0)+.2, oma = c(9, 6, 4, 1), las = 1,
     cex.main = 1.5, font.main = 1, xpd = NA)
@@ -102,10 +106,11 @@ legend(x = mean(par()$usr[1:2]), y = -25,
 par(oldpar)
 dev.off()
 
-# Description: Fitted and observed distribution of number of items implemented per countries. 
+system("convert fig/sar_tobit_fitted.pdf -resize 100% fig/sar_tobit_fitted.png")
+# Description: Fitted and observed distribution of number of items implemented per countries.
 # Panel A1 and A2 show observed values of Article 11 and fitted values of the same article
 # from the SAR Tobit model using the General Trade Network, like-wise, B1-B2, C1-C2, D1-D2 show
 # observed values for Article 11, 5, and 11, and fitted values from SAR Tobit models using
-# GlobalLink Referrals, FCTC INB co-participation, and Interest Group co-membership 
+# GlobalLink Referrals, FCTC INB co-participation, and Interest Group co-membership
 # respectively. Panels in the left show such distribution on 2010, and panels on the right
 # on 2012.

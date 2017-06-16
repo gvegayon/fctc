@@ -61,7 +61,7 @@ for (g in g0[-1])
   adjmat_referrals <- adjmat_referrals + g
 
 adjmat_interest_group_comembership_twomode <-
-  adjmat_interest_group_comembership_twomode$`2011`
+  adjmat_interest_group_comembership_twomode$`2009`
 
 image(adjmat_referrals)
 nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
