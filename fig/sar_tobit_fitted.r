@@ -25,7 +25,7 @@ networks      <- c(
 networks <- matrix(networks, ncol = 2, byrow = TRUE)
 
 # Finding files
-files <- list.files(path = "code/", pattern = "sar_tobit_.+.rda", full.names = TRUE)
+files <- list.files(path = "models/", pattern = "sar_tobit_.+.rda", full.names = TRUE)
 
 
 histoplot <- function(
@@ -41,7 +41,7 @@ histoplot <- function(
   ) {
   
   env <- new.env()
-  load(sprintf("code/sar_tobit_%s.rda", net), envir = env)
+  load(sprintf("models/sar_tobit_%s.rda", net), envir = env)
   
   # Getting observed data
   obs <- subset(model_data, year2012 == use2012)[[var]]
