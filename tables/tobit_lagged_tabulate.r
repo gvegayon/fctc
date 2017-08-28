@@ -18,6 +18,11 @@ networks      <- c(
 
 networks <- matrix(networks, ncol = 2, byrow = TRUE)
 
+# Function to compute pseudo R2 using McFadden's method
+pseudoR2 <- function(x) {
+  sprintf("%.2f", 1 - x$loglik[2]/x$loglik[1])
+}
+
 # Function to get coefficients
 get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   env <- new.env()
@@ -47,7 +52,11 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   )
   
   # # Number of observations
-  ans <- rbind(ans, matrix(nobs, ncol = 1, dimnames = list("N", netname)))
+  ans <- rbind(
+    ans,
+    matrix(nobs, ncol = 1, dimnames = list("N", netname)),
+    matrix(pseudoR2(env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]), ncol = 1, dimnames = list("Pseudo R2", netname))
+    )
   
   ans
 }
@@ -55,18 +64,23 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
 # Variables to include in the table
 varnames <- list(
   c(
-  rho = "rho", 
-  `Gov. Ownership` = "govtown",
-  `Tobacco Prod. PP` = "tobac_prod_pp",
-  `Years since Sign.` = "`Years since Sign.`", 
-  `Years since Ratif.` = "`Years since Ratif.`",
-  `GDP pp` = "GDP",
-  `Democracy` = "democracy",
-  `% Female Smoke` = "perc_female_smoke",
-  `% Male Smoke` = "perc_male_smoke",
-  `Labor` = "labor",
-  `Women's rights` = "womens_rights",
-  `Population` = "population"
+  rho                     = "rho", 
+  `Gov. Ownership`        = "govtown",
+  `Tobacco Prod. PP`      = "tobac_prod_pp",
+  `Years since Sign.`     = "`Years since Sign.`", 
+  `Years since Ratif.`    = "`Years since Ratif.`",
+  `GDP pp`                = "GDP",
+  `Democracy`             = "democracy",
+  `% Female Smoke`        = "perc_female_smoke",
+  `% Male Smoke`          = "perc_male_smoke",
+  `Labor`                 = "labor",
+  `Women's rights`        = "womens_rights",
+  `Population`            = "population",
+  `Eastern Mediterranean` = "`Eastern Mediterranean`",
+  European                = "European",
+  African                 = "African",
+  `Western Pacific`       = "`Western Pacific`",
+  `(Intercept)`           = "(Intercept)"
   )
 )
 
@@ -79,7 +93,7 @@ varnames[[6]] <- c(varnames[[1]], `Bloomberg FCTC Count` = "bloomberg_fctc_count
 articles <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # Loop through model number
-for (m in 1:6) {
+for (m in 0:6) {
   
   # Creating new environment
   env <- new.env()
@@ -98,7 +112,14 @@ for (m in 1:6) {
       ans0 <- get_coefs(
         netname  = net,
         depvar   = a,
-        varnames = varnames[[m]],
+        varnames = if (m == 0) {
+          c(varnames[[m + 1]],
+            structure(
+              paste0(a, "_lagged"),
+              names = sprintf("Art %s (t-1)",gsub("sum_art0?", "", a))
+              )
+            )
+          } else varnames[[m]],
         modelnum = m, 
         digits   = 2
       )

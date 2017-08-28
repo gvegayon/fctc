@@ -10,7 +10,7 @@ library(netdiffuseR)
 library(texreg)
 library(Matrix)
 library(spdep)
-library(spatialprobit)
+library(AER)
 
 model_data <- read.csv("data/model_data.csv", na="<NA>", check.names = FALSE)
 model_data <- model_data[with(model_data, order(year, entry)),]
@@ -135,6 +135,20 @@ for (Wnum in 1:nrow(networks)) {
   rho_asterisk_table <- NULL
   rho_per_article    <- vector("numeric", length(articles))
   names(rho_per_article) <- articles
+  
+  
+  for (art in articles) {
+    # Creating and estimating model (including lagged exposure)
+    model_data[["rho"]] <- as.matrix(
+      W %*% model_data[[sprintf("%s_lagged",art)]]
+    )
+    mod <- makeformula(art, c(common_covars, "rho", sprintf("%s_lagged",art)))
+    ans <- AER::tobit(mod, data=model_data)
+    
+    # Creating the object
+    assign(paste("tobit_lagged",art,0,sep="_"), ans, envir = .GlobalEnv)
+    message("Network ", Wname, " article ", art, " model ", 0,  " done.")
+  }
   
   # Model 1: Only characteristics
   

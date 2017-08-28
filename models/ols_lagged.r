@@ -136,6 +136,21 @@ for (Wnum in 1:nrow(networks)) {
   rho_per_article    <- vector("numeric", length(articles))
   names(rho_per_article) <- articles
   
+  # Model 0: Only characteristics + lagged
+  
+  for (art in articles) {
+    # Creating and estimating model (including lagged exposure)
+    model_data[["rho"]] <- as.matrix(
+      W %*% model_data[[sprintf("%s_lagged",art)]]
+    )
+    mod <- makeformula(art, c(common_covars, "rho", sprintf("%s_lagged",art)))
+    ans <- lm(mod, data=model_data)
+    
+    # Creating the object
+    assign(paste("ols_lagged",art, 0,sep="_"), ans, envir = .GlobalEnv)
+    message("Network ", Wname, " article ", art, " model ", 0,  " done.")
+  }
+  
   # Model 1: Only characteristics
   
   for (art in articles) {

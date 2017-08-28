@@ -2,18 +2,18 @@
 options(stringsAsFactors = FALSE)
 rm(list=ls())
 
-load("data-raw/country_distance/country_distance.rda")
+load("data-raw/country_distance/country_min_dist.rda")
 
 # Loading names
 country_names <- read.csv("data/gw_country_codes.csv", na="<NA>")
 
 # Subseting only those that we have
-ids <- which(rownames(adjmat_mindist) %in% country_names$code)
-adjmat_mindist <- adjmat_mindist[ids,ids]
+ids <- which(rownames(country_min_dist) %in% country_names$gwcode)
+adjmat_mindist <- country_min_dist[ids,ids]
 
 # Renaming dims
 newnames <- dimnames(adjmat_mindist)
-newnames <- lapply(newnames, function(x) with(country_names,entry[match(x, code)]))
+newnames <- lapply(newnames, function(x) with(country_names,entry[match(x, gwcode)]))
 dimnames(adjmat_mindist) <- newnames
 
 # Coercing to dgCMatrix

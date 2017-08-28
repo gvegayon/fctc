@@ -75,7 +75,7 @@
 "CW","Curaçao","—"
 "CX","Christmas Island","—"
 "CY","Cyprus","6 districts"
-"CZ","Czechia","14 regions91 districts"
+"CZ","Czech Republic","14 regions91 districts"
 "DE","Germany","16 Länder"
 "DJ","Djibouti","5 regions
 1 city"
@@ -100,13 +100,13 @@
 "FK","Falkland Islands (Malvinas)","—"
 "FM","Micronesia, Federated States of","4 states"
 "FO","Faroe Islands","—"
-"FR","France","22 metropolitan regions
+"FR","France","13 metropolitan regions
 5 overseas departments96 metropolitan departments1 dependency
 7 overseas territorial collectivities"
 "GA","Gabon","9 provinces"
 "GB","United Kingdom","3 countries
 1 province
-3 nations78 unitary authorities27 two-tier counties32 london boroughs1 city corporation36 metropolitan districts11 districts32 council areas"
+3 nations78 unitary authorities27 two-tier counties32 London boroughs1 city corporation36 metropolitan districts11 districts32 council areas"
 "GD","Grenada","6 parishes
 1 dependency"
 "GE","Georgia","2 autonomous republics
@@ -123,8 +123,7 @@
 1 governorate33 prefectures"
 "GP","Guadeloupe","—"
 "GQ","Equatorial Guinea","2 regions7 provinces"
-"GR","Greece","13 administrative regions51 departments
-1 self-governed part"
+"GR","Greece","13 administrative regions1 self-governed part"
 "GS","South Georgia and the South Sandwich Islands","—"
 "GT","Guatemala","22 departments"
 "GU","Guam","—"
@@ -329,8 +328,8 @@
 1 ward"
 "TV","Tuvalu","1 town council
 7 island councils"
-"TW","Taiwan, Province of China ","13 districts
-3 municipalities
+"TW","Taiwan, Province of China ","13 counties
+3 cities
 6 special municipalities"
 "TZ","Tanzania, United Republic of","30 regions"
 "UA","Ukraine","24 regions

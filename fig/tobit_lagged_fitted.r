@@ -49,19 +49,31 @@ histoplot <- function(
   obs <- model_data[[var]]
   
   # Getting predicted
-  ans            <- env[[sprintf("tobit_lagged_%s_1", var)]]
+  ans            <- env[[sprintf("tobit_lagged_%s_0", var)]]
   pred           <- ans$linear.predictors
   pred[pred < 0] <- 0
   
-  ansols  <- envols[[sprintf("ols_lagged_%s_1", var)]]
+  ansols  <- envols[[sprintf("ols_lagged_%s_0", var)]]
   predols <- ansols$fitted.values
   # predols[predols < 0] <- 0
   
   # Drawing qqplots
-  qqplot(obs, predols, plot.it = TRUE, xlab="", ylab="", col = cols[2], pch=pch[2], cex=1.75)
-  ans <- qqplot(obs, pred, plot.it = FALSE)
+  ans    <- qqplot(pred, obs, plot.it = FALSE)
+  ansols <- qqplot(predols, obs, plot.it = FALSE)
   
-  with(ans, points(x, y, col=cols[1], pch=pch[1]))
+  # ans0 <- hist(obs, plot=FALSE)
+  # ans  <- hist(pred, plot=FALSE)
+  # ansols <- hist(predols, plot=FALSE)
+  
+  # Plotting region
+  plot.new()
+  plot.window(xlim = range(c(ans$x, ansols$x)), ylim = range(c(ans$y, ansols$y)))
+  
+  # Axis
+  axis(1);axis(2)
+  
+  with(ans,    points(x, jitter(y), col=cols[1], pch=pch[1]))
+  with(ansols, points(x, jitter(y), col=cols[2], pch=pch[2]))
   abline(b=1, a=0, xpd=FALSE)
   
   
@@ -71,23 +83,24 @@ histoplot <- function(
 }
 
 graphics.off()
-setEPS()
+# setEPS()
 # postscript("fig/tobit_lagged_fitted.eps", width = 7.92, height = 8.42)
-tiff("fig/tobit_lagged_fitted.tiff", width = 761, height = 809)
+# pdf("fig/tobit_lagged_fitted.pdf", width = 7.92, height = 8.42)
+png("fig/tobit_lagged_fitted.png", width = 600, height = 600)
 oldpar <- par(no.readonly = TRUE)
-par(mfrow = c(2, 2), mai = c(0,0,0,0)+.2, oma = c(9, 6, 4, 1), las = 1,
+par(mfrow = c(2, 2), mai = c(0,0,0,0)+.2, oma = c(7, 6, 2, 1), las = 1,
     cex.main = 1.5, font.main = 1, xpd = NA, xaxs = "i")
 # General Trade
-histoplot("adjmat_general_trade", "sum_art11", lgnd = "A")
+histoplot("adjmat_general_trade", "sum_art11", lgnd = "General Trade")
 
 # General Trade
-histoplot("adjmat_referrals", "sum_art11", lgnd = "B")
+histoplot("adjmat_referrals", "sum_art11", lgnd = "Referrals")
 
 # General Trade
-histoplot("adjmat_fctc_cop_coparticipation_twomode", "sum_art11", lgnd = "C")
+histoplot("adjmat_fctc_cop_coparticipation_twomode", "sum_art11", lgnd = "COP co-participation")
 
 # General Trade
-histoplot("adjmat_interest_group_comembership_twomode", "sum_art11", lgnd = "D")
+histoplot("adjmat_interest_group_comembership_twomode", "sum_art11", lgnd = "Interest Group\nco-membership")
 
 legend("bottomright",
        legend = c("Tobit", "OLS"),
@@ -100,7 +113,7 @@ legend("bottomright",
 # Adding text
 par(mfrow = c(1,1), las = oldpar$las)
 
-mtext(side = 1, text = "Predited", outer = TRUE, line=4)
+mtext(side = 1, text = "Predicted", outer = TRUE, line=4)
 mtext(side = 2, text = "Observed", outer = TRUE, line=4)
 
 

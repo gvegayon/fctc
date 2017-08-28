@@ -8,21 +8,10 @@ options(stringsAsFactors = FALSE)
 
 # Reading data
 dat <- read.csv("data-raw/country_borders/country_borders.csv", na="<NA>")
-country_codes <- read.csv("data-raw/country_codes/country_codes.csv", na="<NA>")
-country_codes <- subset(country_codes, select=c(-subdivision_assigned_codes))
-colnames(country_codes)[2] <- "ego"
+country_codes <- read.csv("data/gw_country_codes.csv", na="<NA>")
+colnames(country_codes)[3] <- "ego"
 
 dat <- merge(dat, country_codes, by="ego", all.x=TRUE, all.y=FALSE)
-
-# Droping some
-todrop <- c(
-  "Antártica Chilena Province (Chile)",
-  "Australian Antarctic Territory (Australia)",
-  "British Antarctic Territory (United Kingdom)",
-  "European Union",
-  "France (including French overseas departments",
-  "..."
-)
 
 # Hand coding
 dat$entry[dat$ego == "Bolivia"] <- "BO"
@@ -55,6 +44,8 @@ dat$entry[dat$ego == "Venezuela"] <- "VE"
 dat$entry[dat$ego == "Vietnam"] <- "VN"
 dat$entry[dat$ego == "Vatican City"] <- "VA"
 dat$entry[dat$ego == "Vietnam"] <- "VN"
+
+# View(dat[is.na(dat$entry),],"dat")
 
 # All the rest that has NA in entry is droped
 dat <- subset(dat, !is.na(entry))

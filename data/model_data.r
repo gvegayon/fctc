@@ -65,7 +65,7 @@ for (who in unique(dat$who_region))
 
 # Filtering --------------------------------------------------------------------
 dat <- filter(dat, year %in% years_reported)
-dat <- filter(dat, !is.na(ratification))
+dat <- filter(dat, !is.na(ratification)) # Only those which ratified
 
 # Sorting the data
 dat <- dat[with(dat, order(entry, year)),]
@@ -85,7 +85,7 @@ dat$year_signature    <- dat$signature %/% 10000L
 dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
                                        year_signature))
 
-# Truncating to 2010
+# With respect to 2010 (trucate it to )
 dat$`Years since Ratif.` <- with(dat, 2010L - year_ratification)
 dat$`Years since Sign.`  <- with(dat, 2010L - year_signature)
 
@@ -95,14 +95,20 @@ dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
 write.csv(dat, "data/model_data_unscaled.csv", row.names = FALSE, na = "<NA>")
 
 # Rescaling variables ----------------------------------------------------------
-dat$tobac_prod_pp       <- with(dat, tobac_prod/population)
+dat$tobac_prod_pp            <- with(dat, tobac_prod/population)
 dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
 dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
 dat$logPopulation            <- log(dat$population)
 
 for (v in colnames(dat))
-  if (is.double(dat[[v]]))
+  if (is.double(dat[[v]])) 
     dat[[v]] <- dat[[v]]/sd(dat[[v]])
+
+  #   {
+  #   cat(sprintf("%30s: Yes\n", v))
+  # } else
+  #   cat(sprintf("%30s:     No\n", v))
+  #   # dat[[v]] <- dat[[v]]/sd(dat[[v]])
 
 # Including interest on policy (subscribed to GL posts) ------------------------
 

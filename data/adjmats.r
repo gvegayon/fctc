@@ -21,7 +21,7 @@ library(netdiffuseR)
 library(stringr)
 
 # 1. Reading data --------------------------------------------------------------
-edgelist         <- foreign::read.dta("data-raw/allnets.dta")
+edgelist <- foreign::read.dta("data-raw/allnets.dta")
 id_entry <- read.csv("data/party_attributes.csv", na="<NA>")
 id_entry <- unique(subset(id_entry, select=c(ego_number, entry)))
 

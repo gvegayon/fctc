@@ -25,6 +25,8 @@ for (article in articles) {
     lvls[[as.character(ind)]] <- sapply(dat[,test], function(x) length(unique(x)))
     
     # If this is an indicator var, then keep it
+    # Some variables are actually descriptions, so we only keep those that have
+    # 3 levels... Yes/No/No answer
     if (max(lvls[[as.character(ind)]]) > 3) next
     
     # Reshaping
@@ -95,6 +97,9 @@ dat[dat$country_name=="Czech Republic",]$entry <- "CZ"
 
 for (v in which(grepl("sum_art",colnames(dat))))
   dat[,v] <- as.integer(dat[,v])
+
+# Sorting
+dat <- dat[with(dat, order(country_name, year)), ]
 
 write.csv(dat, file = "data/implementation.csv",
           row.names = FALSE, na="<NA>")
