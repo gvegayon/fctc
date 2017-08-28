@@ -42,18 +42,23 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   pvals <- ans[,"Pr(>|z|)"]
   pvals <- ifelse(pvals > .1, "", ifelse(pvals >.05, "*", ifelse(pvals >.01, "**", "***")))
   
-  ans <- matrix(
-    sprintf(sprintf("%%.%if (%%.%if) %%s", digits, digits),
-            ans[,"Estimate"],
-            ans[,"Std. Error"],
-            pvals),
-    ncol = 1,
-    dimnames = list(names(varnames), netname)
-  )
+  mask_b  <- sprintf("%%.%if %%s", digits, digits)
+  mask_sd <- sprintf("(%%.%if)", digits)
+  
+  tab <- matrix(ncol=1, nrow=nrow(ans)*2, dimnames = list(1:(nrow(ans)*2), netname))
+  rowid_betas <- seq(1, nrow(tab) - 1L, by = 2)
+  rowid_sds   <- seq(2, nrow(tab), by = 2)
+  
+  rownames(tab)[rowid_betas] <- names(varnames)
+  rownames(tab)[rowid_sds]   <- ""
+  
+  tab[rowid_betas,1] <- sprintf(mask_b, ans[,"Estimate"], pvals)
+  tab[rowid_sds,  1] <- sprintf(mask_sd, ans[,"Std. Error"])
+  
   
   # # Number of observations
   ans <- rbind(
-    ans,
+    tab,
     matrix(nobs, ncol = 1, dimnames = list("N", netname)),
     matrix(pseudoR2(env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]), ncol = 1, dimnames = list("Pseudo R2", netname))
     )
@@ -143,31 +148,58 @@ for (m in 0:6) {
   }
   
   # Storing rhos
-  colnames(rhos) <- networks[,2]
+  colnames(rhos) <- networks[match(colnames(rhos), networks[,1]),2]
   write.table(
-    rhos,
+    matrix(c("", gsub("sum_art0?", "Article ",rownames(rhos))), nrow=1),
     sprintf("tables/tobit_lagged_tabulate_rhos_model=%i.csv", m),
-    row.names = TRUE, sep=",", quote=FALSE
+    row.names = FALSE, col.names = FALSE, sep=","
+    )
+  write.table(
+    t(rhos),
+    sprintf("tables/tobit_lagged_tabulate_rhos_model=%i.csv", m),
+    row.names = TRUE, sep=",", quote=TRUE,
+    col.names = FALSE, append=TRUE
   )
   
   # Putting all tables together
   fn <- sprintf("tables/tobit_lagged_tabulate_model=%i.csv", m)
-  for (a in articles) {
+  # for (a in articles) {
+  #   
+  #   # Article number
+  #   write.table(
+  #     matrix(c(gsub("sum_art0?", "Art. ", a), colnames(get(a, envir = env))), nrow=1) ,
+  #     fn, row.names = FALSE, col.names = FALSE, quote = TRUE, sep=",",
+  #     append = ifelse(a == articles[1], FALSE, TRUE)
+  #   )
+  #   
+  #   # Writing values
+  #   write.table(
+  #     get(a, envir = env), fn, append = TRUE, row.names = TRUE, sep = ",",
+  #     col.names = FALSE,
+  #     quote=FALSE)
+  # }
+  
+  for (i in 1:length(networks[,1])) {
+    # Getting the data
+    tmpdat <- do.call(cbind, lapply(env, "[", i=, j=networks[i,2]))
+    tmpdat <- tmpdat[, order(colnames(tmpdat))]
+    colnames(tmpdat) <- gsub("sum_art0?", "Article ", colnames(tmpdat))
     
     # Article number
     write.table(
-      gsub("sum_art0?", "Art. ", a),
-      fn, row.names = FALSE, col.names = FALSE, quote = FALSE,
-      append = ifelse(a == articles[1], FALSE, TRUE)
+      matrix(c(networks[i,2], colnames(tmpdat)), nrow=1) ,
+      fn, row.names = FALSE, col.names = FALSE, quote = TRUE, sep=",",
+      append = ifelse(i == 1, FALSE, TRUE)
     )
     
-    # Writing values
     write.table(
-      get(a, envir = env), fn, append = TRUE, row.names = TRUE, sep = ",",
-      col.names = ifelse(a == articles[1], TRUE, FALSE),
-      quote=FALSE)
+      tmpdat,
+      fn, row.names = TRUE, col.names = FALSE, quote = TRUE, sep=",",
+      append = TRUE
+    )
+
   }
-  
+   
   # Adding note
   write.table(
     "Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'",
@@ -175,6 +207,7 @@ for (m in 0:6) {
 
   # Cleaning everything 
   message("Model ", m, " done ----------------------------------------------------")
+
   rm(env)
 }
 
