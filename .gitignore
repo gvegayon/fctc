@@ -6,6 +6,11 @@
 *.pptx
 
 *.pdf
+*.eps
+*.png
+
+*.aux
+*.log
 
 *.Rhistory
 *.dta
