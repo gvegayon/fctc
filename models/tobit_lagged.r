@@ -25,11 +25,13 @@ makeformula <- function(y, x) {
   as.formula(paste(y, paste(x, collapse=" + "), sep=" ~ "))
 }
 
-common_covars <- c("`Eastern Mediterranean`", "European", "African", "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
-                   "democracy", "GDP", "`Years since Sign.`", "`Years since Ratif.`",
+common_covars <- c("`Eastern Mediterranean`", "European", "African",
+                   "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
+                   "democracy", "GDP",
+                   "`Years since Sign.`", "`Years since Ratif.`",
                    "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
                    "labor", "womens_rights", "population", "govtown")
-                   # "subscribed", "govtown")
+                   
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # List of networks (with pretty names) that will be used
@@ -61,7 +63,7 @@ for (g in g0[-1])
   adjmat_referrals <- adjmat_referrals + g
 
 adjmat_interest_group_comembership_twomode <-
-  adjmat_interest_group_comembership_twomode$`2009`
+  adjmat_interest_group_comembership_twomode$`2010`
 
 image(adjmat_referrals)
 nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
@@ -245,30 +247,3 @@ for (Wnum in 1:nrow(networks)) {
   message("Network ", Wname, " done.")
 }
 
-stop()
-# Neat table with all Rho ------------------------------------------------------
-
-rownames(SIGNIFICANCE_MODEL1) <- networks[,2]
-
-dat <- SIGNIFICANCE_MODEL1
-dat[] <- paste(
-  sprintf("%0.2f", dat),
-  ifelse(dat[] <= asterisks[3], "***",
-         ifelse(dat[] <= asterisks[2], "**",
-                ifelse(dat <= asterisks[1], "*", " ")))
-)
-
-# Column/row names and alignment
-colnames(dat) <- gsub(".+art0?", "Art. ",colnames(dat))
-
-dat <- xtable::xtable(dat)
-
-xtable::align(dat) <- rep("l", ncol(dat) + 1)
-xtable::caption(dat) <- paste0(
-  "Significance level of $\\rho$ per network/article in terms of p-values of the SAR models.", 
-  "*** $p < ", asterisks[3],"$, ",
-  "** $p < ", asterisks[2],"$, and ",
-  "* $p < ", asterisks[1],"$."
-)
-
-print(dat, file="fig/sar_rho_summary.tex", booktabs=TRUE)

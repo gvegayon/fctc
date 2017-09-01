@@ -42,8 +42,8 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   pvals <- ans[,"Pr(>|z|)"]
   pvals <- ifelse(pvals > .1, "", ifelse(pvals >.05, "*", ifelse(pvals >.01, "**", "***")))
   
-  mask_b  <- sprintf("%%.%if %%s", digits, digits)
-  mask_sd <- sprintf("(%%.%if)", digits)
+  mask_b  <- sprintf("%%0.%if %%s", digits, digits)
+  mask_sd <- sprintf("(%%0.%if)", digits)
   
   tab <- matrix(ncol=1, nrow=nrow(ans)*2, dimnames = list(1:(nrow(ans)*2), netname))
   rowid_betas <- seq(1, nrow(tab) - 1L, by = 2)
@@ -85,6 +85,7 @@ varnames <- list(
   European                = "European",
   African                 = "African",
   `Western Pacific`       = "`Western Pacific`",
+  `South-East Asia`       = "`South-East Asia`",
   `(Intercept)`           = "(Intercept)"
   )
 )
@@ -106,6 +107,21 @@ for (m in 0:6) {
   # Looping through depvars
   rhos <- matrix(NA, nrow = length(articles), ncol = nrow(networks),
                  dimnames = list(articles, networks[,1]))
+  
+  rhos <- matrix(NA,
+    nrow = nrow(networks)*2,
+    ncol = length(articles),
+    dimnames = list(
+      1:(nrow(networks)*2),
+      articles)
+    )
+  
+  rowid_betas <- structure(seq(1, nrow(rhos) - 1L, by = 2), names = networks[,1])
+  rowid_sds   <- structure(seq(2, nrow(rhos), by = 2), names = networks[,1])
+  
+  rownames(rhos)[rowid_betas] <- networks[,1]
+  rownames(rhos)[rowid_sds]   <- ""
+  
   for (a in articles) {
     
     ans <- NULL
@@ -134,7 +150,10 @@ for (m in 0:6) {
       )
       
       # Adding to the overall list
-      rhos[a, net] <- ans0["rho",1,drop=TRUE]
+      rhos[rowid_betas[net], a] <- ans0["rho",1,drop=TRUE]
+      rhos[rowid_sds[net], a] <- ans0[
+        match("rho", rownames(ans0)) + 1,
+        1,drop=TRUE]
       
       # Are we there yet?
       message("Network: ", net, " variable: ", a, " done.")
@@ -148,14 +167,15 @@ for (m in 0:6) {
   }
   
   # Storing rhos
-  colnames(rhos) <- networks[match(colnames(rhos), networks[,1]),2]
+  rownames(rhos)[rowid_betas] <- networks[match(names(rowid_betas), networks[,1]),2]
+  
   write.table(
-    matrix(c("", gsub("sum_art0?", "Article ",rownames(rhos))), nrow=1),
+    matrix(c("", gsub("sum_art0?", "Article ",colnames(rhos))), nrow=1),
     sprintf("tables/tobit_lagged_tabulate_rhos_model=%i.csv", m),
     row.names = FALSE, col.names = FALSE, sep=","
     )
   write.table(
-    t(rhos),
+    rhos,
     sprintf("tables/tobit_lagged_tabulate_rhos_model=%i.csv", m),
     row.names = TRUE, sep=",", quote=TRUE,
     col.names = FALSE, append=TRUE

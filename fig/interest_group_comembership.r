@@ -11,7 +11,7 @@ model_data <- read.csv("data/model_data.csv", na = "<NA>")
 # Filtering the right countries
 ids <- sort(unique(model_data$entry))
 
-W <- adjmat_interest_group_comembership_twomode$`2009`
+W <- adjmat_interest_group_comembership_twomode$`2010`
 
 # Filling the missing entities
 test <- ids[which(!(ids %in% colnames(W)))]
@@ -85,17 +85,21 @@ coordinates <- layout_with_fr(net)
 coordinates <- put_together(coordinates, net)
 
 maximpl     <- 10
-mixing_cols <- c("navyblue", "tomato")
+mixing_cols <- blues9 # c(blues9[4], "tomato")
 
 graphics.off()
 for (yearnum in c(2010, 2012)) {
   
   # Making space
-  pdf(sprintf("fig/interest_group_comembership%i.pdf", yearnum),
-      width = 10, height = 12)
+  # pdf(sprintf("fig/interest_group_comembership%i.pdf", yearnum),
+  #     width = 10, height = 12)
+  png(sprintf("fig/interest_group_comembership%i.png", yearnum),
+      width = 700,
+      height = 900,
+      family = "Arial")
   
   oldpar <- par(no.readonly = TRUE)
-  par(mfrow = c(3, 2), mar = rep(1, 4), oma = c(0, 0, 0, 0))
+  par(mfrow = c(3, 2), mar = rep(0.25, 4), oma = c(0, 0, 0, 0))
   
   for (art in c(5, 6, 8, 11, 13)) {
     
@@ -111,7 +115,7 @@ for (yearnum in c(2010, 2012)) {
     V(net)[names(vcols)]$color <- vcols
     
     # Vertex and label size
-    vsize <- rescale_vertex_igraph(degree(net), minmax.relative.size = c(.025, .05))
+    vsize <- rescale_vertex_igraph(degree(net), minmax.relative.size = c(.025, .08))
     lsize <- ((vsize - min(vsize))/(max(vsize) - min(vsize)) + .5)/1.5
     
     
@@ -123,41 +127,46 @@ for (yearnum in c(2010, 2012)) {
          edge.arrow.size = .25,
          vertex.label.cex = lsize,
          vertex.label.color = "white",
-         vertex.frame.color = "transparent",
-         edge.color = adjustcolor("gray", .9),
+         vertex.frame.color = "black",
+         edge.color = adjustcolor("gray", .5),
          edge.width = .5,
-         edge.curved = TRUE
+         edge.curved = TRUE,
+         vertex.label = NA
          
     )
     
-    box()
+    box(lwd = 2, col="gray")
     
     legend(
       "topleft",
-      legend = sprintf(
+      legend = c(
+        sprintf("Art. %i", art),
+        sprintf(
         "Avg. Impl.: %.2f",
         mean(model_data[[varname]][model_data$year == yearnum])
-      ),
-      bty = "n"
+        )
+        ),
+      bty = "n",
+      cex = 1.5, text.font = c(2, 1)
     )
     
-    legend("topright", legend = sprintf("Art. %i", art), cex = 1.5, text.font = 2,
-           bty = "n")
   }
   
   plot.new()
   plot.window(c(-1,1), c(-1,1))
   
   labran <- pretty_within(c(0, maximpl))
-  labran[length(labran)] <- paste(maximpl, ">=")
+  labran[length(labran)] <- paste("\n",maximpl, "or more")
   
+  
+  par(cex=1.2)
   drawColorKey(
     x = c(0,maximpl), 
     labels = labran,
     color.palette = grDevices::colorRampPalette(mixing_cols)(maximpl + 1),
     nlevels = maximpl + 1,
-    key.pos = c(.3, .8, .1, .9),
-    main = "Vertices Colored by # of\nItems Implemented per Article", lwd = 0
+    key.pos = c(.5, .7, .1, .9),
+    main = "Number of Items\nImplemented\nper Article\n", lwd = 0
   )
   
   par(oldpar)

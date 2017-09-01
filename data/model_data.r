@@ -85,7 +85,12 @@ dat$year_signature    <- dat$signature %/% 10000L
 dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
                                        year_signature))
 
-# With respect to 2010 (trucate it to )
+# With respect to 2010 (trucate it to 2010)
+# 
+# Prior to 2010, implementation cannot affect ratification/signature since it
+# was an event that happened before. But, the implementation level of 2010 can
+# certainly affect signature and ratification as it is a posterior event. Therefore
+# we truncate these variables at 0.
 dat$`Years since Ratif.` <- with(dat, 2010L - year_ratification)
 dat$`Years since Sign.`  <- with(dat, 2010L - year_signature)
 
