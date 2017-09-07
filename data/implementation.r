@@ -5,12 +5,23 @@ rm(list=ls())
 options(stringsAsFactors = FALSE)
 
 # Parameters
-articles   <- c(5, 6, 8, 11, 13)
-na_replace <- 0L # If 'no response', what to replace with
-process    <- function(x) sum(x)
+codes       <- read.csv("data-raw/fctc_implementation_db/key.csv")
+codes$art   <- gsub("-","", codes$art)
+codes$art   <- gsub("a","1", codes$art)
+codes$art   <- gsub("b","2", codes$art)
+codes$art   <- gsub("c","3", codes$art)
+codes$art   <- gsub("d","4", codes$art)
+codes$art   <- as.integer(codes$art)
+
+articles    <- sort(unique(codes$art))
+art_to_keep <- c(5, 6, 8, 11, 13)
+na_replace  <- NA # If 'no response', what to replace with
+process     <- function(x) {
+  if (all(is.na(x))) return(NA)
+  sum(x, na.rm=TRUE)
+}
 
 # Reading keys
-codes <- read.csv("data-raw/fctc_implementation_db/key.csv")
 country_codes <- read.csv("data-raw/country_codes/country_codes.csv")
 
 lvls  <- list()
@@ -42,6 +53,13 @@ for (article in articles) {
     ans[[as.character(ind)]] <- dat
   }
 
+  # In the case that no article is 'useful'
+  if (!length(unlist(ans))) {
+    message("Article ", article," has no indicator (Yes/No) of implementations. Skipping.")
+    next
+  }
+    
+  
   # More processing (stacking)
   newdat <- ans[[1]]
   for (d in ans[-1]) {
@@ -50,13 +68,15 @@ for (article in articles) {
   newdat <- data.frame(
     Party = newdat$Party,
     year  = newdat$time,
-    count = rowSums(subset(newdat, select=c(-Party, -time)))
+    count = apply(subset(newdat, select=c(-Party, -time)), 1, process)
   )
     
-  colnames(newdat)[3] <- sprintf("sum_art%02d", article)
+  colnames(newdat)[3] <- sprintf("sum_art%05d", article)
   
   # Saving the object
-  assign(sprintf("art%02d", article), newdat)
+  assign(sprintf("art%05d", article), newdat)
+  
+  message("Article ", article, " processed.")
 }
 
 # Putting all together
@@ -98,8 +118,83 @@ dat[dat$country_name=="Czech Republic",]$entry <- "CZ"
 for (v in which(grepl("sum_art",colnames(dat))))
   dat[,v] <- as.integer(dat[,v])
 
-# Sorting
-dat <- dat[with(dat, order(country_name, year)), ]
+# Checking which countries did not report anything
+dat$no_report <- apply(
+  dat[,grepl("^sum_art[0-9]+",colnames(dat))], 
+  1,
+  function(x) all(is.na(x))
+)
 
-write.csv(dat, file = "data/implementation.csv",
-          row.names = FALSE, na="<NA>")
+# Sorting
+implementation <- dat[with(dat, order(country_name, year)), ]
+implementation <- subset(implementation, select = c(
+  "entry", "year", "no_report", sprintf("sum_art%05i", art_to_keep)
+))
+
+colnames(implementation) <-
+  c("entry", "year", "no_report", sprintf("sum_art%02d", art_to_keep))
+
+write.csv(implementation, file = "data/implementation.csv", row.names = FALSE, na="<NA>")
+
+
+# Some stats -------------------------------------------------------------------
+party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
+party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
+
+party_attributes <- subset(party_attributes, select = c(entry, year))
+
+treaty_dates     <- read.csv("data/treaty_dates.csv", na = "<NA>")
+treaty_dates     <- subset(treaty_dates, select=c(entry, country_name, signature, ratification))
+
+party_attributes <- dplyr::left_join(party_attributes, treaty_dates)
+party_attributes <- subset(party_attributes, year == 2012 & !is.na(ratification))
+
+dat$year <- as.integer(dat$year)
+dat      <- subset(dat, year==2012, select = -country_name)
+dat2     <- dplyr::left_join(party_attributes, dat, by=c("entry"))
+
+sums <- colnames(dat2)[grepl("sum_art",colnames(dat2))]
+sums <- apply(dat2[,c("country_name", sums)], 1, function(x) c(x[1], all(is.na(x[-1])))) %>%
+  t %>% as.data.frame
+
+sums
+
+table(sums, useNA="always") %>%
+  addmargins %>% print(digits=2)
+
+# Listing the countries
+unname(sums[sums$V2 == TRUE,1,drop=FALSE]) %>% `row.names<-`(NULL)
+
+# 1 Angola
+# 2 Belize
+# 3 Cameroon
+# 4 Cabo Verde
+# 5 Czechia
+# 6 Democratic Republic of the Congo
+# 7 Dominica
+# 8 El Salvador
+# 9 Equatorial Guinea
+# 10 Ethiopia
+# 11 Grenada
+# 12 Guinea
+# 13 Guinea-Bissau
+# 14 Jamaica
+# 15 Kenya
+# 16 Kiribati
+# 17 Liberia
+# 18 Maldives
+# 19 Myanmar
+# 20 Nauru
+# 21 Nicaragua
+# 22 Nigeria
+# 23 Papua New Guinea
+# 24 Romania
+# 25 Samoa
+# 26 Syrian Arab Republic
+# 27 Tajikistan
+# 28 The former Yugoslav Republic of Macedonia
+# 29 Timor-Leste
+# 30 Turkmenistan
+# 31 Uzbekistan
+# 32 Zambia
+# 33 Zimbabwe

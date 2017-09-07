@@ -1,0 +1,3 @@
+.scrollPane {  }
+.scrollBar { width:5px; /* Set the width of the scrollbar */ border-radius:5px; /* Remove if you want square corners*/ background-color:#466ca6; /* Set the scrollbar color*/	transition:opacity 0.3s linear; /* Mouseover delay */ right:0px; }
+/*#announcements { height:220px; }*/

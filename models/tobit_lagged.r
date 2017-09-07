@@ -96,7 +96,7 @@ for (art in articles) {
 }
 
 # Dropping and sorting again (just in case)
-model_data <- subset(model_data, year == 2012)
+model_data <- subset(model_data, year == 2012 & !no_report)
 model_data <- model_data[order(model_data$entry),]
 
 # Distance network -------------------------------------------------------------
@@ -145,8 +145,13 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho", sprintf("%s_lagged",art)))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
     
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
+      
     # Creating the object
     assign(paste("tobit_lagged",art,0,sep="_"), ans, envir = .GlobalEnv)
     message("Network ", Wname, " article ", art, " model ", 0,  " done.")
@@ -160,8 +165,13 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho"))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
     
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
+      
     # Creating the object
     assign(paste("tobit_lagged",art,1,sep="_"), ans, envir = .GlobalEnv)
     message("Network ", Wname, " article ", art, " model ", 1,  " done.")
@@ -177,7 +187,12 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho", "pol_shift"))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
+    
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
     
     # Creating the object
     assign(paste("tobit_lagged",art,2,sep="_"), ans, envir = .GlobalEnv)
@@ -191,8 +206,13 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho", "bloomberg_amount"))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
     
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
+      
     # Creating the object
     assign(paste("tobit_lagged",art,3,sep="_"), ans, envir = .GlobalEnv)
     message("Network ", Wname, " article ", art, " model ", 3,  " done.")
@@ -205,8 +225,13 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho", "bloomberg_count"))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
     
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
+      
     # Creating the object
     assign(paste("tobit_lagged",art,4,sep="_"), ans, envir = .GlobalEnv)
     message("Network ", Wname, " article ", art, " model ", 4,  " done.")
@@ -219,8 +244,13 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho", "bloomberg_fctc_amount"))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
     
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
+      
     # Creating the object
     assign(paste("tobit_lagged",art,5,sep="_"), ans, envir = .GlobalEnv)
     message("Network ", Wname, " article ", art, " model ", 5,  " done.")
@@ -233,8 +263,13 @@ for (Wnum in 1:nrow(networks)) {
       W %*% model_data[[sprintf("%s_lagged",art)]]
     )
     mod <- makeformula(art, c(common_covars, "rho", "bloomberg_fctc_count"))
-    ans <- AER::tobit(mod, data=model_data)
+    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
     
+    if (inherits(ans, "error")) {
+      message("!!! Error in network ", Wname, " article ", art, " model.")
+      next
+    }
+      
     # Creating the object
     assign(paste("tobit_lagged",art,6,sep="_"), ans, envir = .GlobalEnv)
     message("Network ", Wname, " article ", art, " model ", 6,  " done.")

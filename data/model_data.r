@@ -27,9 +27,11 @@ treaty_dates     <- read.csv("data/treaty_dates.csv", na = "<NA>")
 treaty_dates     <- subset(treaty_dates, select=c(entry, signature, ratification))
 
 implementation   <- read.csv("data/implementation.csv", na = "<NA>")
-implementation   <- subset(implementation, select=c(-country_name))
+# implementation   <- subset(implementation, select=c(-country_name))
 
 govtown          <- read.csv("data/govtown.csv", na = "<NA>")
+
+# Imputation for implementation ------------------------------------------------
 
 # Merging ----------------------------------------------------------------------
 dat <- left_join(party_attributes, political_shifts, by=c("year", "entry"))
@@ -46,11 +48,43 @@ dat$bloomberg_fctc_amount <- coalesce(dat$bloomberg_fctc_amount, 0)
 
 # Implementation data should be filled with zeros instead of NAs
 # we will assume that they did not implemented
+# > subset(dat, year == 2012 & !is.na(ratification))$no_report %>% table(useNA="always")
+# .
+# FALSE  TRUE  <NA> 
+#   143    22    11 
+
+# Carry forward imputation
+carry_forward <- function(idv, v) {
+  
+  for (.entry in unique(dat[[idv]])) {
+    
+    # Which needs to be solved
+    idx <- which(dat[[idv]] == .entry)
+    
+    dat[idx,v][-1] <- ifelse(
+      is.na(dat[idx,v][-length(dat[idx,v])]),
+      dat[idx,v][-1],
+      dat[idx,v][-length(dat[idx,v])]
+    )
+  }
+  
+  dat
+}
+
+# Sorting
+dat <- dat[with(dat, order(entry, year)),]
+dat2 <- carry_forward("entry", "sum_art05")
+
+View(cbind(dat2[,c("entry", "year", "sum_art05")], dat[,c("entry", "year", "sum_art05")]))
+
+dat$sum_art05[dat$year == 2012]
+
 dat$sum_art05[is.na(dat$sum_art05)] <- 0L
 dat$sum_art06[is.na(dat$sum_art06)] <- 0L
 dat$sum_art08[is.na(dat$sum_art08)] <- 0L
 dat$sum_art11[is.na(dat$sum_art11)] <- 0L
 dat$sum_art13[is.na(dat$sum_art13)] <- 0L
+
 
 # Pasting names
 dat <- left_join(dat, country_codes, by="entry")
@@ -96,6 +130,10 @@ dat$`Years since Sign.`  <- with(dat, 2010L - year_signature)
 
 dat$`Years since Ratif.`[dat$`Years since Ratif.` < 0] <- 0L
 dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
+
+# If NA, it means that these didn't showed in the lists of reports, but may
+# have ratified.
+dat$no_report[is.na(dat$no_report)] <- TRUE
 
 write.csv(dat, "data/model_data_unscaled.csv", row.names = FALSE, na = "<NA>")
 

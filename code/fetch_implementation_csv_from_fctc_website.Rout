@@ -1,0 +1,214 @@
+
+R version 3.3.2 (2016-10-31) -- "Sincere Pumpkin Patch"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> # This script gets the data from the FCTC website
+> # This file is ment to be ran from the top folder of the project.
+> # doing webscrapping
+> 
+> rm(list=ls())
+> 
+> # Packages used for this
+> library(httr)
+> library(xml2)
+> library(rvest)
+> library(stringr)
+> 
+> # Parameters 
+> articles  <- c(5, 6, 8, 11, 13)
+> overwrite <- TRUE
+> 
+> # Generic country url
+> url_art_expr <- "http://apps.who.int/fctc/implementation/database/article/article-%d/reports"
+> url_ind_expr <- "http://apps.who.int/fctc/implementation/database/sites/implementation/scripts/src/tabulardata.php?indicator=%s"
+> 
+> # Container (metadata)
+> INDICATORS <- structure(
++   list(id=NULL, title=NULL, art=NULL, description=NULL, url=NULL),
++   class="data.frame"
++ )
+> 
+> for (art in articles) {
++   # Step 0: Generating the uri and checking if it exists or not
++   url_art <- sprintf(url_art_expr, art)
++   ans     <- httr::GET(url_art)
++   
++   # Step 1: Get the list of links ------------------------------------------------
++   ans <- httr::content(ans)
++   ans <- xml2::xml_find_all(ans, '//*[@id="indicators"]')
++   ans <- xml2::xml_attr(ans, "src")
++   
++   # Now we have the site of the list
++   ans <- httr::GET(ans)
++   ans <- httr::content(ans)
++   
++   sites <- xml2::xml_find_all(ans, '/html/body/ul/li')
++   sites <- xml2::xml_find_all(sites, "a")
++   urls  <- xml2::xml_attr(sites, "href")
++   
++   # If there's no data
++   if (!length(urls)) {
++     message("No data found at url:", url_art)
++     next
++   }
++   
++   descs <- xml2::xml_text(sites)
++   
++   # Step 2: Download each site ---------------------------------------------------
++   for (i in seq_along(urls)) {
++     # Getting the name of the indivator
++     ind  <- stringr::str_extract(urls[i], "(?<=indicators/)[0-9]+")
++     fn   <- sprintf("data-raw/fctc_implementation_db/%s.csv", ind)
++     
++     if (file.exists(fn) & !overwrite) {
++       message("File ", fn, " already exists, skipping.")
++       next
++     }
++     
++     ind_url <- sprintf(url_ind_expr, ind)
++     site <- xml2::read_html(ind_url)
++     
++     # Parsing webpage
++     titl <- xml2::xml_find_all(site, '//*[@id="indicator-container"]/h2')
++     titl <- xml2::xml_text(titl)
++     
++     cn  <- xml2::xml_find_all(site, '//*[@id="table-answers"]/thead')
++     cn  <- xml2::xml_text(xml2::xml_contents(cn), trim = TRUE)
++     cn  <- cn[nchar(cn) != 0]
++     dat <- rvest::html_table(site)[[1]]
++     colnames(dat) <- cn
++     
++     # Adding name to list
++     INDICATORS <- rbind(
++       INDICATORS,
++       cbind(id=ind, title=titl, art=art, description=descs[i],
++             url = ind_url)
++     )
++     
++     # Saving dataset
++     write.csv(dat, fn)
++     write.csv(INDICATORS, "data-raw/fctc_implementation_db/key.csv")
++     message("Indicator ",ind, " complete (", titl, ").")
++   }
++ }
+No encoding supplied: defaulting to UTF-8.
+Indicator 5048 complete (Comprehensive multisectoral national tobacco control strategy).
+Indicator 5049 complete (Tobacco control included in national health strategies).
+Indicator 5050 complete (Any aspect of tobacco referred in any national strategy).
+Indicator 5784 complete (Focal point for tobacco control).
+Indicator 5212 complete (Tobacco control unit ).
+Indicator 5785 complete (National coordinating mechanism for tobacco control ).
+Indicator 5214 complete (Details on focal point for tobacco control, tobacco control unit and national coordinating mechanism for tobacco control).
+Indicator 5215 complete (Progress made in implementing Article 5.1).
+Indicator 5216 complete (Additional information concerning general obligations).
+Indicator 5067 complete (Interference by the tobacco industry).
+Indicator 5790 complete (Public access to a wide range of information on the tobacco industry).
+Indicator 5787 complete (Details on the protection of public health policies).
+Indicator 5788 complete (Progress made in protection of public health policies).
+Indicator 7004 complete (Use of guidelines on Article 5.3).
+Indicator 5789 complete (Additional information concerning protection of public health policies).
+No encoding supplied: defaulting to UTF-8.
+Indicator 5528 complete (Existence of information on tobacco-related mortality).
+Indicator 5530 complete (Additional information on tobacco-related mortality).
+Indicator 5534 complete (Existence of information on the economic burden of tobacco use).
+Indicator 5484 complete (Proportion of the retail price consisting of taxes ).
+Indicator 5485 complete (Only specific tax levied).
+Indicator 5486 complete (Only ad valorem tax levied).
+Indicator 5487 complete (Combination of specific and ad valorem taxes levied).
+Indicator 5488 complete (Complex tax structure applied).
+Indicator 5502 complete (Trends in taxation).
+Indicator 5503 complete (Tobacco tax earmarking).
+Indicator 5524 complete (Trends in prices).
+Indicator 5222 complete (Tax policies to reduce tobacco consumption).
+Indicator 5223 complete (Tobacco sales to international travelers prohibited).
+Indicator 5224 complete (Tobacco imports by international travelers prohibited).
+Indicator 5225 complete (Progress made in implementing Article 6).
+Indicator 5226 complete (Additional information concerning price and tax measures).
+No encoding supplied: defaulting to UTF-8.
+Indicator 5525 complete (Availability of data on exposure to tobacco smoke).
+Indicator 5526 complete (Details concerning data on exposure to tobacco smoke).
+Indicator 5026 complete (Tobacco smoking banned in public places).
+Indicator 5851 complete (National law providing for the ban).
+Indicator 5852 complete (Subnational law(s) providing for the ban).
+Indicator 5853 complete (Administrative and executive orders providing for the ban).
+Indicator 5854 complete (Voluntary agreements providing for the ban).
+Indicator 5857 complete (Explanation of type/nature and content of the measures providing the ban).
+Indicator 5858 complete (Mechanism/infrastructure for enforcement provided).
+Indicator 5859 complete (Details of the mechanism/infrastructure for enforcement ).
+Indicator 5570 complete (Progress made in implementing Article 8).
+Indicator 7009 complete (Use of guidelines on Article 8).
+Indicator 5571 complete (Additional information concerning protection from exposure to tobacco smoke).
+No encoding supplied: defaulting to UTF-8.
+Indicator 5575 complete (Packaging of tobacco products does not carry advertisement or promotion).
+Indicator 4434 complete (Misleading descriptors).
+Indicator 4435 complete (Health warnings required).
+Indicator 4436 complete (Health warnings approved by the competent national authority).
+Indicator 4437 complete (Rotated health warnings).
+Indicator 4438 complete (Large, clear, visible and legible health warnings).
+Indicator 4439 complete (Health warnings occupying no less than 30% ).
+Indicator 4440 complete (Health warnings occupying 50% or more ).
+Indicator 4441 complete (Health warnings in the form of pictures or pictograms).
+Indicator 5576 complete (Copyright to pictures owned by the Government).
+Indicator 5578 complete (Granting of license for the use of health warnings ).
+Indicator 5874 complete (Constituents of tobacco products).
+Indicator 5875 complete (Emissions of tobacco products).
+Indicator 5579 complete (Progress made in implementing Article 11).
+Indicator 7018 complete (Use of guidelines on Article 11).
+Indicator 5580 complete (Additional information concerning packaging and labelling).
+No encoding supplied: defaulting to UTF-8.
+Indicator 5346 complete (Comprehensive ban on all tobacco advertising, promotion and sponsorship).
+Indicator 5349 complete (Ban on display of tobacco products at points of sales ).
+Indicator 5350 complete (Ban covering the domestic internet).
+Indicator 5351 complete (Ban covering the global internet).
+Indicator 5352 complete (Ban covering brand stretching and/or sharing).
+Indicator 5353 complete (Ban covering product placement ).
+Indicator 5354 complete (Ban covering the depiction/use of tobacco in entertainment media ).
+Indicator 5356 complete (Ban covering tobacco sponsorship ).
+Indicator 5357 complete (Ban covering corporate social responsibility).
+Indicator 5358 complete (Ban covering cross-border advertising originating from the country).
+Indicator 5359 complete (Ban covering cross-border advertising entering the country).
+Indicator 5360 complete (Precluded by constitution from undertaking a comprehensive ban).
+Indicator 5361 complete (All tobacco advertising, promotion and sponsorship restricted).
+Indicator 5362 complete (Cross-border advertising originating from the country restricted).
+Indicator 5363 complete (Advertising by false and misleading means prohibited).
+Indicator 5364 complete (Use of warnings to accompany all advertising required).
+Indicator 5365 complete (Use of direct or indirect incentives restricted).
+Indicator 5366 complete (Disclosure of advertising expenditures required).
+Indicator 5367 complete (Advertising restricted on radio).
+Indicator 5368 complete (Advertising restricted on television).
+Indicator 5369 complete (Advertising restricted in print media).
+Indicator 5370 complete (Advertising restricted on the domestic internet).
+Indicator 5371 complete (Advertising restricted on the global internet).
+Indicator 5376 complete (Sponsorship of international events and activities restricted).
+Indicator 5377 complete (Tobacco sponsorship of participants therein restricted).
+Indicator 5638 complete (Cooperation on the elimination of cross-border advertising).
+Indicator 5639 complete (Penalties imposed for cross-border advertising ).
+Indicator 5640 complete (Progress made in implementing Article 13).
+Indicator 7014 complete (Use of guidelines on Article 13).
+Indicator 5641 complete (Additional information concerning tobacco advertising, promotion and sponsorship).
+> 
+> cat(sprintf("This dataset has been generated on %s",Sys.time()),
++     "Using http://apps.who.int/fctc/implementation/database ",
++     "Each file has the form -[indicator id].csv-.",
++     "Details on what does each indicator has can be found at the -key.csv- file.",
++     file = "data-raw/fctc_implementation_db/readme.md", sep="\n")
+> 
+> 
+> proc.time()
+   user  system elapsed 
+112.528  41.492 158.586 

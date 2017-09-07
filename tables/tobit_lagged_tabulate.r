@@ -66,6 +66,8 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   ans
 }
 
+tryGet_coef <- function(...) tryCatch(get_coefs(...), error = function(e) e)
+
 # Variables to include in the table
 varnames <- list(
   c(
@@ -130,20 +132,28 @@ for (m in 0:6) {
     for (net in networks[,1]) {
       
       # Fetching the data and rowbinding
-      ans0 <- get_coefs(
+      tmpvnames <- if (m == 0) {
+        c(varnames[[m + 1]],
+          structure(
+            paste0(a, "_lagged"),
+            names = sprintf("Art %s (t-1)",gsub("sum_art0?", "", a))
+          )
+        )
+      } else varnames[[m]]
+      
+      ans0 <- tryGet_coef(
         netname  = net,
         depvar   = a,
-        varnames = if (m == 0) {
-          c(varnames[[m + 1]],
-            structure(
-              paste0(a, "_lagged"),
-              names = sprintf("Art %s (t-1)",gsub("sum_art0?", "", a))
-              )
-            )
-          } else varnames[[m]],
+        varnames = tmpvnames,
         modelnum = m, 
         digits   = 2
       )
+      
+      if (inherits(ans0, "error")) {
+        message("!!!ERROR: Network ", net, " model ", m," didn't worked...")
+        ans <- cbind(ans, rep(NA, length(tmpvnames)*2 + 2))
+        next
+      }
       
       ans <- cbind(
         ans, ans0

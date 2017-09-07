@@ -11,12 +11,13 @@ library(rvest)
 library(stringr)
 
 # Parameters 
-articles  <- c(5, 6, 8, 11, 13)
-overwrite <- TRUE
+articles  <- c(5,"22-26a", "22-26b", "22-26c", "22-26d") #c(5, 6, 8, 11, 13) # 2:20, 
+overwrite <- FALSE
 
 # Generic country url
-url_art_expr <- "http://apps.who.int/fctc/implementation/database/article/article-%d/reports"
+url_art_expr <- "http://apps.who.int/fctc/implementation/database/article/article-%s/reports"
 url_ind_expr <- "http://apps.who.int/fctc/implementation/database/sites/implementation/scripts/src/tabulardata.php?indicator=%s"
+fn_key <- "data-raw/fctc_implementation_db/key.csv"
 
 # Container (metadata)
 INDICATORS <- structure(
@@ -26,7 +27,15 @@ INDICATORS <- structure(
 
 for (art in articles) {
   # Step 0: Generating the uri and checking if it exists or not
-  url_art <- sprintf(url_art_expr, art)
+  url_art <- switch(art,
+         `22-26a` = "http://apps.who.int/fctc/implementation/database/article/assistance-provided/reports",
+         `22-26b` = "http://apps.who.int/fctc/implementation/database/article/assistance-received/reports",
+         `22-26c` = "http://apps.who.int/fctc/implementation/database/article/other-questions-related-assistance/reports",
+         `22-26d` = "http://apps.who.int/fctc/implementation/database/article/priorities-and-comments/reports",
+         sprintf(url_art_expr, art)
+  )
+  
+  # url_art <- sprintf(url_art_expr, art)
   ans     <- httr::GET(url_art)
   
   # Step 1: Get the list of links ------------------------------------------------
@@ -46,7 +55,7 @@ for (art in articles) {
   if (!length(urls)) {
     message("No data found at url:", url_art)
     next
-  }
+  } 
   
   descs <- xml2::xml_text(sites)
   
@@ -76,15 +85,19 @@ for (art in articles) {
     
     # Adding name to list
     INDICATORS <- rbind(
-      INDICATORS,
+        INDICATORS,
       cbind(id=ind, title=titl, art=art, description=descs[i],
             url = ind_url)
     )
     
     # Saving dataset
+    if (file.exists(fn_key)) 
+      INDICATORS <- unique(rbind(read.csv(fn_key), INDICATORS))
+        
     write.csv(dat, fn)
-    write.csv(INDICATORS, "data-raw/fctc_implementation_db/key.csv")
+    write.csv(INDICATORS, fn_key, row.names = FALSE)
     message("Indicator ",ind, " complete (", titl, ").")
+  
   }
 }
 
