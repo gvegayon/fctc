@@ -21,32 +21,83 @@ load("data/adjmat_mindist.rda")
 load("data/adjmat_centroid_dist.rda")
 
 # Function to create formulas
-makeformula <- function(y, x) {
-  as.formula(paste(y, paste(x, collapse=" + "), sep=" ~ "))
+makeformula <- function(x) {
+  paste(paste(x, collapse=" + "))
 }
 
-common_covars <- c("`Eastern Mediterranean`", "European", "African",
-                   "`Western Pacific`", "`South-East Asia`", #"Asia", "Europe", "Africa", "America",
-                   "democracy", "GDP",
-                   "`Years since Sign.`", "`Years since Ratif.`",
-                   "tobac_prod_pp", "perc_female_smoke", "perc_male_smoke",
-                   "labor", "womens_rights", "population", "govtown")
+common_covars <- c(
+  "`Eastern Mediterranean`",
+  "European",
+  "African",
+  "`Western Pacific`",
+  "`South-East Asia`",
+  "democracy",
+  "GDP",
+  "`Years since Sign.`",
+  "`Years since Ratif.`",
+  "tobac_prod_pp",
+  "perc_female_smoke",
+  "perc_male_smoke",
+  "labor",
+  "womens_rights",
+  "population",
+  "govtown"
+  )
                    
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # List of networks (with pretty names) that will be used
 networks      <- c(
+  "adjmat_centroid_dist", "Centroid Distance",
+  "adjmat_mindist", "Minimal distance",
   "adjmat_general_trade", "General Trade",
   "adjmat_tobacco_trade", "Tobacco Trade",
-  "adjmat_mindist", "Minimal distance",
-  "adjmat_centroid_dist", "Centroid Distance",
-  "adjmat_border", "Country Borders",
-  "adjmat_gl_posts", "GlobalLink Posts",
-  "adjmat_referrals", "GlobalLink Referrals",
-  "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
-  "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation",
-  "adjmat_interest_group_comembership_twomode", " Interest Group co-membership"
+  "adjmat_referrals", "GLOBALink Referrals",
+  "adjmat_interest_group_comembership_twomode", "GLOBALink co-subscription"#,"Interest Group co-membership",
+  # "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
+  # "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation",
+  # "adjmat_border", "Country Borders",
+  # "adjmat_gl_posts", "GlobalLink Posts"
   )
+
+# Listing models
+# Models are lists that hold the following values:
+# - vars: List of the variables that will be used as predictors.
+# - filter (optional): A function that will be applied prior to run the model.
+# - about (optional): A brief description
+models <- list(
+  Baseline              = list(
+    vars = c("rho", common_covars),
+    about  = "This is the baseline specification."),
+  Imp2010               = list(
+    vars = c("rho", "y_lagged", common_covars),
+    about  = "This specification includes the number of items reported on 2010."),
+  Imp2010_report        = list(
+    vars   = c("rho", "y_lagged", common_covars),
+    filter = function(x) {
+      subset(x, no_report == 0L)
+    },
+    about  = "This specification includes the number of items reported on 2010. Also, it only includes members that provided a reported on 2012."),
+  Imp2010_dummy_report  = list(
+    vars   = c("rho", "y_lagged", "no_report", common_covars),
+    about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
+  PolShift              = list(
+    vars   = c("rho", "pol_shift", common_covars),
+    about  = "This specification includes a variable capturing political shifts."),
+  Bloomberg_amount      = list(
+    vars   = c("rho", "bloomberg_amount_pp", common_covars),
+    about  = "This specification includes 'percapita amount of Bloomberg funds'."),
+  Bloomberg_count       = list(
+    vars   = c("rho", "bloomberg_count", common_covars),
+    about  = "This specification includes 'Number of Bloomberg project'."),
+  Bloomberg_amount_fctc = list(
+    vars   = c("rho", "bloomberg_fctc_amount_pp", common_covars),
+    about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
+  Bloomberg_count_fctc  = list(
+    vars   = c("rho", "bloomberg_fctc_count", common_covars),
+    about  = "This specification includes 'Number of FCTC Bloomberg project'.")
+)
+
 
 # Preprocessing networks gl_posts and referrals
 g0 <- adjmat_gl_posts[as.character(2008:2010)] # 
@@ -71,10 +122,7 @@ nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
 # If i referred j, then i has an influence over j, hence we transpose to compute
 # exposures.
 adjmat_referrals <- t(adjmat_referrals)
-
 networks      <- matrix(networks, byrow = TRUE, ncol=2)
-
-
 asterisks     <- c(.05, .01, .001)
 
 # We will only work with static networs, this is, we will exclude the
@@ -93,10 +141,15 @@ for (art in articles) {
   
   model_data[[sprintf("%s_lagged", art)]] <- NA
   model_data[ids1,sprintf("%s_lagged", art)] <- model_data[ids0,][[art]]
+  
+  # We assume that, if missing the lagged value is zero
+  model_data[ids1,sprintf("%s_lagged", art)][
+    is.na(model_data[ids1,sprintf("%s_lagged", art)])
+  ] <- 0
 }
 
 # Dropping and sorting again (just in case)
-model_data <- subset(model_data, year == 2012 & !no_report)
+model_data <- subset(model_data, year == 2012)
 model_data <- model_data[order(model_data$entry),]
 
 # Distance network -------------------------------------------------------------
@@ -138,147 +191,49 @@ for (Wnum in 1:nrow(networks)) {
   rho_per_article    <- vector("numeric", length(articles))
   names(rho_per_article) <- articles
   
-  
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho", sprintf("%s_lagged",art)))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
+  # Looping through the models
+  for (m in seq_along(models)) {
     
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
+    for (art in articles) {
       
-    # Creating the object
-    assign(paste("tobit_lagged",art,0,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 0,  " done.")
-  }
-  
-  # Model 1: Only characteristics
-  
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho"))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
-    
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
+      # Name of the lagged variable
+      art_lagged <- sprintf("%s_lagged", art)
       
-    # Creating the object
-    assign(paste("tobit_lagged",art,1,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 1,  " done.")
-  }
-  
-  
-  
-  # Model 2: We add political shifts
-  ids <- complete.cases(model_data$pol_shift)
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho", "pol_shift"))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
-    
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
-    
-    # Creating the object
-    assign(paste("tobit_lagged",art,2,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 2,  " done.")
-  }
-  
-  # Model 3: Bloomberg amount
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho", "bloomberg_amount"))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
-    
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
+      # Generate the exposure data and lagged outcome
+      model_data[["rho"]]      <- as.matrix(W %*% model_data[[art_lagged]])
+      model_data[["y_lagged"]] <- model_data[[art_lagged]]
+
+      # Write down the model
+      mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))
       
-    # Creating the object
-    assign(paste("tobit_lagged",art,3,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 3,  " done.")
-  }
-  
-  # Model 4: Bloomberg count
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho", "bloomberg_count"))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
-    
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
+      # Filtering the data (if needed)
+      if (length(models[[m]]$filter))
+        tmpdata <- models[[m]]$filter(model_data)
+      else tmpdata <- model_data
       
-    # Creating the object
-    assign(paste("tobit_lagged",art,4,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 4,  " done.")
-  }
-  
-  # Model 5: Bloomberg amount
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho", "bloomberg_fctc_amount"))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
+      # Run the model
+      ans <- tryCatch(AER::tobit(mod, data=tmpdata), error=function(e) e)
     
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
+      # Did it run?  
+      if (inherits(ans, "error")) {
+        message("!!! Error in network ", Wname, " article ", art, " model.")
+        next
+      }
       
-    # Creating the object
-    assign(paste("tobit_lagged",art,5,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 5,  " done.")
-  }
-  
-  # Model 6: Bloomberg count fctc
-  for (art in articles) {
-    # Creating and estimating model (including lagged exposure)
-    model_data[["rho"]] <- as.matrix(
-      W %*% model_data[[sprintf("%s_lagged",art)]]
-    )
-    mod <- makeformula(art, c(common_covars, "rho", "bloomberg_fctc_count"))
-    ans <- tryCatch(AER::tobit(mod, data=model_data), error = function(e) e)
+      # Creating the object
+      assign(paste("tobit_lagged",art, m, sep="_"), ans, envir = .GlobalEnv)
+      message("Network ", Wname, " article ", art, " model ", m,  " done.")
+    }
     
-    if (inherits(ans, "error")) {
-      message("!!! Error in network ", Wname, " article ", art, " model.")
-      next
-    }
-      
-    # Creating the object
-    assign(paste("tobit_lagged",art,6,sep="_"), ans, envir = .GlobalEnv)
-    message("Network ", Wname, " article ", art, " model ", 6,  " done.")
   }
-  
   
   # Saving results -----------------------------------------------------------
   save(Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$"), file = sprintf("models/tobit_lagged_%s.rda", Wname))
   
   message("Network ", Wname, " done.")
 }
+
+# Saving the models specifications
+save(models, networks, articles,
+     file = sprintf("models/tobit_lagged_specifications.rda"))
 

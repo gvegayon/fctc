@@ -2,21 +2,62 @@ rm(list = ls())
 
 library(AER)
 
-# List of networks
-networks      <- c(
-  "adjmat_general_trade", "General Trade",
-  "adjmat_tobacco_trade", "Tobacco Trade",
-  "adjmat_mindist", "Minimal distance",
-  "adjmat_centroid_dist", "Centroid Distance",
-  "adjmat_border", "Country Borders",
-  "adjmat_gl_posts", "GlobalLink Posts",
-  "adjmat_referrals", "GlobalLink Referrals",
-  "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
-  "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation",
-  "adjmat_interest_group_comembership_twomode", "Interest Group co-membership"
+# Reading the models data (not the results themselfs) --------------------------
+
+# Loading the model specifications, this includes:
+#  - models,
+#  - networks, and
+#  - articles
+load("models/tobit_lagged_specifications.rda")
+
+# Processing the models (names of the variables) -------------------------------
+
+# Changing the varnames of the models
+fancy_varnames <- c(
+  `Lagged Exposure (rho)` = "rho", 
+  `Gov. Ownership`        = "govtown",
+  `Tobacco Prod. PP`      = "tobac_prod_pp",
+  `Years since Sign.`     = "`Years since Sign.`", 
+  `Years since Ratif.`    = "`Years since Ratif.`",
+  `GDP pp`                = "GDP",
+  `Democracy`             = "democracy",
+  `% Female Smoke`        = "perc_female_smoke",
+  `% Male Smoke`          = "perc_male_smoke",
+  `Labor`                 = "labor",
+  `Women's rights`        = "womens_rights",
+  `Population`            = "population",
+  `Eastern Mediterranean` = "`Eastern Mediterranean`",
+  European                = "European",
+  African                 = "African",
+  `Western Pacific`       = "`Western Pacific`",
+  `South-East Asia`       = "`South-East Asia`",
+  `(Intercept)`           = "(Intercept)",
+  `Implemented 2010`      = "y_lagged",
+  PolShift                = "pol_shift",
+  `Bloomberg $$$ PP`      = "bloomberg_amount_pp",
+  `Bloomberg #`           = "bloomberg_count",
+  `Bloomberg FCTC $$$ PP` = "bloomberg_fctc_amount_pp",
+  `Bloomberg FCTC #`      = "bloomberg_fctc_count",
+  `No report`             = "no_report"
 )
 
-networks <- matrix(networks, ncol = 2, byrow = TRUE)
+models <- lapply(models, function(x) {
+  # Which of this model's variables are in fancy names?
+  ids <- which(x$vars %in% fancy_varnames)
+  
+  # Issuing a warning
+  test <- which(!(x$vars %in% fancy_varnames))
+  if (length(test))
+    warning("The following variables don't show in -fancu_varnames-:",
+            paste(x$vars[test], collapse=", "), ".")
+  
+  # These have to have a name... otherwise, there's nothing to replace!
+  names(x$vars)      <- x$vars
+  names(x$vars)[ids] <- names(fancy_varnames[match(x$vars[ids], fancy_varnames)])
+  x
+})
+
+# Functions to process the data ------------------------------------------------
 
 # Function to compute pseudo R2 using McFadden's method
 pseudoR2 <- function(x) {
@@ -57,10 +98,11 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   
   
   # # Number of observations
+  model_obj_name <- sprintf("tobit_lagged_%s_%i", depvar, modelnum)
   ans <- rbind(
     tab,
     matrix(nobs, ncol = 1, dimnames = list("N", netname)),
-    matrix(pseudoR2(env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]), ncol = 1, dimnames = list("Pseudo R2", netname))
+    matrix(pseudoR2(env[[model_obj_name]]), ncol = 1, dimnames = list("Pseudo R2", netname))
     )
   
   ans
@@ -68,40 +110,9 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
 
 tryGet_coef <- function(...) tryCatch(get_coefs(...), error = function(e) e)
 
-# Variables to include in the table
-varnames <- list(
-  c(
-  rho                     = "rho", 
-  `Gov. Ownership`        = "govtown",
-  `Tobacco Prod. PP`      = "tobac_prod_pp",
-  `Years since Sign.`     = "`Years since Sign.`", 
-  `Years since Ratif.`    = "`Years since Ratif.`",
-  `GDP pp`                = "GDP",
-  `Democracy`             = "democracy",
-  `% Female Smoke`        = "perc_female_smoke",
-  `% Male Smoke`          = "perc_male_smoke",
-  `Labor`                 = "labor",
-  `Women's rights`        = "womens_rights",
-  `Population`            = "population",
-  `Eastern Mediterranean` = "`Eastern Mediterranean`",
-  European                = "European",
-  African                 = "African",
-  `Western Pacific`       = "`Western Pacific`",
-  `South-East Asia`       = "`South-East Asia`",
-  `(Intercept)`           = "(Intercept)"
-  )
-)
-
-varnames[[2]] <- c(varnames[[1]], PolShift = "pol_shift")
-varnames[[3]] <- c(varnames[[1]], `Bloomberg Amount` = "bloomberg_amount")
-varnames[[4]] <- c(varnames[[1]], `Bloomberg Count` = "bloomberg_count")
-varnames[[5]] <- c(varnames[[1]], `Bloomberg FCTC Amount` = "bloomberg_fctc_amount")
-varnames[[6]] <- c(varnames[[1]], `Bloomberg FCTC Count` = "bloomberg_fctc_count")
-
-articles <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
 
 # Loop through model number
-for (m in 0:6) {
+for (m in seq_along(models)) {
   
   # Creating new environment
   env <- new.env()
@@ -132,26 +143,17 @@ for (m in 0:6) {
     for (net in networks[,1]) {
       
       # Fetching the data and rowbinding
-      tmpvnames <- if (m == 0) {
-        c(varnames[[m + 1]],
-          structure(
-            paste0(a, "_lagged"),
-            names = sprintf("Art %s (t-1)",gsub("sum_art0?", "", a))
-          )
-        )
-      } else varnames[[m]]
-      
       ans0 <- tryGet_coef(
         netname  = net,
         depvar   = a,
-        varnames = tmpvnames,
+        varnames = models[[m]]$vars,
         modelnum = m, 
         digits   = 2
       )
       
       if (inherits(ans0, "error")) {
         message("!!!ERROR: Network ", net, " model ", m," didn't worked...")
-        ans <- cbind(ans, rep(NA, length(tmpvnames)*2 + 2))
+        ans <- cbind(ans, rep(NA, length(models[[m]]$vars)*2 + 2))
         next
       }
       
@@ -160,9 +162,10 @@ for (m in 0:6) {
       )
       
       # Adding to the overall list
-      rhos[rowid_betas[net], a] <- ans0["rho",1,drop=TRUE]
-      rhos[rowid_sds[net], a] <- ans0[
-        match("rho", rownames(ans0)) + 1,
+      rho_fancy_name            <- names(fancy_varnames)[fancy_varnames == "rho"]
+      rhos[rowid_betas[net], a] <- ans0[rho_fancy_name, 1,drop=TRUE]
+      rhos[rowid_sds[net], a]   <- ans0[
+        match(rho_fancy_name, rownames(ans0)) + 1,
         1,drop=TRUE]
       
       # Are we there yet?
@@ -179,36 +182,28 @@ for (m in 0:6) {
   # Storing rhos
   rownames(rhos)[rowid_betas] <- networks[match(names(rowid_betas), networks[,1]),2]
   
+  # Extracting the model name...
+  model_name <- names(models)[[m]]
+  fn <- sprintf("tables/tobit_lagged_tabulate_model=%s_rhos.csv", model_name)
   write.table(
     matrix(c("", gsub("sum_art0?", "Article ",colnames(rhos))), nrow=1),
-    sprintf("tables/tobit_lagged_tabulate_rhos_model=%i.csv", m),
+    fn,
     row.names = FALSE, col.names = FALSE, sep=","
     )
   write.table(
-    rhos,
-    sprintf("tables/tobit_lagged_tabulate_rhos_model=%i.csv", m),
-    row.names = TRUE, sep=",", quote=TRUE,
-    col.names = FALSE, append=TRUE
+    rhos, fn, row.names = TRUE, sep=",", quote=TRUE, col.names = FALSE,
+    append=TRUE
   )
   
-  # Putting all tables together
-  fn <- sprintf("tables/tobit_lagged_tabulate_model=%i.csv", m)
-  # for (a in articles) {
-  #   
-  #   # Article number
-  #   write.table(
-  #     matrix(c(gsub("sum_art0?", "Art. ", a), colnames(get(a, envir = env))), nrow=1) ,
-  #     fn, row.names = FALSE, col.names = FALSE, quote = TRUE, sep=",",
-  #     append = ifelse(a == articles[1], FALSE, TRUE)
-  #   )
-  #   
-  #   # Writing values
-  #   write.table(
-  #     get(a, envir = env), fn, append = TRUE, row.names = TRUE, sep = ",",
-  #     col.names = FALSE,
-  #     quote=FALSE)
-  # }
+  # Adding note
+  write.table(
+    "Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'",
+    fn, append = TRUE, row.names = FALSE, col.names = FALSE, quote=FALSE)
+  cat(paste("\"Note:", models[[m]]$about), "\"", file = fn, append = TRUE)
   
+  # Putting all tables together
+  fn <- sprintf("tables/tobit_lagged_tabulate_model=%s.csv", model_name)
+
   for (i in 1:length(networks[,1])) {
     # Getting the data
     tmpdat <- do.call(cbind, lapply(env, "[", i=, j=networks[i,2]))
@@ -234,9 +229,10 @@ for (m in 0:6) {
   write.table(
     "Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'",
     fn, append = TRUE, row.names = FALSE, col.names = FALSE, quote=FALSE)
+  cat(paste("\"Note:", models[[m]]$about), "\"", file = fn, append = TRUE)
 
   # Cleaning everything 
-  message("Model ", m, " done ----------------------------------------------------")
+  message("Model ", model_name, " done ----------------------------------------------------")
 
   rm(env)
 }

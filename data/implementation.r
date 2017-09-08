@@ -124,6 +124,7 @@ dat$no_report <- apply(
   1,
   function(x) all(is.na(x))
 )
+dat$no_report <- as.integer(dat$no_report)
 
 # Sorting
 implementation <- dat[with(dat, order(country_name, year)), ]

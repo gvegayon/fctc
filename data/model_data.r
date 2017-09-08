@@ -54,18 +54,24 @@ dat$bloomberg_fctc_amount <- coalesce(dat$bloomberg_fctc_amount, 0)
 #   143    22    11 
 
 # Carry forward imputation
-carry_forward <- function(idv, v) {
+carry_forward_and_zero_back <- function(idv, v, dat) {
   
   for (.entry in unique(dat[[idv]])) {
     
     # Which needs to be solved
     idx <- which(dat[[idv]] == .entry)
     
-    dat[idx,v][-1] <- ifelse(
-      is.na(dat[idx,v][-length(dat[idx,v])]),
-      dat[idx,v][-1],
-      dat[idx,v][-length(dat[idx,v])]
-    )
+    # Forward
+    for (t in 2:length(idx))
+      dat[idx, v][t] <- ifelse(
+        is.na(dat[idx, v][t]), dat[idx, v][t - 1L],
+        dat[idx, v][t])
+    
+    # Backwards (only zeros)
+    for (t in (length(idx) - 1L):1)
+      dat[idx, v][t] <- ifelse(
+        is.na(dat[idx, v][t]) & dat[idx, v][t + 1L] == 0, dat[idx, v][t + 1L],
+        dat[idx, v][t])
   }
   
   dat
@@ -73,11 +79,42 @@ carry_forward <- function(idv, v) {
 
 # Sorting
 dat <- dat[with(dat, order(entry, year)),]
-dat2 <- carry_forward("entry", "sum_art05")
+dat$no_report[is.na(dat$no_report)] <- 1L
+articles <- sprintf("sum_art%02i", c(5, 6, 8, 11, 13))
 
-View(cbind(dat2[,c("entry", "year", "sum_art05")], dat[,c("entry", "year", "sum_art05")]))
 
-dat$sum_art05[dat$year == 2012]
+# Imputing
+dat2 <- dat
+for (art in articles)
+  dat2 <- carry_forward_and_zero_back("entry", art, dat2)
+
+dat2$no_report <- apply(
+  dat2[,grepl("^sum_art[0-9]+",colnames(dat2))], 
+  1,
+  function(x) all(is.na(x))
+)
+dat2$no_report <- as.integer(dat2$no_report)
+
+for (y in c(2010, 2012))
+  print(table(
+    `n/a (Original)` = dat$no_report[dat$year == y],
+    Imputed  = dat2$no_report[dat2$year == y]
+    )
+  )
+
+# View(cbind(dat2[,c("entry", "year", "sum_art11")], dat[,c("entry", "year", "sum_art11")]),
+#      "Imputation")
+
+# Comparing before and after
+for (art in articles)
+print(table(
+  Original = dat[[art]][dat$year %in% c(2012)],
+  Imputed  = dat2[[art]][dat2$year %in% c(2012)],
+  useNA="always"
+  ))
+
+# We'll just used the imputed data instead...
+dat <- dat2
 
 dat$sum_art05[is.na(dat$sum_art05)] <- 0L
 dat$sum_art06[is.na(dat$sum_art06)] <- 0L
@@ -133,7 +170,7 @@ dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
 
 # If NA, it means that these didn't showed in the lists of reports, but may
 # have ratified.
-dat$no_report[is.na(dat$no_report)] <- TRUE
+dat$no_report[is.na(dat$no_report)] <- 1L
 
 write.csv(dat, "data/model_data_unscaled.csv", row.names = FALSE, na = "<NA>")
 

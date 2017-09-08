@@ -1,0 +1,10 @@
+2017-09-08  George G. Vega Yon <g.vegayon@gmail.com>
+	* data/model_data.r: Now imputing data,
+	* models/tobit_lagged.r: Better model specification
+	* tables/*: idem.
+
+
+2017-09-06  George G. Vega Yon <g.vegayon@gmail.com>
+	* Starting to work with ChangeLog
+	* Working on Brook's latest version of exposure
+
