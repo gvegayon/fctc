@@ -32,7 +32,7 @@ fancy_varnames <- c(
   `Western Pacific`       = "`Western Pacific`",
   `South-East Asia`       = "`South-East Asia`",
   `(Intercept)`           = "(Intercept)",
-  `Implemented 2010`      = "y_lagged",
+  `Lagged Y (Number of Items in 2010)`      = "y_lagged",
   PolShift                = "pol_shift",
   `Bloomberg $$$ PP`      = "bloomberg_amount_pp",
   `Bloomberg #`           = "bloomberg_count",

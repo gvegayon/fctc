@@ -114,6 +114,12 @@ print(table(
   ))
 
 # We'll just used the imputed data instead...
+# Egypt did not reported on 2012 but did on 2010
+# So carry forward only works on it!
+# See http://apps.who.int/fctc/implementation/database/article/article-13/indicators/5346/reports
+# Comprehensive ban on all tobacco advertising, promotion and sponsorship
+# Party	2014	2012	2010
+# Egypt	| Yes |	Answer/report not provided |	Yes
 dat <- dat2
 
 dat$sum_art05[is.na(dat$sum_art05)] <- 0L
