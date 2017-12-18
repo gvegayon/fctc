@@ -33,7 +33,7 @@ party_attributes <- party_attributes[party_attributes$entry %in% treaty_dates$en
 length(unique(party_attributes$entry)) #183 countries
 
 implementation <- read.csv("data/implementation.csv", na="<NA>")
-implementation <- subset(implementation, select=c(-country_name))
+# implementation <- subset(implementation, select=c(-country_name))
 implementation <- implementation[implementation$entry %in% treaty_dates$entry,]
 length(unique(implementation$entry)) #166 countries
 
@@ -145,6 +145,8 @@ adjmat_3 <- adjmat_tobacco_trade[countrylist3, countrylist3]
 treaty_dates3 <- subset(treaty_dates, entry %in% countrylist3)
 model_dat3 <- subset(model_dat, entry %in% countrylist3)
 
+# adjmat_3@x <- as.integer(adjmat_3@x > cen)
+
 # create diffnet object
 my_diffnet3 <- new_diffnet(
   graph = adjmat_3,
@@ -160,7 +162,7 @@ plot_adopters(my_diffnet3)
 ## LOGIT MODEL -----
 
 # Variables to export
-my_diffnet3[["CohesiveExposure"]] <- exposure(my_diffnet3)
+my_diffnet3[["CohesiveExposure"]] <- exposure(my_diffnet3, valued=TRUE)
 my_diffnet3[["Adopt"]] <- my_diffnet3$cumadopt
 
 # As data frame
@@ -176,8 +178,9 @@ tail(my_diffnet3_df)
 
 # Running logit
 summary(
-  glm(Adopt ~ LaggedExposure 
-      #+ factor(per) #why is this in here?
+  glm(Adopt ~ 
+        LaggedExposure 
+      + factor(per) #why is this in here?
       + population 
       + GDP 
       + democracy 
@@ -185,7 +188,7 @@ summary(
       + perc_female_smoke 
       + perc_male_smoke 
       + number_ngos
-      + who_reg2, #need to recode this...
+      + factor(who_reg2), #need to recode this...
       data=my_diffnet3_df,
       family = binomial(link="logit")
   )
