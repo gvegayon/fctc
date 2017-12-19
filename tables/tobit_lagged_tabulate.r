@@ -41,6 +41,10 @@ fancy_varnames <- c(
   `No report`             = "no_report"
 )
 
+# # If you want to filter models, for now we will only focus on the model described
+# # in the paper. The other specifications showed no significance.
+# models <- models["Imp2010_report"]
+
 models <- lapply(models, function(x) {
   # Which of this model's variables are in fancy names?
   ids <- which(x$vars %in% fancy_varnames)
@@ -202,34 +206,37 @@ for (m in seq_along(models)) {
   cat(paste("\"Note:", models[[m]]$about), "\"", file = fn, append = TRUE)
   
   # Putting all tables together
-  fn <- sprintf("tables/tobit_lagged_tabulate_model=%s.csv", model_name)
 
-  for (i in 1:length(networks[,1])) {
+  for (a in articles) {
+    fn <- sprintf("tables/tobit_lagged_tabulate_model=%s-art=%s.csv",
+                  model_name, gsub(".+art", "", a))
+    
     # Getting the data
-    tmpdat <- do.call(cbind, lapply(env, "[", i=, j=networks[i,2]))
-    tmpdat <- tmpdat[, order(colnames(tmpdat))]
-    colnames(tmpdat) <- gsub("sum_art0?", "Article ", colnames(tmpdat))
+    tmpdat <- env[[a]]
     
-    # Article number
+    # Writing article number
     write.table(
-      matrix(c(networks[i,2], colnames(tmpdat)), nrow=1) ,
-      fn, row.names = FALSE, col.names = FALSE, quote = TRUE, sep=",",
-      append = ifelse(i == 1, FALSE, TRUE)
+      matrix(c(gsub(".+art(0|_)?", "Article ", a), colnames(tmpdat)), nrow=1),
+      file = fn, append = FALSE, sep=",",
+      quote=TRUE, row.names = FALSE, col.names = FALSE
     )
-    
+
+    # Article number
     write.table(
       tmpdat,
       fn, row.names = TRUE, col.names = FALSE, quote = TRUE, sep=",",
       append = TRUE
     )
+    
+    # Adding note
+    write.table(
+      "Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'",
+      fn, append = TRUE, row.names = FALSE, col.names = FALSE, quote=FALSE)
+    cat(paste("\"Note:", models[[m]]$about), "\"", file = fn, append = TRUE)
 
   }
    
-  # Adding note
-  write.table(
-    "Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'",
-    fn, append = TRUE, row.names = FALSE, col.names = FALSE, quote=FALSE)
-  cat(paste("\"Note:", models[[m]]$about), "\"", file = fn, append = TRUE)
+  
 
   # Cleaning everything 
   message("Model ", model_name, " done ----------------------------------------------------")
