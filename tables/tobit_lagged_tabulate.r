@@ -12,6 +12,9 @@ load("models/tobit_lagged_specifications.rda")
 
 # Processing the models (names of the variables) -------------------------------
 
+# Networks to use
+networks <- networks[networks[,1] != "adjmat_mindist",]
+
 # Changing the varnames of the models
 fancy_varnames <- c(
   `Lagged Exposure (rho)` = "rho", 
@@ -52,7 +55,7 @@ models <- lapply(models, function(x) {
   # Issuing a warning
   test <- which(!(x$vars %in% fancy_varnames))
   if (length(test))
-    warning("The following variables don't show in -fancu_varnames-:",
+    warning("The following variables don't show in -fancy_varnames-:",
             paste(x$vars[test], collapse=", "), ".")
   
   # These have to have a name... otherwise, there's nothing to replace!

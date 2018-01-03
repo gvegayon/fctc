@@ -1,7 +1,12 @@
+# TAKE A LOOK AT
+# https://cran.r-project.org/web/packages/dggridR/vignettes/dggridR.html
+#
+
 
 rm(list=ls())
 options(stringsAsFactors = FALSE)
 library(cshapes)
+library(maps)
 
 # Reading data
 model_data       <- read.csv("data/model_data.csv", na="<NA>")
@@ -24,19 +29,22 @@ draw_implementation_map <- function(
   main = "",
   sub=NULL,
   title.args = list(),
-  add.key    = TRUE
+  add.key    = TRUE,
+  itemran
   ) {
   
   # Marking those countries for which we have data
   ids   <- dat[[iso2var]]
   world <- world[world$ISO1AL2 %in% ids,]
+  dat   <- dat[match(world$ISO1AL2, ids),]
+  ids   <- ids[match(world$ISO1AL2, ids)]
   
   cdat <- dat[[countvar]]
-  cdat <- cdat[match(world$ISO1AL2, ids)]
+  # cdat <- cdat[match(world$ISO1AL2, ids)]
   have_data <- !is.na(cdat)
   
-  cdat <- (cdat - min(cdat, na.rm = TRUE))/
-    (max(cdat, na.rm=TRUE) - min(cdat, na.rm = TRUE))
+  cdat <- (cdat - itemran[1])/
+    (itemran[2] - itemran[1])
   
   colors <- colorRamp(blues9)(cdat)
   colors[is.na(colors)] <- 255
@@ -46,17 +54,23 @@ draw_implementation_map <- function(
     oldpar <- par(no.readonly = TRUE)
     par(mar = par()$mar*c(0,0,0,3))
   }
-  plot(world[have_data,], col=colors, border="gray")
-  plot(world[!have_data,], col="gray", density=30, add=TRUE, border="gray")
+  # plot(world[have_data,], col=colors, border="gray", lwd=.5)
+  plot(world[!have_data,], col="gray", density=30, add=TRUE, border="gray",
+       lwd=.5)
+  
+  # Adding labels
+  text(
+    getSpPPolygonsLabptSlots(world[have_data,]),
+    labels = world[have_data,]$ISO1AL2,
+    cex    = .5
+      )
   
   # Adding color key
   if (add.key) {
     par(oldpar)
-    dat <- dat[[countvar]][match(world$ISO1AL2, ids)]
-    dat <- dat[!is.na(dat)]
-    dat_seq <- min(dat):max(dat)
+    dat_seq <- itemran[1]:itemran[2]
     netdiffuseR::drawColorKey(
-      x             = c(-1,dat), 
+      x             = c(-1, itemran), 
       tick.marks    = c(-1, dat_seq),
       labels        = c("Treaty not ratified",dat_seq),
       color.palette = c("gray",colorRampPalette(blues9)(length(dat_seq))),
@@ -73,24 +87,44 @@ draw_implementation_map <- function(
   do.call(title, c(list(main=main, sub=sub),title.args))
 }
 
-graphics.off()
-oldpar <- par(no.readonly = TRUE)
-pdf(file = "fig/implementation_art11_map2012.pdf", width = 12, height = 8.5)
-draw_implementation_map(
-  subset(model_data, is.na(year) | year==2012),
-  "entry", "sum_art11", cshape_data,
-  main="", # Number of items implemented of Art. 11 by 2012.
-  sub="") # Source: Downloaded from http://apps.who.int/fctc/implementation/database
-par(oldpar)
-dev.off()
+for (art in c(5, 6, 8, 11, 13)) {
+  
+  # Varname
+  vn <- sprintf("sum_art%02i", art)
+  
+  # For 2012
+  fn <- sprintf("fig/implementation_art%02i_map2012.pdf", art)
 
-graphics.off()
-oldpar <- par(no.readonly = TRUE)
-pdf(file = "fig/implementation_art11_map2010.pdf", width = 12, height = 8.5)
-draw_implementation_map(
-  subset(model_data, is.na(year) | year==2010),
-  "entry", "sum_art11", cshape_data,
-  main="", # Number of items implemented of Art. 11 by 2010.
-  sub="")  # Source: Downloaded from http://apps.who.int/fctc/implementation/database
-par(oldpar)
-dev.off()
+  # Maximum number of items implemented
+  iran <- range(model_data[[vn]], na.rm = TRUE)
+  
+  graphics.off()
+  oldpar <- par(no.readonly = TRUE)
+  pdf(file = fn, width = 12, height = 8.5)
+  draw_implementation_map(
+    subset(model_data, is.na(year) | year==2012),
+    "entry", vn, cshape_data,
+    main="", # Number of items implemented of Art. 11 by 2012.
+    sub="", # Source: Downloaded from http://apps.who.int/fctc/implementation/database
+    itemran = iran
+  )
+  par(oldpar)
+  dev.off()
+  
+  # For 2010
+  fn <- sprintf("fig/implementation_art%02i_map2010.pdf", art)
+
+  graphics.off()
+  oldpar <- par(no.readonly = TRUE)
+  pdf(file = fn, width = 12, height = 8.5)
+  draw_implementation_map(
+    subset(model_data, is.na(year) | year==2010),
+    "entry", vn, cshape_data,
+    main="", # Number of items implemented of Art. 11 by 2010.
+    sub="",  # Source: Downloaded from http://apps.who.int/fctc/implementation/database
+    itemran = iran
+  )
+  par(oldpar)
+  dev.off()
+}
+
