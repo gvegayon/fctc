@@ -1,7 +1,5 @@
 # TAKE A LOOK AT
 # https://cran.r-project.org/web/packages/dggridR/vignettes/dggridR.html
-#
-
 
 rm(list=ls())
 options(stringsAsFactors = FALSE)
