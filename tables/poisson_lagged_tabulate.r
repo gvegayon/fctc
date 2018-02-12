@@ -8,7 +8,7 @@ library(AER)
 #  - models,
 #  - networks, and
 #  - articles
-load("models/tobit_lagged_specifications.rda")
+load("models/poisson_lagged_specifications.rda")
 
 # Processing the models (names of the variables) -------------------------------
 
@@ -18,7 +18,7 @@ networks <- networks[networks[,1] != "adjmat_mindist",]
 # Changing the varnames of the models
 fancy_varnames <- c(
   `Lagged Exposure (rho)` = "rho", 
-  # `Gov. Ownership`        = "govtown",
+  `Gov. Ownership`        = "govtown",
   `Tobacco Prod. PP`      = "tobac_prod_pp",
   `Years since Sign.`     = "`Years since Sign.`", 
   `Years since Ratif.`    = "`Years since Ratif.`",
@@ -26,8 +26,8 @@ fancy_varnames <- c(
   `Democracy`             = "democracy",
   `% Female Smoke`        = "perc_female_smoke",
   `% Male Smoke`          = "perc_male_smoke",
-  # `Labor`                 = "labor",
-  # `Women's rights`        = "womens_rights",
+  `Labor`                 = "labor",
+  `Women's rights`        = "womens_rights",
   `Population`            = "population",
   `Eastern Mediterranean` = "`Eastern Mediterranean`",
   European                = "European",
@@ -54,11 +54,9 @@ models <- lapply(models, function(x) {
   
   # Issuing a warning
   test <- which(!(x$vars %in% fancy_varnames))
-  if (length(test)) {
+  if (length(test))
     warning("The following variables don't show in -fancy_varnames-:",
             paste(x$vars[test], collapse=", "), ".")
-    
-  }
   
   # These have to have a name... otherwise, there's nothing to replace!
   names(x$vars)      <- x$vars
@@ -69,8 +67,8 @@ models <- lapply(models, function(x) {
 # Functions to process the data ------------------------------------------------
 
 # Function to compute pseudo R2 using McFadden's method
-getAIC <- function(x) {
-  sprintf("%.2f", AIC(x))
+pseudoR2 <- function(x) {
+  sprintf("%.2f", x$aic)
 }
 
 # Function to get coefficients
@@ -78,16 +76,15 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   env <- new.env()
   
   # Fetching the estimates
-  load(sprintf("models/tobit_lagged_%s.rda", netname), envir = env)
+  load(sprintf("models/poisson_lagged_%s.rda", netname), envir = env)
   
-  estimates <- env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]
+  estimates <- env[[sprintf("poisson_lagged_%s_%i", depvar, modelnum)]]
   
   # Retrieving the betas and sds
-  nobs <- nrow(estimates$y)
+  nobs <- length(estimates$y)
   estimates <- summary(estimates)$coefficients[]
 
   # Getting the 
-  varnames <- varnames[varnames %in% fancy_varnames]
   ans <- estimates[varnames,,drop=FALSE]
   
   pvals <- ans[,"Pr(>|z|)"]
@@ -108,11 +105,11 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   
   
   # # Number of observations
-  model_obj_name <- sprintf("tobit_lagged_%s_%i", depvar, modelnum)
+  model_obj_name <- sprintf("poisson_lagged_%s_%i", depvar, modelnum)
   ans <- rbind(
     tab,
     matrix(nobs, ncol = 1, dimnames = list("N", netname)),
-    matrix(getAIC(env[[model_obj_name]]), ncol = 1, dimnames = list("AIC", netname))
+    matrix(pseudoR2(env[[model_obj_name]]), ncol = 1, dimnames = list("Pseudo R2", netname))
     )
   
   ans
@@ -128,21 +125,21 @@ for (m in seq_along(models)) {
   env <- new.env()
   
   # Looping through depvars
-  # rhos <- matrix(NA, ncol = length(articles), nrow = nrow(networks),
-  #                dimnames = list(networks[,1], articles))
+  rhos <- matrix(NA, nrow = length(articles), ncol = nrow(networks),
+                 dimnames = list(articles, networks[,1]))
   
   rhos <- matrix(NA,
-    nrow = length(articles)*2,
-    ncol = nrow(networks),
+    nrow = nrow(networks)*2,
+    ncol = length(articles),
     dimnames = list(
-      1:(length(articles)*2),
-      networks[,1])
+      1:(nrow(networks)*2),
+      articles)
     )
   
-  rowid_betas <- structure(seq(1, nrow(rhos) - 1L, by = 2), names = articles)
-  rowid_sds   <- structure(seq(2, nrow(rhos), by = 2), names = articles)
+  rowid_betas <- structure(seq(1, nrow(rhos) - 1L, by = 2), names = networks[,1])
+  rowid_sds   <- structure(seq(2, nrow(rhos), by = 2), names = networks[,1])
   
-  rownames(rhos)[rowid_betas] <- articles
+  rownames(rhos)[rowid_betas] <- networks[,1]
   rownames(rhos)[rowid_sds]   <- ""
   
   for (a in articles) {
@@ -173,8 +170,8 @@ for (m in seq_along(models)) {
       
       # Adding to the overall list
       rho_fancy_name            <- names(fancy_varnames)[fancy_varnames == "rho"]
-      rhos[rowid_betas[a], net] <- ans0[rho_fancy_name, 1,drop=TRUE]
-      rhos[rowid_sds[a], net]   <- ans0[
+      rhos[rowid_betas[net], a] <- ans0[rho_fancy_name, 1,drop=TRUE]
+      rhos[rowid_sds[net], a]   <- ans0[
         match(rho_fancy_name, rownames(ans0)) + 1,
         1,drop=TRUE]
       
@@ -190,15 +187,13 @@ for (m in seq_along(models)) {
   }
   
   # Storing rhos
-  colnames(rhos) <- networks[match(colnames(rhos), networks[,1]),2]
+  rownames(rhos)[rowid_betas] <- networks[match(names(rowid_betas), networks[,1]),2]
   
   # Extracting the model name...
   model_name <- names(models)[[m]]
-  fn <- sprintf("tables/tobit_lagged_tabulate_model=%s_rhos.csv", model_name)
-  
-  rownames(rhos) <- gsub("sum_art0?", "Article ",rownames(rhos))
+  fn <- sprintf("tables/poisson_lagged_tabulate_model=%s_rhos.csv", model_name)
   write.table(
-    matrix(c("", colnames(rhos)), nrow=1),
+    matrix(c("", gsub("sum_art0?", "Article ",colnames(rhos))), nrow=1),
     fn,
     row.names = FALSE, col.names = FALSE, sep=","
     )
@@ -216,7 +211,7 @@ for (m in seq_along(models)) {
   # Putting all tables together
 
   for (a in articles) {
-    fn <- sprintf("tables/tobit_lagged_tabulate_model=%s-art=%s.csv",
+    fn <- sprintf("tables/poisson_lagged_tabulate_model=%s-art=%s.csv",
                   model_name, gsub(".+art", "", a))
     
     # Getting the data
