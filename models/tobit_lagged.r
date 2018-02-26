@@ -33,7 +33,6 @@ common_covars <- c(
   "`South-East Asia`",
   "democracy",
   "GDP",
-  "`Years since Sign.`",
   "`Years since Ratif.`",
   "tobac_prod_pp",
   "perc_female_smoke",

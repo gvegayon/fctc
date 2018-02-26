@@ -1,0 +1,84 @@
+---
+title: "GL networks"
+date: "February 26, 2018"
+output: pdf_document
+---
+
+In the current version of the paper we are using collapsed versions of the GL networks. A while ago we took this decision for two reasons:
+
+1.  Since we are comparing 2010 to 2012, dynamics are not useful here. We just use the 2010 network compute exposures.
+
+2.  The GL networks for the latest years are too sparse to be used in the models.
+
+Here are a couple of visualizations of the adjacency matrices that shows the second point:
+
+```{r Setup, echo=FALSE, message=FALSE, warning=FALSE}
+
+knitr::opts_chunk$set(out.width = ".4\\linewidth")
+# DESCRIPTION:
+# This file runs linear models on then proportion of implementation using the
+# co-subscription networks.
+
+# Preparing space
+options(stringsAsFactors = FALSE)
+
+library(netdiffuseR)
+library(texreg)
+library(Matrix)
+library(spdep)
+library(AER)
+
+model_data <- read.csv("../data/model_data.csv", na="<NA>", check.names = FALSE)
+model_data <- model_data[with(model_data, order(year, entry)),]
+model_data$`year2012` <- as.integer(model_data$year == 2012)
+load("../data/adjmats.rda")
+load("../data/adjmat_border.rda")
+load("../data/adjmat_mindist.rda")
+load("../data/adjmat_centroid_dist.rda")
+
+# List of networks (with pretty names) that will be used
+networks      <- c(
+  "adjmat_centroid_dist", "Centroid Distance",
+  "adjmat_mindist", "Minimal distance",
+  "adjmat_general_trade", "General Trade",
+  "adjmat_tobacco_trade", "Tobacco Trade",
+  "adjmat_referrals", "GLOBALink Referrals",
+  "adjmat_interest_group_comembership_twomode", "GLOBALink co-subscription"#,"Interest Group co-membership",
+  # "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
+  # "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation",
+  # "adjmat_border", "Country Borders",
+  # "adjmat_gl_posts", "GlobalLink Posts"
+  )
+
+```
+
+```{r GL-posts, echo=FALSE}
+
+image(adjmat_gl_posts$`2010`, xlab="GL Posts 2010")
+
+# Preprocessing networks gl_posts and referrals
+g0 <- adjmat_gl_posts[as.character(2008:2010)] # 
+adjmat_gl_posts <- g0[[1]]
+for (g in g0[-1])
+  adjmat_gl_posts <- adjmat_gl_posts + g
+
+image(adjmat_gl_posts, xlab = "GL Posts 2008-2010 collapsed")
+# nlinks(adjmat_gl_posts)/(nnodes(adjmat_gl_posts)*(nnodes(adjmat_gl_posts)-1))
+
+```
+
+
+```{r GL-referals, echo=FALSE}
+
+image(adjmat_referrals$`2010`, xlab = "GL Referals 2010")
+
+g0 <- adjmat_referrals # 
+adjmat_referrals <- g0[[1]]
+for (g in g0[-1])
+  adjmat_referrals <- adjmat_referrals + g
+
+image(adjmat_referrals, xlab="GL Referals 2002-2011 collapsed")
+
+```
+
+

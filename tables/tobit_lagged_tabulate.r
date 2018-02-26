@@ -20,7 +20,7 @@ fancy_varnames <- c(
   `Lagged Exposure (rho)` = "rho", 
   # `Gov. Ownership`        = "govtown",
   `Tobacco Prod. PP`      = "tobac_prod_pp",
-  `Years since Sign.`     = "`Years since Sign.`", 
+  # `Years since Sign.`     = "`Years since Sign.`", 
   `Years since Ratif.`    = "`Years since Ratif.`",
   `GDP pp`                = "GDP",
   `Democracy`             = "democracy",
