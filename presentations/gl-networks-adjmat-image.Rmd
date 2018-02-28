@@ -43,7 +43,8 @@ networks      <- c(
   "adjmat_general_trade", "General Trade",
   "adjmat_tobacco_trade", "Tobacco Trade",
   "adjmat_referrals", "GLOBALink Referrals",
-  "adjmat_interest_group_comembership_twomode", "GLOBALink co-subscription"#,"Interest Group co-membership",
+  "adjmat_interest_group_comembership_twomode",
+  "GLOBALink co-subscription"#,"Interest Group co-membership",
   # "adjmat_fctc_cop_coparticipation_twomode", "FCTC COP co-participation",
   # "adjmat_fctc_inb_coparticipation_twomode", "FCTC INB co-participation",
   # "adjmat_border", "Country Borders",
@@ -81,4 +82,10 @@ image(adjmat_referrals, xlab="GL Referals 2002-2011 collapsed")
 
 ```
 
+
+```{r GL-co-subscriptions, echo=FALSE}
+
+image(adjmat_interest_group_comembership_twomode$`2010`, xlab = "GLOBALink co-subscription 2010")
+
+```
 
