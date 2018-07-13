@@ -15,4 +15,4 @@ The paper includes the following:
 This depends on the following packages:
 
 "netdiffuseR", "MatchIt", "spdep", "stringr", "rvest", "httr", "cshapes", "texreg",
-"dplyr", "xml2", "foreign", "parallel"
+"dplyr", "xml2", "foreign", "parallel", "wbstats"
