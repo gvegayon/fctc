@@ -40,7 +40,7 @@ G <- lapply(years, function(y) {
 
 names(G) <- years
   
-saveRDS(G, "data/comtrade.csv")
+saveRDS(G, "data/comtrade.rds")
 
 # Comtrade tobacco -------------------------------------------------------------
 
