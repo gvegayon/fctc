@@ -14,6 +14,8 @@ indicators <- wbindicators()
 # UPP.COM.POL.XQ Combined polity score
 # GV.VOIC.AC.ES Voice and Accountability (estimate)
 # RQ.EST Regulatory Quality: Estimate
+# SG.GEN.MNST.ZS Proportion of women in ministerial level positions (%)
+
 
 
 smoke_female <- wb(indicator = "SH.PRV.SMOK.FE")
