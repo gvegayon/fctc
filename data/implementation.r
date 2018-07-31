@@ -14,7 +14,7 @@ codes$art   <- gsub("d","4", codes$art)
 codes$art   <- as.integer(codes$art)
 
 articles    <- sort(unique(codes$art))
-art_to_keep <- c(5, 6, 8, 11, 13)
+art_to_keep <- c(5, 6, 8, 11, 13, 14)
 na_replace  <- NA # If 'no response', what to replace with
 process     <- function(x) {
   if (all(is.na(x))) return(NA)

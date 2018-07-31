@@ -4,11 +4,12 @@
 rm(list=ls())
 options(stringsAsFactors=FALSE)
 library(dplyr)
+library(magrittr)
 library(readxl)
 library(netdiffuseR)
 
 # parameter
-years_reported <- c(2010, 2012) # 2014 (need to extend data)
+years_reported <- c(2010, 2012, 2014, 2016) # 2014 (need to extend data)
 
 # Reading datasets -------------------------------------------------------------
 country_codes    <- read.csv("data-raw/country_codes/country_codes.csv", na.strings = NULL)
@@ -20,6 +21,9 @@ political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
 party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
 
+worldbank <- read.csv("data/world", na = "<NA>")
+worldbank <- subset(party_attributes, who_region != "none", select=c(-country_name))
+
 bloomberg        <- read.csv("data/bloomberg.csv", na = "<NA>")
 bloomberg        <- subset(bloomberg, select=c(-country_name))
 
@@ -27,11 +31,20 @@ treaty_dates     <- read.csv("data/treaty_dates.csv", na = "<NA>")
 treaty_dates     <- subset(treaty_dates, select=c(entry, signature, ratification))
 
 implementation   <- read.csv("data/implementation.csv", na = "<NA>")
-# implementation   <- subset(implementation, select=c(-country_name))
+implementation_post2014 <- readr::read_csv("data/implementation-post2014.csv", na = "<NA>")
 
 govtown          <- read.csv("data/govtown.csv", na = "<NA>")
 
 # Imputation for implementation ------------------------------------------------
+
+# Merging two implementations
+
+implementation <- implementation %>%
+  filter(year != 2014) %>% # Getting 2014 from  implementation_post2014
+  rbind(implementation_post2014) %>%
+  arrange(entry, year) %>%
+  as_tibble
+
 
 # Merging ----------------------------------------------------------------------
 dat <- left_join(party_attributes, political_shifts, by=c("year", "entry"))
@@ -76,6 +89,40 @@ carry_forward_and_zero_back <- function(idv, v, dat) {
   
   dat
 }
+
+
+# Compuiting some basic stats, how often the number of items implementad decreased?
+test <- implementation %>%
+  group_by(entry) %>%
+  mutate(
+    diff05 = sum_art05 - lag(sum_art05),
+    diff06 = sum_art06 - lag(sum_art06),
+    diff08 = sum_art08 - lag(sum_art08),
+    diff11 = sum_art11 - lag(sum_art11),
+    diff13 = sum_art13 - lag(sum_art13),
+    diff14 = sum_art14 - lag(sum_art14)
+  ) %>%
+  mutate(
+    diff05 = if_else(diff05 > 0, "+", if_else(diff05 == 0, "=", "-")),
+    diff06 = if_else(diff06 > 0, "+", if_else(diff06 == 0, "=", "-")),
+    diff08 = if_else(diff08 > 0, "+", if_else(diff08 == 0, "=", "-")),
+    diff11 = if_else(diff11 > 0, "+", if_else(diff11 == 0, "=", "-")),
+    diff13 = if_else(diff13 > 0, "+", if_else(diff13 == 0, "=", "-")),
+    diff14 = if_else(diff14 > 0, "+", if_else(diff14 == 0, "=", "-"))
+  )
+  ungroup 
+
+lapply(
+    colnames(test)[grepl("^diff", colnames(test))],
+    function(x) {
+      ans <- prop.table(table(test[[x]], test$year), 2)
+      rownames(ans) <- paste(gsub("diff", "", x), rownames(ans))
+      ans
+    }) %>%
+  do.call("rbind", .) %>%
+  as_tibble(rownames = "change") %>%
+  readr::write_csv(path="data/model_data-variation-of-implementation.csv")
+  
 
 # Sorting
 dat <- dat[with(dat, order(entry, year)),]

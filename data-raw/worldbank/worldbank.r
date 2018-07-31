@@ -1,4 +1,8 @@
 library(wbstats)
+
+library(dplyr)
+library(magrittr)
+
 indicators <- wbindicators()
 
 "SH.PRV.SMOK.FE" # Smoking Prevalence % female
@@ -8,7 +12,7 @@ indicators <- wbindicators()
 # United Nations Industrial Development Organization, International Yearbook of Industrial Statistics.
 # World Development Indicators
 
-# SH.XPD.PCAP.GX Government health expenditure per capita (current
+# SH.XPD.PUBL.ZS Health expenditure, public (% of GDP)
 # CC.EST Control of Corruption (estimate) 
 # RL.EST Rule of Law (estimate) 
 # UPP.COM.POL.XQ Combined polity score
@@ -17,12 +21,34 @@ indicators <- wbindicators()
 # SG.GEN.MNST.ZS Proportion of women in ministerial level positions (%)
 
 
+health_exp   <- wb(indicator = "SH.XPD.PUBL.ZS") %>% as_tibble
+smoke_female <- wb(indicator = "SH.PRV.SMOK.FE") %>% as_tibble
+smoke_male   <- wb(indicator = "SH.PRV.SMOK.FE") %>% as_tibble
+tobacco_prod <- wb(indicator = "NV.MNF.FBTO.ZS.UN") %>% as_tibble
+population   <- wb(indicator = "SP.POP.TOTL") %>% as_tibble
 
-smoke_female <- wb(indicator = "SH.PRV.SMOK.FE")
-smoke_male   <- wb(indicator = "SH.PRV.SMOK.FE")
-tobacco_prod <- wb(indicator = "NV.MNF.FBTO.ZS.UN")
-population   <- wb(indicator = "SP.POP.TOTL")
+rule_of_law  <- wb(indicator = "RL.EST") %>% as_tibble
+ctrl_corrup  <- wb(indicator = "CC.EST") %>% as_tibble
+polity       <- wb(indicator="UPP.COM.POL.XQ") %>% as_tibble
 
-rule_of_law <- wb(indicator = "RL.EST")
-control_of_corruption <- wb(indicator = "CC.EST")
-polity <- wb(indicator="UPP.COM.POL.XQ")
+
+# Merging all data
+datasets <- ls()[sapply(mget(ls()), inherits, "tbl_df")]
+worldbank <- get(datasets[1]) %>%
+  select(iso3c, iso2c, value, date) %>%
+  set_colnames(c("iso3c", "iso2c", datasets[1], "date"))
+  
+
+for (d in datasets[-1]) {
+  
+  # Getting subset
+  subd <- get(d) %>%
+    select(iso3c, iso2c, value, date) %>%
+    set_colnames(c("iso3c", "iso2c", d, "date"))
+  
+  # Joining
+  worldbank <- left_join(worldbank, subd)
+  
+}
+
+readr::write_csv(worldbank, "data-raw/worldbank/worldbank.csv", na = "<NA>")

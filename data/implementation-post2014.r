@@ -17,7 +17,7 @@ codes       <- read.csv("data-raw/fctc_implementation_2014-and-on/key.csv")
 # codes$art   <- as.integer(codes$art)
 
 articles    <- sort(unique(codes$art))
-art_to_keep <- as.character(c(5, 6, 8, 11, 13))
+art_to_keep <- as.character(c(5, 6, 8, 11, 13, 14))
 na_replace  <- NA # If 'no response', what to replace with
 process     <- function(x) {
   if (all(is.na(x))) return(NA)
@@ -53,7 +53,7 @@ for (article in articles) {
     
     colnames(dat)[colnames(dat) == "X"] <- sprintf("ind%s", ind)
     
-    ans[[as.character(ind)]] <- dat
+    ans[[as.character(ind)]] <- subset(dat, select = -Region)
   }
 
   # In the case that no article is 'useful'
@@ -65,13 +65,13 @@ for (article in articles) {
   
   # More processing (stacking)
   newdat <- ans[[1]]
-  # for (d in ans[-1]) {
-  #   newdat <- merge(newdat, d, by=c("Party", "time"))
-  # }
+  for (d in ans[-1]) {
+    newdat <- merge(newdat, d, by=c("Party", "time"))
+  }
   newdat <- data.frame(
     Party = newdat$Party,
     year  = newdat$time,
-    count = apply(subset(newdat, select=c(-Party, -time, -Region)), 1, process)
+    count = apply(subset(newdat, select=c(-Party, -time)), 1, process)
   )
     
   colnames(newdat)[3] <- sprintf("sum_art%05s", article)
@@ -123,7 +123,7 @@ for (v in which(grepl("sum_art",colnames(dat))))
 
 # Checking which countries did not report anything
 dat$no_report <- apply(
-  dat[,grepl("^sum_art[0-9]+",colnames(dat))], 
+  dat[,grepl("^sum_art\\s*[0-9]+",colnames(dat))], 
   1,
   function(x) all(is.na(x))
 )
