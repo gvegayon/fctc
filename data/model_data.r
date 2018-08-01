@@ -6,10 +6,11 @@ options(stringsAsFactors=FALSE)
 library(dplyr)
 library(magrittr)
 library(readxl)
-library(netdiffuseR)
+# library(netdiffuseR)
 
 # parameter
 years_reported <- c(2010, 2012, 2014, 2016) # 2014 (need to extend data)
+articles_to_use <- c(5, 6, 8, 11, 13, 14)
 
 # Reading datasets -------------------------------------------------------------
 country_codes    <- read.csv("data-raw/country_codes/country_codes.csv", na.strings = NULL)
@@ -18,11 +19,9 @@ country_codes    <- subset(country_codes, select=c(-subdivision_assigned_codes))
 political_shifts <- read.csv("data/political_shifts.csv", na = "<NA>")
 political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 
-party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
-party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
-
+# party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
+# party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
 worldbank <- read.csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
-
 qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
 
 
@@ -49,11 +48,15 @@ implementation <- implementation %>%
 
 
 # Merging ----------------------------------------------------------------------
-dat <- left_join(party_attributes, political_shifts, by=c("year", "entry"))
-dat <- left_join(dat, treaty_dates, by="entry")
-dat <- left_join(dat, implementation)
-dat <- left_join(dat, bloomberg, by=c("year", "entry"))
-dat <- left_join(dat, govtown, by = "entry")
+dat <- worldbank %>% 
+  left_join(political_shifts, by=c("date" = "year", "iso2c" = "entry")) %>%
+  rename(entry = iso2c, year = date) %>%
+  left_join(treaty_dates, by="entry") %>%
+  as_tibble %>%
+  left_join(implementation, by=c("year", "entry")) %>%
+  left_join(bloomberg, by=c("year", "entry")) %>%
+  left_join(govtown, by = "entry") %>%
+  arrange(entry, year)
 
 # Bloomberg data should be filled with zeros instead of NAs
 dat$bloomberg_amount      <- coalesce(dat$bloomberg_amount, 0)
@@ -75,6 +78,9 @@ carry_forward_and_zero_back <- function(idv, v, dat) {
     
     # Which needs to be solved
     idx <- which(dat[[idv]] == .entry)
+    
+    if (length(idx) < 2)
+      next
     
     # Forward
     for (t in 2:length(idx))
@@ -127,15 +133,17 @@ lapply(
   
 
 # Sorting
-dat <- dat[with(dat, order(entry, year)),]
 dat$no_report[is.na(dat$no_report)] <- 1L
-articles <- sprintf("sum_art%02i", c(5, 6, 8, 11, 13))
-
+articles <- sprintf("sum_art%02i", articles_to_use)
 
 # Imputing
 dat2 <- dat
-for (art in articles)
-  dat2 <- carry_forward_and_zero_back("entry", art, dat2)
+library(tidyr)
+library(tidyselect)
+
+dat2 <- group_by(dat, entry) %>%
+  fill(starts_with("sum_art"), .direction = "down") %>%
+  as.data.frame
 
 dat2$no_report <- apply(
   dat2[,grepl("^sum_art[0-9]+",colnames(dat2))], 
@@ -144,7 +152,7 @@ dat2$no_report <- apply(
 )
 dat2$no_report <- as.integer(dat2$no_report)
 
-for (y in c(2010, 2012))
+for (y in years_reported)
   print(table(
     `n/a (Original)` = dat$no_report[dat$year == y],
     Imputed  = dat2$no_report[dat2$year == y]

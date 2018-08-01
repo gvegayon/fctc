@@ -1,6 +1,7 @@
 # This file processes the raw data presented in the UN Treaty Collection
 # website. 
 rm(list=ls())
+options(stringsAsFactors = FALSE)
 
 dat <- read.csv("data-raw/fctc_un_treaty/un_treaty_dates_raw.csv")
 
@@ -48,8 +49,22 @@ dat$country_name <- stringr::str_replace(dat$country_name, "\\)","")
 country_codes <- read.csv("data-raw/country_codes/country_codes.csv", na.strings = NULL)
 dat <- merge(dat, country_codes, by="country_name", all.x=TRUE, all.y=FALSE)
 
+
 # Not all match, so need some hand coding
-# dat[dat$country_name=="European Union",]$entry <- "EU" 
+dat[dat$country_name == "CÃ´te d'Ivoire",'entry'] <- "CI"
+dat[dat$country_name == "Democratic People's Republic of Korea",'entry'] <- "KP"
+dat[dat$country_name == "Democratic Republic of the Congo",'entry'] <- "CD"
+dat[dat$country_name == "Eswatini",'entry'] <- "SZ"
+dat[dat$country_name == "European Union",'entry'] <- "EU"
+dat[dat$country_name == "Republic of Korea",'entry'] <- "KR"
+dat[dat$country_name == "Republic of Moldova",'entry'] <- "MD"
+dat[dat$country_name == "St. Kitts and Nevis",'entry'] <- "KN"
+dat[dat$country_name == "St. Lucia",'entry'] <- "LC"
+dat[dat$country_name == "St. Vincent and the Grenadines",'entry'] <- "VC"
+dat[dat$country_name == "The former Yugoslav Republic of Macedonia",'entry'] <- "MK"
+dat[dat$country_name == "United Kingdom of Great Britain and Northern Ireland",'entry'] <- "GB"
+dat[dat$country_name == "United Republic of Tanzania",'entry'] <- "TZ"
+dat[dat$country_name == "United States of America",'entry'] <- "US"
 
 # Saving
 dat <- dat[order(dat$country_name),]

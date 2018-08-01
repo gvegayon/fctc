@@ -43,6 +43,7 @@
 "Cameroon",20040513,20060203,<NA>,<NA>,<NA>,<NA>,<NA>,"CM","10 regions"
 "Canada",20030715,20041126,<NA>,<NA>,<NA>,<NA>,<NA>,"CA","10 provinces
 3 territories"
+"CÃ´te d'Ivoire",20030724,20100813,<NA>,<NA>,<NA>,<NA>,<NA>,"CI",<NA>
 "Central African Republic",20031229,20051107,<NA>,<NA>,<NA>,<NA>,<NA>,"CF","1 commune
 14 prefectures
 2 economic prefectures"
@@ -58,13 +59,12 @@
 "Congo",20040323,20070206,<NA>,<NA>,<NA>,<NA>,<NA>,"CG","12 departments"
 "Cook Islands",20040514,20040514,<NA>,<NA>,<NA>,<NA>,<NA>,"CK","—"
 "Costa Rica",20030703,20080821,<NA>,<NA>,<NA>,<NA>,<NA>,"CR","7 provinces"
-"Côte d'Ivoire",20030724,20100813,<NA>,<NA>,<NA>,<NA>,<NA>,"CI",<NA>
 "Croatia",20040602,20080714,<NA>,<NA>,<NA>,<NA>,<NA>,"HR","1 city
 20 counties"
 "Cuba",20040629,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"CU","15 provinces
 1 special municipality"
 "Cyprus",20040524,20051026,<NA>,<NA>,<NA>,<NA>,<NA>,"CY","6 districts"
-"Czechia",20030616,20120601,<NA>,<NA>,<NA>,<NA>,<NA>,"CZ","14 regions91 districts"
+"Czech Republic",20030616,20120601,<NA>,<NA>,<NA>,<NA>,<NA>,"CZ","14 regions91 districts"
 "Democratic People's Republic of Korea",20030617,20050427,<NA>,<NA>,<NA>,<NA>,<NA>,"KP",<NA>
 "Democratic Republic of the Congo",20040628,20051028,<NA>,<NA>,<NA>,<NA>,<NA>,"CD",<NA>
 "Denmark",20030616,20041216,<NA>,<NA>,<NA>,<NA>,<NA>,"DK","5 regions"
@@ -76,14 +76,15 @@
 "El Salvador",20040318,20140721,<NA>,<NA>,<NA>,<NA>,<NA>,"SV","14 departments"
 "Equatorial Guinea",<NA>,20050917,<NA>,<NA>,<NA>,TRUE,<NA>,"GQ","2 regions7 provinces"
 "Estonia",20040608,20050727,<NA>,<NA>,<NA>,<NA>,<NA>,"EE","15 counties"
+"Eswatini",20040629,20060113,<NA>,<NA>,<NA>,<NA>,<NA>,"SZ",<NA>
 "Ethiopia",20040225,20140325,<NA>,<NA>,<NA>,<NA>,<NA>,"ET","2 administrations
 9 states"
-"European Union",20030616,20050630,<NA>,<NA>,TRUE,<NA>,<NA>,<NA>,<NA>
+"European Union",20030616,20050630,<NA>,<NA>,TRUE,<NA>,<NA>,"EU",<NA>
 "Fiji",20031003,20031003,<NA>,<NA>,<NA>,<NA>,<NA>,"FJ","4 divisions
 1 dependency
 14 provinces"
 "Finland",20030616,20050124,<NA>,<NA>,<NA>,<NA>,<NA>,"FI","19 regions"
-"France",20030616,20041019,<NA>,TRUE,<NA>,<NA>,<NA>,"FR","22 metropolitan regions
+"France",20030616,20041019,<NA>,TRUE,<NA>,<NA>,<NA>,"FR","13 metropolitan regions
 5 overseas departments96 metropolitan departments1 dependency
 7 overseas territorial collectivities"
 "Gabon",20030822,20090220,<NA>,<NA>,<NA>,<NA>,<NA>,"GA","9 provinces"
@@ -94,8 +95,7 @@
 9 regions"
 "Germany",20031024,20041216,<NA>,<NA>,<NA>,<NA>,<NA>,"DE","16 Länder"
 "Ghana",20030620,20041129,<NA>,<NA>,<NA>,<NA>,<NA>,"GH","10 regions"
-"Greece",20030616,20060127,<NA>,<NA>,<NA>,<NA>,<NA>,"GR","13 administrative regions51 departments
-1 self-governed part"
+"Greece",20030616,20060127,<NA>,<NA>,<NA>,<NA>,<NA>,"GR","13 administrative regions1 self-governed part"
 "Grenada",20040629,20070814,<NA>,<NA>,<NA>,<NA>,<NA>,"GD","6 parishes
 1 dependency"
 "Guatemala",20030925,20051116,<NA>,<NA>,<NA>,<NA>,<NA>,"GT","22 departments"
@@ -160,7 +160,7 @@
 "Montenegro",<NA>,20061023,<NA>,<NA>,<NA>,<NA>,TRUE,"ME","23 municipalities"
 "Morocco",20040416,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"MA","16 regions46 provinces
 17 prefectures"
-"Mozambique",20030618,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"MZ","1 city
+"Mozambique",20030618,20170714,<NA>,<NA>,<NA>,<NA>,<NA>,"MZ","1 city
 10 provinces"
 "Myanmar",20031023,20040421,<NA>,<NA>,<NA>,<NA>,<NA>,"MM","7 regions
 7 states
@@ -235,7 +235,6 @@
 "St. Vincent and the Grenadines",20040614,20101029,<NA>,<NA>,<NA>,<NA>,<NA>,"VC",<NA>
 "Sudan",20040610,20051031,<NA>,<NA>,<NA>,<NA>,<NA>,"SD","18 states"
 "Suriname",20040624,20081216,<NA>,<NA>,<NA>,<NA>,<NA>,"SR","10 districts"
-"Swaziland",20040629,20060113,<NA>,<NA>,<NA>,<NA>,<NA>,"SZ","4 districts"
 "Sweden",20030616,20050707,<NA>,<NA>,<NA>,<NA>,<NA>,"SE","21 counties"
 "Switzerland",20040625,<NA>,<NA>,<NA>,<NA>,<NA>,<NA>,"CH","26 cantons"
 "Syrian Arab Republic",20030711,20041122,<NA>,<NA>,<NA>,<NA>,<NA>,"SY","14 provinces"
