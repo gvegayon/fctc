@@ -21,8 +21,10 @@ political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
 party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
 
-worldbank <- read.csv("data/world", na = "<NA>")
-worldbank <- subset(party_attributes, who_region != "none", select=c(-country_name))
+worldbank <- read.csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
+
+qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
+
 
 bloomberg        <- read.csv("data/bloomberg.csv", na = "<NA>")
 bloomberg        <- subset(bloomberg, select=c(-country_name))

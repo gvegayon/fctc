@@ -15,10 +15,10 @@ indicators <- wbindicators()
 # SH.XPD.PUBL.ZS Health expenditure, public (% of GDP)
 # CC.EST Control of Corruption (estimate) 
 # RL.EST Rule of Law (estimate) 
-# UPP.COM.POL.XQ Combined polity score
 # GV.VOIC.AC.ES Voice and Accountability (estimate)
 # RQ.EST Regulatory Quality: Estimate
 # SG.GEN.MNST.ZS Proportion of women in ministerial level positions (%)
+# NY.GDP.PCAP.PP.KD GDP per capita, PPP (constant 2011 international $)
 
 
 health_exp   <- wb(indicator = "SH.XPD.PUBL.ZS") %>% as_tibble
@@ -29,8 +29,7 @@ population   <- wb(indicator = "SP.POP.TOTL") %>% as_tibble
 
 rule_of_law  <- wb(indicator = "RL.EST") %>% as_tibble
 ctrl_corrup  <- wb(indicator = "CC.EST") %>% as_tibble
-polity       <- wb(indicator="UPP.COM.POL.XQ") %>% as_tibble
-
+gdp_percapita_ppp <- wb(indicator = "NY.GDP.PCAP.PP.KD") %>% as_tibble
 
 # Merging all data
 datasets <- ls()[sapply(mget(ls()), inherits, "tbl_df")]
