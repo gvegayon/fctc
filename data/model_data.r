@@ -6,24 +6,25 @@ options(stringsAsFactors=FALSE)
 library(dplyr)
 library(magrittr)
 library(readxl)
-# library(netdiffuseR)
+library(netdiffuseR)
 
 # parameter
 years_reported <- c(2010, 2012, 2014, 2016) # 2014 (need to extend data)
 articles_to_use <- c(5, 6, 8, 11, 13, 14)
 
 # Reading datasets -------------------------------------------------------------
-country_codes    <- read.csv("data-raw/country_codes/country_codes.csv", na.strings = NULL)
+country_codes    <- readr::read_csv("data-raw/country_codes/country_codes.csv", na = "<NA>")
 country_codes    <- subset(country_codes, select=c(-subdivision_assigned_codes))
 
-political_shifts <- read.csv("data/political_shifts.csv", na = "<NA>")
+political_shifts <- readr::read_csv("data/political_shifts.csv", na = "<NA>")
 political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 
 # party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
 # party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
-worldbank <- read.csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
+worldbank <- readr::read_csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
 qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
 
+tobacco_prod <- readr::read_csv("data/tobacco_prod.csv")
 
 bloomberg        <- read.csv("data/bloomberg.csv", na = "<NA>")
 bloomberg        <- subset(bloomberg, select=c(-country_name))
@@ -52,10 +53,10 @@ dat <- worldbank %>%
   left_join(political_shifts, by=c("date" = "year", "iso2c" = "entry")) %>%
   rename(entry = iso2c, year = date) %>%
   left_join(treaty_dates, by="entry") %>%
-  as_tibble %>%
   left_join(implementation, by=c("year", "entry")) %>%
   left_join(bloomberg, by=c("year", "entry")) %>%
   left_join(govtown, by = "entry") %>%
+  left_join(tobacco_prod, by = c("entry", "year")) %>%
   arrange(entry, year)
 
 # Bloomberg data should be filled with zeros instead of NAs
@@ -70,34 +71,6 @@ dat$bloomberg_fctc_amount <- coalesce(dat$bloomberg_fctc_amount, 0)
 # .
 # FALSE  TRUE  <NA> 
 #   143    22    11 
-
-# Carry forward imputation
-carry_forward_and_zero_back <- function(idv, v, dat) {
-  
-  for (.entry in unique(dat[[idv]])) {
-    
-    # Which needs to be solved
-    idx <- which(dat[[idv]] == .entry)
-    
-    if (length(idx) < 2)
-      next
-    
-    # Forward
-    for (t in 2:length(idx))
-      dat[idx, v][t] <- ifelse(
-        is.na(dat[idx, v][t]), dat[idx, v][t - 1L],
-        dat[idx, v][t])
-    
-    # Backwards (only zeros)
-    for (t in (length(idx) - 1L):1)
-      dat[idx, v][t] <- ifelse(
-        is.na(dat[idx, v][t]) & dat[idx, v][t + 1L] == 0, dat[idx, v][t + 1L],
-        dat[idx, v][t])
-  }
-  
-  dat
-}
-
 
 # Compuiting some basic stats, how often the number of items implementad decreased?
 test <- implementation %>%
@@ -117,7 +90,7 @@ test <- implementation %>%
     diff11 = if_else(diff11 > 0, "+", if_else(diff11 == 0, "=", "-")),
     diff13 = if_else(diff13 > 0, "+", if_else(diff13 == 0, "=", "-")),
     diff14 = if_else(diff14 > 0, "+", if_else(diff14 == 0, "=", "-"))
-  )
+  ) %>%
   ungroup 
 
 lapply(
@@ -136,14 +109,30 @@ lapply(
 dat$no_report[is.na(dat$no_report)] <- 1L
 articles <- sprintf("sum_art%02i", articles_to_use)
 
-# Imputing
+# Imputing ---------------------------------------------------------------------
 dat2 <- dat
 library(tidyr)
 library(tidyselect)
 
+# Carry forward
 dat2 <- group_by(dat, entry) %>%
   fill(starts_with("sum_art"), .direction = "down") %>%
+  arrange(entry, year) %>%
   as.data.frame
+
+# Zero back
+for (j in articles)
+  for (i in nrow(dat2):2) {
+    
+    # Are we in the current
+    if (dat2$entry[i] != dat2$entry[i-1])
+      next
+    
+    if (!is.na(dat2[i, j]) && (dat2[i, j] == 0 & is.na(dat2[i-1, j])))
+      dat2[i-1, j] <- dat2[i, j]
+    
+  }
+    
 
 dat2$no_report <- apply(
   dat2[,grepl("^sum_art[0-9]+",colnames(dat2))], 
@@ -159,8 +148,12 @@ for (y in years_reported)
     )
   )
 
-# View(cbind(dat2[,c("entry", "year", "sum_art11")], dat[,c("entry", "year", "sum_art11")]),
-#      "Imputation")
+# dat %>%
+#   select(entry, year, sum_art05, sum_art11) %>%
+#   cbind(
+#     subset(dat2[,c("entry", "year", "sum_art05", "sum_art11")])
+#   ) %>%
+#   View("Are we OK?")
 
 # Comparing before and after
 for (art in articles)
@@ -202,7 +195,7 @@ dat <- filter(dat, year %in% years_reported)
 dat <- filter(dat, !is.na(ratification)) # Only those which ratified
 
 # Sorting the data
-dat <- dat[with(dat, order(entry, year)),]
+dat <- dat %>% arrange(entry, year)
 
 # View(subset(
 #   dat,
@@ -225,8 +218,8 @@ dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
 # was an event that happened before. But, the implementation level of 2010 can
 # certainly affect signature and ratification as it is a posterior event. Therefore
 # we truncate these variables at 0.
-dat$`Years since Ratif.` <- with(dat, 2010L - year_ratification)
-dat$`Years since Sign.`  <- with(dat, 2010L - year_signature)
+dat$`Years since Ratif.` <- with(dat, 2014L - year_ratification)
+dat$`Years since Sign.`  <- with(dat, 2014L - year_signature)
 
 dat$`Years since Ratif.`[dat$`Years since Ratif.` < 0] <- 0L
 dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
@@ -238,14 +231,14 @@ dat$no_report[is.na(dat$no_report)] <- 1L
 write.csv(dat, "data/model_data_unscaled.csv", row.names = FALSE, na = "<NA>")
 
 # Rescaling variables ----------------------------------------------------------
-dat$tobac_prod_pp            <- with(dat, tobac_prod/population)
+dat$tobac_prod_pp            <- with(dat, tobacco_prod/population)
 dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
 dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
 dat$logPopulation            <- log(dat$population)
 
 for (v in colnames(dat))
   if (is.double(dat[[v]])) 
-    dat[[v]] <- dat[[v]]/sd(dat[[v]])
+    dat[[v]] <- dat[[v]]/sd(dat[[v]], na.rm = TRUE)
 
   #   {
   #   cat(sprintf("%30s: Yes\n", v))

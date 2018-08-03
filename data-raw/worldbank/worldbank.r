@@ -24,7 +24,8 @@ indicators <- wbindicators()
 health_exp   <- wb(indicator = "SH.XPD.PUBL.ZS") %>% as_tibble
 smoke_female <- wb(indicator = "SH.PRV.SMOK.FE") %>% as_tibble
 smoke_male   <- wb(indicator = "SH.PRV.SMOK.FE") %>% as_tibble
-tobacco_prod <- wb(indicator = "NV.MNF.FBTO.ZS.UN") %>% as_tibble
+smoke        <- wb(indicator = "SH.PRV.SMOK") %>% as_tibble
+# tobacco_prod <- wb(indicator = "NV.MNF.FBTO.ZS.UN") %>% as_tibble
 population   <- wb(indicator = "SP.POP.TOTL") %>% as_tibble
 
 rule_of_law  <- wb(indicator = "RL.EST") %>% as_tibble
