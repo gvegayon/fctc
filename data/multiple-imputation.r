@@ -3,7 +3,7 @@ library(dplyr)
 library(magrittr)
 
 dat <- readr::read_csv("data/model_data.csv", na="<NA>") %>%
-  select(-logPopulation) %>%
+  select(-logPopulation, -none) %>%
   arrange(entry, year)
 
 
@@ -23,6 +23,8 @@ to_skip <- c(
   "sum_art14",
   "signature",
   "ratification",
+  "who_region",
+  "continent",
   "Years since Ratif.",
   "Years since Sign."
 )
@@ -38,7 +40,7 @@ ans <- amelia(
   cl       = cl
 )
 
-tscsPlot(ans, "smoke_female", cs = "entry")
+# tscsPlot(ans, "smoke_female", cs = "entry")
 
 
 View(cbind(

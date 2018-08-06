@@ -185,6 +185,7 @@ dat$sum_art13[is.na(dat$sum_art13)] <- 0L
 dat <- left_join(dat, country_codes, by="entry")
 
 # Creating dummies -------------------------------------------------------------
+
 for (cont in unique(dat$continent))
   if (!is.na(cont))
     dat[[cont]] <- ifelse(dat$continent == cont, 1L, 0L)
