@@ -19,8 +19,9 @@ country_codes    <- subset(country_codes, select=c(-subdivision_assigned_codes))
 political_shifts <- readr::read_csv("data/political_shifts.csv", na = "<NA>")
 political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 
-# party_attributes <- read.csv("data/party_attributes.csv", na = "<NA>")
-# party_attributes <- subset(party_attributes, who_region != "none", select=c(-country_name))
+who_region <- readr::read_csv("data/party_attributes.csv", na = "<NA>") %>%
+  select(entry, who_region, continent)
+
 worldbank <- readr::read_csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
 qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
 
@@ -57,6 +58,7 @@ dat <- worldbank %>%
   left_join(bloomberg, by=c("year", "entry")) %>%
   left_join(govtown, by = "entry") %>%
   left_join(tobacco_prod, by = c("entry", "year")) %>%
+  left_join(who_region, by = c("entry")) %>%
   arrange(entry, year)
 
 # Bloomberg data should be filled with zeros instead of NAs
@@ -184,10 +186,12 @@ dat <- left_join(dat, country_codes, by="entry")
 
 # Creating dummies -------------------------------------------------------------
 for (cont in unique(dat$continent))
-  dat[[cont]] <- ifelse(dat$continent == cont, 1L, 0L)
+  if (!is.na(cont))
+    dat[[cont]] <- ifelse(dat$continent == cont, 1L, 0L)
 
 for (who in unique(dat$who_region))
-  dat[[who]] <- ifelse(dat$who_region == who, 1L, 0L)
+  if (!is.na(who))
+    dat[[who]] <- ifelse(dat$who_region == who, 1L, 0L)
 
 
 # Filtering --------------------------------------------------------------------
