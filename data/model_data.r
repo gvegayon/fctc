@@ -111,6 +111,33 @@ lapply(
 dat$no_report[is.na(dat$no_report)] <- 1L
 articles <- sprintf("sum_art%02i", articles_to_use)
 
+# Filling some missing data ----------------------------------------------------
+dat[dat$entry=="AI","who_region"] <- "Americas"
+dat[dat$entry=="AN","who_region"] <- "Americas"
+dat[dat$entry=="AS","who_region"] <- "Western Pacific"
+dat[dat$entry=="AW","who_region"] <- "Americas"
+dat[dat$entry=="BM","who_region"] <- "Americas"
+dat[dat$entry=="CK","who_region"] <- "Western Pacific"
+dat[dat$entry=="GF","who_region"] <- "Americas"
+dat[dat$entry=="GL","who_region"] <- "European"
+dat[dat$entry=="GU","who_region"] <- "Americas"
+dat[dat$entry=="HK","who_region"] <- "Western Pacific"
+dat[dat$entry=="JE","who_region"] <- "European"
+dat[dat$entry=="KY","who_region"] <- "Americas"
+dat[dat$entry=="ME","who_region"] <- "European"
+dat[dat$entry=="MO","who_region"] <- "Western Pacific"
+dat[dat$entry=="MQ","who_region"] <- "Americas"
+dat[dat$entry=="NU","who_region"] <- "Western Pacific"
+dat[dat$entry=="PR","who_region"] <- "Americas"
+dat[dat$entry=="PS","who_region"] <- "Eastern Mediterranean"
+dat[dat$entry=="RE","who_region"] <- "African"
+dat[dat$entry=="SS","who_region"] <- "African"
+dat[dat$entry=="TW","who_region"] <- "Western Pacific"
+dat[dat$entry=="VI","who_region"] <- "Americas"
+dat[dat$entry=="XK","who_region"] <- "European"
+dat[dat$entry=="LI","who_region"] <- "European"
+
+
 # Imputing ---------------------------------------------------------------------
 dat2 <- dat
 library(tidyr)
@@ -186,11 +213,11 @@ dat <- left_join(dat, country_codes, by="entry")
 
 # Creating dummies -------------------------------------------------------------
 
-for (cont in unique(dat$continent))
-  if (!is.na(cont))
-    dat[[cont]] <- ifelse(dat$continent == cont, 1L, 0L)
+# for (cont in unique(dat$continent))
+#   if (!is.na(cont))
+#     dat[[cont]] <- ifelse(dat$continent == cont, 1L, 0L)
 
-for (who in unique(dat$who_region))
+for (who in unique(dat$who_region))0
   if (!is.na(who))
     dat[[who]] <- ifelse(dat$who_region == who, 1L, 0L)
 

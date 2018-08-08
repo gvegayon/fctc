@@ -2,10 +2,13 @@ library(Amelia)
 library(dplyr)
 library(magrittr)
 
-dat <- readr::read_csv("data/model_data.csv", na="<NA>") %>%
-  select(-logPopulation, -none) %>%
+dat <- readr::read_csv("data/model_data_unscaled.csv", na="<NA>") %>%
+  unique %>%
   arrange(entry, year)
 
+yeardat <- model.matrix(~0+factor(year), dat)
+colnames(yeardat) <- gsub(".+([0-9]{4})", "year\\1", colnames(yeardat))
+dat <- cbind(dat, yeardat)
 
 to_skip <- c(
   "country_name",
@@ -14,15 +17,15 @@ to_skip <- c(
   "pol_shift",
   "pol_shift_left",
   "pol_shift_right",
-  "subscribed",
+  "signature",
   "sum_art05",
   "sum_art06",
   "sum_art08",
   "sum_art11",
   "sum_art13",
   "sum_art14",
-  "signature",
-  "ratification",
+  "year_signature",
+  "year_ratification",
   "who_region",
   "continent",
   "Years since Ratif.",
@@ -31,13 +34,54 @@ to_skip <- c(
 
 cl <- parallel::makeForkCluster(8L)
 
+# Generating bounds
+ranges <- lapply(colnames(dat), function(x) range(dat[[x]], na.rm = TRUE)) %>%
+  set_names(colnames(dat)) %>%
+  bind_cols
+
+ranges <- ranges[,sapply(ranges, function(x) all(is.numeric(x)))] %>%
+  as.matrix %>%
+  t
+
+ranges <- ranges[!(rownames(ranges) %in% c(to_skip, "year", "entry")),]
+ranges <- cbind(
+  match(rownames(ranges), colnames(dat)),
+  ranges
+  )
+
+ranges <- ranges[
+  c(
+    "ctrl_corrup",
+"gdp_percapita_ppp",
+"health_exp",
+"population",
+"rule_of_law",
+"smoke_female",
+"smoke_male",
+"ratification",
+"bloomberg_count",
+"bloomberg_amount",
+"bloomberg_fctc_count",
+"bloomberg_fctc_amount",
+"govtown",
+"tobacco_prod",
+"South-East Asia",
+"year2010",
+"year2012",
+"year2014",
+"year2016"
+  )
+  ,
+]
+
 ans <- amelia(
   x        = as.data.frame(dat),
   idvars   = to_skip,
   ts       = "year",
   cs       = "entry",
   parallel = "multicore",
-  cl       = cl
+  cl       = cl,
+  bounds = ranges
 )
 
 # tscsPlot(ans, "smoke_female", cs = "entry")
@@ -46,12 +90,12 @@ ans <- amelia(
 View(cbind(
   country = dat$country_name,
   year    = dat$year,
-  gdp1 = ans$imputations$imp1$smoke_female,
-  gdp2 = ans$imputations$imp2$smoke_female,
-  gdp3 = ans$imputations$imp3$smoke_female,
-  gdp4 = ans$imputations$imp5$smoke_female,
-  gdp5 = ans$imputations$imp5$smoke_female,
-  dat$smoke_female
+  smoke_im1 = ans$imputations$imp1$smoke_female,
+  smoke_im2 = ans$imputations$imp2$smoke_female,
+  smoke_im3 = ans$imputations$imp3$smoke_female,
+  smoke_im4 = ans$imputations$imp5$smoke_female,
+  smoke_im5 = ans$imputations$imp5$smoke_female,
+  smoke = dat$smoke_female
 ), "Imputed")
 
 library(ggplot2)
