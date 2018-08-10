@@ -9,12 +9,17 @@ rm(list=ls())
 library(netdiffuseR)
 library(texreg)
 library(Matrix)
-library(spdep)
 library(AER)
+library(magrittr)
+library(dplyr)
 
-model_data <- read.csv("data/model_data.csv", na="<NA>", check.names = FALSE)
-model_data <- model_data[with(model_data, order(year, entry)),]
-model_data$`year2012` <- as.integer(model_data$year == 2012)
+model_data <- readr::read_csv("data/multiple-imputation1.csv")
+
+# Year fixed effects: 2010 as reference
+year0_1           <- model.matrix(~0+factor(year), model_data)
+colnames(year0_1) <- gsub(".+([0-9]{4})$", "Year \\1", colnames(year0_1))
+model_data        <- cbind(model_data, year0_1[,-1]) 
+
 load("data/adjmats.rda")
 load("data/adjmat_border.rda")
 load("data/adjmat_mindist.rda")
@@ -26,24 +31,29 @@ makeformula <- function(x) {
 }
 
 common_covars <- c(
-  "`Eastern Mediterranean`",
-  "European",
+  # "`Eastern Mediterranean`",
+  "Americas",
   "African",
+  "European",
   "`Western Pacific`",
   "`South-East Asia`",
-  "democracy",
-  "GDP",
+  # "democracy",
+  "ctrl_corrup",
+  "rule_of_law",
+  "gdp_percapita_ppp",
   "`Years since Ratif.`",
   "tobac_prod_pp",
-  "perc_female_smoke",
-  "perc_male_smoke",
+  "smoke_female",
+  "smoke_male",
   "labor",
   "womens_rights",
   "population",
   "govtown"
   )
+
+which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
                    
-articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13")
+articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13", "sum_art14")
 
 # List of networks (with pretty names) that will be used
 networks      <- c(

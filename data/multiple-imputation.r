@@ -2,13 +2,10 @@ library(Amelia)
 library(dplyr)
 library(magrittr)
 
-dat <- readr::read_csv("data/model_data_unscaled.csv", na="<NA>") %>%
+dat <- readr::read_csv("data/model_data.csv", na="<NA>") %>%
   unique %>%
-  arrange(entry, year)
-
-yeardat <- model.matrix(~0+factor(year), dat)
-colnames(yeardat) <- gsub(".+([0-9]{4})", "year\\1", colnames(yeardat))
-dat <- cbind(dat, yeardat)
+  arrange(entry, year) %>%
+  select(-`South-East Asia`)
 
 to_skip <- c(
   "country_name",
@@ -17,6 +14,8 @@ to_skip <- c(
   "pol_shift",
   "pol_shift_left",
   "pol_shift_right",
+  "continent",
+  "who_region",
   "signature",
   "sum_art05",
   "sum_art06",
@@ -26,86 +25,91 @@ to_skip <- c(
   "sum_art14",
   "year_signature",
   "year_ratification",
-  "who_region",
-  "continent",
   "Years since Ratif.",
   "Years since Sign."
 )
 
-cl <- parallel::makeForkCluster(8L)
+# Turning smoke to pcent
+dat %<>% mutate(
+  smoke_female = smoke_female/100,
+  smoke_male   = smoke_male/100
+)
 
-# Generating bounds
-ranges <- lapply(colnames(dat), function(x) range(dat[[x]], na.rm = TRUE)) %>%
-  set_names(colnames(dat)) %>%
-  bind_cols
-
-ranges <- ranges[,sapply(ranges, function(x) all(is.numeric(x)))] %>%
-  as.matrix %>%
-  t
-
-ranges <- ranges[!(rownames(ranges) %in% c(to_skip, "year", "entry")),]
-ranges <- cbind(
-  match(rownames(ranges), colnames(dat)),
-  ranges
-  )
-
-ranges <- ranges[
-  c(
-    "ctrl_corrup",
-"gdp_percapita_ppp",
-"health_exp",
-"population",
-"rule_of_law",
-"smoke_female",
-"smoke_male",
-"ratification",
-"bloomberg_count",
-"bloomberg_amount",
-"bloomberg_fctc_count",
-"bloomberg_fctc_amount",
-"govtown",
-"tobacco_prod",
-"South-East Asia",
-"year2010",
-"year2012",
-"year2014",
-"year2016"
-  )
-  ,
-]
+regions <- model.matrix(~0+who_region, dat) 
+colnames(regions) <- gsub("^who_region", "", colnames(regions))
+dat <- cbind(dat, regions[,-3]) # Reference: Eastern Mediterranean
 
 ans <- amelia(
   x        = as.data.frame(dat),
+  m        = 10,
   idvars   = to_skip,
   ts       = "year",
+  polytime = 1,
   cs       = "entry",
-  parallel = "multicore",
-  cl       = cl,
-  bounds = ranges
+  logs     = c("gdp_percapita_ppp", "health_exp", "birth_death"),
+  sqrts    = c("population", "tobacco_prod"),
+  lgstc    = c("smoke_female", "smoke_male"), 
+  emburn   = c(10, 1000)
 )
 
-# tscsPlot(ans, "smoke_female", cs = "entry")
-
-
-View(cbind(
+View(tibble(
   country = dat$country_name,
   year    = dat$year,
-  smoke_im1 = ans$imputations$imp1$smoke_female,
-  smoke_im2 = ans$imputations$imp2$smoke_female,
-  smoke_im3 = ans$imputations$imp3$smoke_female,
-  smoke_im4 = ans$imputations$imp5$smoke_female,
-  smoke_im5 = ans$imputations$imp5$smoke_female,
-  smoke = dat$smoke_female
+  smk_fem_im1 = round(ans$imputations$imp1$smoke_female, 2),
+  smk_fem_im2 = round(ans$imputations$imp2$smoke_female, 2),
+  smk_fem_im3 = round(ans$imputations$imp3$smoke_female, 2),
+  smk_fem_im4 = round(ans$imputations$imp5$smoke_female, 2),
+  smk_fem_im5 = round(ans$imputations$imp5$smoke_female, 2),
+  smk_mal_im1 = round(ans$imputations$imp1$smoke_male, 2),
+  smk_mal_im2 = round(ans$imputations$imp2$smoke_male, 2),
+  smk_mal_im3 = round(ans$imputations$imp3$smoke_male, 2),
+  smk_mal_im4 = round(ans$imputations$imp5$smoke_male, 2),
+  smk_mal_im5 = round(ans$imputations$imp5$smoke_male, 2),
+  smk_fem = dat$smoke_female,
+  smk_mal = dat$smoke_male
 ), "Imputed")
 
-library(ggplot2)
+View(tibble(
+  country = dat$country_name,
+  year    = dat$year,
+  health_exp_im1 = round(ans$imputations$imp1$health_exp, 2),
+  health_exp_im2 = round(ans$imputations$imp2$health_exp, 2),
+  health_exp_im3 = round(ans$imputations$imp3$health_exp, 2),
+  health_exp_im4 = round(ans$imputations$imp5$health_exp, 2),
+  health_exp_im5 = round(ans$imputations$imp5$health_exp, 2),
+  health_exp     = dat$health_exp
+), "Imputed")
 
-g <- ans$imputations$imp1 %>%
-  rename(smoke_female_imputed = smoke_female) %>%
-  left_join(subset(dat, select = c(entry, year, smoke_female))) %>%
-  mutate(is_miss = is.na(smoke_female))
+graphics.off()
+pdf("data/multiple-imputation.pdf")
+missmap(ans, y.cex = .25, x.cex = .5)
+dev.off()
 
-ggplot(g, aes(x=year, y=smoke_female_imputed, color = is_miss)) +
-  geom_point() + geom_jitter()
+# Rescaling variables ----------------------------------------------------------
 
+rescale_data <- function(dat) {
   
+  dat$tobac_prod_pp            <- with(dat, tobacco_prod/population)
+  dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
+  dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
+  dat$logPopulation            <- log(dat$population)
+  
+  for (v in colnames(dat))
+    if (is.double(dat[[v]])) 
+      dat[[v]] <- dat[[v]]/sd(dat[[v]], na.rm = TRUE)
+  
+  #   {
+  #   cat(sprintf("%30s: Yes\n", v))
+  # } else
+  #   cat(sprintf("%30s:     No\n", v))
+  #   # dat[[v]] <- dat[[v]]/sd(dat[[v]])
+  
+  # Including interest on policy (subscribed to GL posts) ------------------------
+  dat
+}
+
+ans$imputations <- ans$imputations %>% lapply(rescale_data)
+  
+
+
+write.amelia(ans, file.stem = "data/multiple-imputation")

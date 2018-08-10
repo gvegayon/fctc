@@ -20,7 +20,7 @@ political_shifts <- readr::read_csv("data/political_shifts.csv", na = "<NA>")
 political_shifts <- subset(political_shifts, select=c(-country_name, -execrlc))
 
 who_region <- readr::read_csv("data/party_attributes.csv", na = "<NA>") %>%
-  select(entry, who_region, continent)
+  select(entry, who_region, continent) %>% unique
 
 worldbank <- readr::read_csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
 qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
@@ -237,8 +237,8 @@ dat <- dat %>% arrange(entry, year)
 # 
 
 # Updating year of ratification and signature ----------------------------------
-dat$year_ratification <- dat$ratification %/% 10000L
-dat$year_signature    <- dat$signature %/% 10000L
+dat$year_ratification <- as.integer(dat$ratification %/% 10000L)
+dat$year_signature    <- as.integer(dat$signature %/% 10000L)
 
 # Fixing some NAs
 dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
@@ -260,26 +260,7 @@ dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
 # have ratified.
 dat$no_report[is.na(dat$no_report)] <- 1L
 
-write.csv(dat, "data/model_data_unscaled.csv", row.names = FALSE, na = "<NA>")
-
-# Rescaling variables ----------------------------------------------------------
-dat$tobac_prod_pp            <- with(dat, tobacco_prod/population)
-dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
-dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
-dat$logPopulation            <- log(dat$population)
-
-for (v in colnames(dat))
-  if (is.double(dat[[v]])) 
-    dat[[v]] <- dat[[v]]/sd(dat[[v]], na.rm = TRUE)
-
-  #   {
-  #   cat(sprintf("%30s: Yes\n", v))
-  # } else
-  #   cat(sprintf("%30s:     No\n", v))
-  #   # dat[[v]] <- dat[[v]]/sd(dat[[v]])
-
-# Including interest on policy (subscribed to GL posts) ------------------------
-
+# Subscription
 load("data/adjmats.rda")
 graph <- adjmat_gl_posts[c("2008", "2009", "2010")] # 
 graph <- graph[[1]] + graph[[2]] + graph[[3]]
@@ -292,6 +273,11 @@ posts$subscribed <- as.integer(posts$subscribed)
 dat <- merge(dat, posts, by="entry", all.x=TRUE, all.y=FALSE)
 dat$subscribed[is.na(dat$subscribed)] <- 0L
 
-# Saving the data --------------------------------------------------------------
+# Sorting and saving -----------------------------------------------------------
+dat %<>% 
+  filter(!is.na(who_region)) %>%
+  arrange(entry, year)
+
+
 write.csv(dat, "data/model_data.csv", row.names = FALSE, na = "<NA>")
 

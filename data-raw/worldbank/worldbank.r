@@ -12,7 +12,7 @@ indicators <- wbindicators()
 # United Nations Industrial Development Organization, International Yearbook of Industrial Statistics.
 # World Development Indicators
 
-# SH.XPD.PUBL.ZS Health expenditure, public (% of GDP)
+# SH.XPD.GHED.PP.CD Domestic general government health expenditure per capita, PPP (current international $)
 # CC.EST Control of Corruption (estimate) 
 # RL.EST Rule of Law (estimate) 
 # GV.VOIC.AC.ES Voice and Accountability (estimate)
@@ -21,16 +21,21 @@ indicators <- wbindicators()
 # NY.GDP.PCAP.PP.KD GDP per capita, PPP (constant 2011 international $)
 
 
-health_exp   <- wb(indicator = "SH.XPD.PUBL.ZS") %>% as_tibble
+# The variable of health expenditure is not 
+cachedlist <- wbcache(lang = "en") 
+
+health_exp   <- wb(indicator = "SH.XPD.GHED.PP.CD", cache=cachedlist) %>% as_tibble
 smoke_female <- wb(indicator = "SH.PRV.SMOK.FE") %>% as_tibble
 smoke_male   <- wb(indicator = "SH.PRV.SMOK.MA") %>% as_tibble
-smoke        <- wb(indicator = "SH.PRV.SMOK") %>% as_tibble
-# tobacco_prod <- wb(indicator = "NV.MNF.FBTO.ZS.UN") %>% as_tibble
+
 population   <- wb(indicator = "SP.POP.TOTL") %>% as_tibble
+birth_death  <- wb(indicator = "SP.DYN.CBRT.IN", cache=cachedlist) %>% as_tibble # Birth rate, crude (per 1,000 people)
 
 rule_of_law  <- wb(indicator = "RL.EST") %>% as_tibble
 ctrl_corrup  <- wb(indicator = "CC.EST") %>% as_tibble
 gdp_percapita_ppp <- wb(indicator = "NY.GDP.PCAP.PP.KD") %>% as_tibble
+womens_rights <- wb(indicator="SG.GEN.MNST.ZS") %>% as_tibble
+labor         <- wb(indicator="SL.TLF.TOTL.FE.ZS") %>% as_tibble # Labor force, female (% of total labor force)
 
 # Merging all data
 datasets <- ls()[sapply(mget(ls()), inherits, "tbl_df")]
