@@ -206,6 +206,7 @@ dat$sum_art06[is.na(dat$sum_art06)] <- 0L
 dat$sum_art08[is.na(dat$sum_art08)] <- 0L
 dat$sum_art11[is.na(dat$sum_art11)] <- 0L
 dat$sum_art13[is.na(dat$sum_art13)] <- 0L
+dat$sum_art14[is.na(dat$sum_art14)] <- 0L
 
 
 # Pasting names

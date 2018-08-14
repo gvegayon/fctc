@@ -14,6 +14,10 @@ library(magrittr)
 library(dplyr)
 
 model_data <- readr::read_csv("data/multiple-imputation1.csv")
+model_data <- model_data %>%
+  mutate(
+    entry = if_else(is.na(entry), "NA", entry)
+  )
 
 # Year fixed effects: 2010 as reference
 year0_1           <- model.matrix(~0+factor(year), model_data)
@@ -47,8 +51,10 @@ common_covars <- c(
   "smoke_male",
   "labor",
   "womens_rights",
-  "population",
-  "govtown"
+  # "logPopulation",
+  "govtown",
+  "`Year 2014`",
+  "`Year 2016`"
   )
 
 which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
@@ -144,22 +150,22 @@ rm(adjmat_bilateral_investment_treaties)
 # X: party attributes
 
 # Creating the lagged exposure -------------------------------------------------
-for (art in articles) {
-  ids1 <- sort(which(model_data$year == 2012))
-  ids0 <- sort(which(model_data$year == 2010))
-  
-  model_data[[sprintf("%s_lagged", art)]] <- NA
-  model_data[ids1,sprintf("%s_lagged", art)] <- model_data[ids0,][[art]]
-  
-  # We assume that, if missing the lagged value is zero
-  model_data[ids1,sprintf("%s_lagged", art)][
-    is.na(model_data[ids1,sprintf("%s_lagged", art)])
-  ] <- 0
-}
 
-# Dropping and sorting again (just in case)
-model_data <- subset(model_data, year == 2012)
-model_data <- model_data[order(model_data$entry),]
+model_data <- model_data %>%
+  arrange(entry, year) %>%
+  group_by(entry) %>%
+  mutate(
+    sum_art05_lagged = lag(sum_art05),
+    sum_art06_lagged = lag(sum_art06),
+    sum_art08_lagged = lag(sum_art08),
+    sum_art11_lagged = lag(sum_art11),
+    sum_art13_lagged = lag(sum_art13),
+    sum_art14_lagged = lag(sum_art14)
+  ) %>%
+  filter(year >= 2012, n() >= 3) %>%
+  ungroup %>%
+  as.data.frame
+
 
 # Distance network -------------------------------------------------------------
 SIGNIFICANCE_MODEL1 <- NULL
@@ -188,11 +194,17 @@ for (Wnum in 1:nrow(networks)) {
   }
   W <- W[ids,ids]
   
-
   # Row normalization
   W <- W/rowSums(W)
   W@x[is.nan(W@x)] <- 0
   W <- methods::as(W, "dgCMatrix")
+  
+  # Generating the kronecker product (repeatong the times!)
+  W <- model_data$year %>%
+    unique %>%
+    length %>%
+    diag %>%
+    kronecker(W)
   
   # This table will store the values (and add asterisks at the end) on the values
   # of rho and the sifnificance level.
@@ -221,13 +233,23 @@ for (Wnum in 1:nrow(networks)) {
       else tmpdata <- model_data
       
       # Run the model
-      ans <- tryCatch(AER::tobit(mod, data=tmpdata), error=function(e) e)
+      ans <- tryCatch(
+        AER::tobit(mod, data=tmpdata),
+        error   = function(e) e,
+        warning = function(w) structure(w, class="warning")
+        )
     
       # Did it run?  
       if (inherits(ans, "error")) {
         message("!!! Error in network ", Wname, " article ", art, " model.")
         next
       }
+      
+      if (inherits(ans, "warning")) {
+        message("!!! WARNING in network ", Wname, " article ", art, " model.")
+        next
+      }
+        
       
       # Creating the object
       assign(paste("tobit_lagged",art, m, sep="_"), ans, envir = .GlobalEnv)
@@ -237,7 +259,10 @@ for (Wnum in 1:nrow(networks)) {
   }
   
   # Saving results -----------------------------------------------------------
-  save(Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$"), file = sprintf("models/tobit_lagged_%s.rda", Wname))
+  save(
+    Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$"),
+    file = sprintf("models/tobit_lagged_%s.rda", Wname)
+    )
   
   message("Network ", Wname, " done.")
 }
