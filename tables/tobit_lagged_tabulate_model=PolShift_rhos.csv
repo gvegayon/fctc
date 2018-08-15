@@ -1,15 +1,15 @@
 "","Centroid Distance","General Trade","Tobacco Trade","GLOBALink Referrals","GLOBALink co-subscription"
-"Article 5",NA,NA,NA,NA,NA
-"",NA,NA,NA,NA,NA
-"Article 6",NA,NA,NA,NA,NA
-"",NA,NA,NA,NA,NA
-"Article 8",NA,NA,NA,NA,NA
-"",NA,NA,NA,NA,NA
-"Article 11",NA,NA,NA,NA,NA
-"",NA,NA,NA,NA,NA
-"Article 13",NA,NA,NA,NA,NA
-"",NA,NA,NA,NA,NA
-"Article 14",NA,NA,NA,NA,NA
-"",NA,NA,NA,NA,NA
+"Article 5","0.06 ","0.05 ","0.00 ","-0.03 ","0.05 "
+"","(0.27)","(0.06)","(0.04)","(0.04)","(0.06)"
+"Article 6","0.10 ","-0.07 ","-0.01 ","-0.05 ","0.03 "
+"","(0.28)","(0.07)","(0.05)","(0.05)","(0.06)"
+"Article 8","0.52 *","0.01 ","-0.04 ","-0.05 ","-0.02 "
+"","(0.31)","(0.07)","(0.05)","(0.04)","(0.04)"
+"Article 11","0.37 ","0.09 ","-0.02 ","-0.07 ","-0.01 "
+"","(0.34)","(0.08)","(0.06)","(0.05)","(0.06)"
+"Article 13","0.32 ","0.09 ","0.05 ","-0.03 ","-0.00 "
+"","(0.34)","(0.09)","(0.06)","(0.05)","(0.07)"
+"Article 14","0.00 ","-0.03 ","0.00 ","-0.00 ","0.07 "
+"","(0.29)","(0.07)","(0.06)","(0.05)","(0.07)"
 Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'
 "Note: This specification includes a variable capturing political shifts. "

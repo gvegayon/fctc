@@ -11,7 +11,7 @@ to_skip <- c(
   "country_name",
   "iso3c",
   "no_report",
-  "pol_shift",
+  # "pol_shift",
   "pol_shift_left",
   "pol_shift_right",
   "continent",
@@ -38,6 +38,8 @@ dat %<>% mutate(
 regions <- model.matrix(~0+who_region, dat) 
 colnames(regions) <- gsub("^who_region", "", colnames(regions))
 dat <- cbind(dat, regions[,-3]) # Reference: Eastern Mediterranean
+
+set.seed(17778841)
 
 ans <- amelia(
   x        = as.data.frame(dat),
@@ -111,5 +113,5 @@ rescale_data <- function(dat) {
 ans$imputations <- ans$imputations %>% lapply(rescale_data)
   
 
-
+readr::write_csv(rescale_data(dat), path = "data/multiple_imputation.csv")
 write.amelia(ans, file.stem = "data/multiple-imputation")

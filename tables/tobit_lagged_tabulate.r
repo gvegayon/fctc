@@ -27,6 +27,7 @@ fancy_varnames <- c(
   `Rule of Law`           = "rule_of_law",
   `% Female Smoke`        = "smoke_female",
   `% Male Smoke`          = "smoke_male",
+  `Health Exp.`           = "health_exp",
   `Women's Labor`         = "labor",
   `Women's rights`        = "womens_rights",
   `Population`            = "logPopulation",
@@ -43,7 +44,9 @@ fancy_varnames <- c(
   `Bloomberg FCTC $$$ PP` = "bloomberg_fctc_amount_pp",
   `Bloomberg FCTC #`      = "bloomberg_fctc_count",
   `No report`             = "no_report",
-  `(Intercept)`           = "(Intercept)"
+  `(Intercept)`           = "(Intercept)",
+  `Year 2014`             = "`Year 2014`",
+  `Year 2016`             = "`Year 2016`"
 )
 
 # # "`Eastern Mediterranean`",
@@ -106,7 +109,7 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   estimates <- env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]
   
   # Retrieving the betas and sds
-  nobs <- nrow(estimates$y)
+  nobs <- length(estimates$y)
   estimates <- summary(estimates)$coefficients[]
 
   # Getting the 

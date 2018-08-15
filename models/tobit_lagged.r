@@ -13,17 +13,6 @@ library(AER)
 library(magrittr)
 library(dplyr)
 
-model_data <- readr::read_csv("data/multiple-imputation1.csv")
-model_data <- model_data %>%
-  mutate(
-    entry = if_else(is.na(entry), "NA", entry)
-  )
-
-# Year fixed effects: 2010 as reference
-year0_1           <- model.matrix(~0+factor(year), model_data)
-colnames(year0_1) <- gsub(".+([0-9]{4})$", "Year \\1", colnames(year0_1))
-model_data        <- cbind(model_data, year0_1[,-1]) 
-
 load("data/adjmats.rda")
 load("data/adjmat_border.rda")
 load("data/adjmat_mindist.rda")
@@ -51,13 +40,14 @@ common_covars <- c(
   "smoke_male",
   "labor",
   "womens_rights",
-  # "logPopulation",
+  "logPopulation",
   "govtown",
   "`Year 2014`",
-  "`Year 2016`"
+  "`Year 2016`",
+  "health_exp"
   )
 
-which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
+
                    
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13", "sum_art14")
 
@@ -86,13 +76,13 @@ models <- list(
     about  = "This is the baseline specification."),
   Imp2010               = list(
     vars = c("rho", "y_lagged", common_covars),
-    about  = "This specification includes the number of items reported on 2010."),
+    about  = "This specification includes the lagged number of items reported."),
   Imp2010_report        = list(
     vars   = c("rho", "y_lagged", common_covars),
     filter = function(x) {
       subset(x, no_report == 0L)
     },
-    about  = "This specification includes the number of items reported on 2010. Also, it only includes members that provided a reported on 2012."),
+    about  = "This specification includes the lagged number of items reported. Also, it only includes members that provided a reported on 2012."),
   Imp2010_dummy_report  = list(
     vars   = c("rho", "y_lagged", "no_report", common_covars),
     about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
@@ -151,26 +141,42 @@ rm(adjmat_bilateral_investment_treaties)
 
 # Creating the lagged exposure -------------------------------------------------
 
-model_data <- model_data %>%
-  arrange(entry, year) %>%
-  group_by(entry) %>%
-  mutate(
-    sum_art05_lagged = lag(sum_art05),
-    sum_art06_lagged = lag(sum_art06),
-    sum_art08_lagged = lag(sum_art08),
-    sum_art11_lagged = lag(sum_art11),
-    sum_art13_lagged = lag(sum_art13),
-    sum_art14_lagged = lag(sum_art14)
-  ) %>%
-  filter(year >= 2012, n() >= 3) %>%
-  ungroup %>%
-  as.data.frame
+# Reading the model data
+read_data <- function(fn) {
+  
+  # Reading the data in
+  x <- readr::read_csv(fn)
+  x <- x %>%
+    mutate(
+      entry = if_else(is.na(entry), "NA", entry)
+    )
+  
+  # Year fixed effects: 2010 as reference
+  year0_1           <- model.matrix(~0+factor(year), x)
+  colnames(year0_1) <- gsub(".+([0-9]{4})$", "Year \\1", colnames(year0_1))
+  x        <- cbind(x, year0_1[,-1]) 
+  
+  x %>%
+    arrange(entry, year) %>%
+    group_by(entry) %>%
+    mutate(
+      sum_art05_lagged = lag(sum_art05),
+      sum_art06_lagged = lag(sum_art06),
+      sum_art08_lagged = lag(sum_art08),
+      sum_art11_lagged = lag(sum_art11),
+      sum_art13_lagged = lag(sum_art13),
+      sum_art14_lagged = lag(sum_art14)
+    ) %>%
+    filter(year >= 2012, n() >= 3) %>%
+    ungroup %>%
+    as.data.frame
+}
 
-
-# Distance network -------------------------------------------------------------
-SIGNIFICANCE_MODEL1 <- NULL
-for (Wnum in 1:nrow(networks)) {
-  Wname <- networks[Wnum, 1]
+#' Selects the corresponding network to work with.
+#' @param Wnum Number of the network to work with
+select_network <- function(Wname) {
+  
+  
   W <- get(Wname) #adjmat_tobacco_trade # adjmat_general_trade #adjmat_distance_static
   
   # Filtering data: The network must be accomodated to the observed data
@@ -192,6 +198,7 @@ for (Wnum in 1:nrow(networks)) {
     )
     
   }
+  
   W <- W[ids,ids]
   
   # Row normalization
@@ -200,11 +207,27 @@ for (Wnum in 1:nrow(networks)) {
   W <- methods::as(W, "dgCMatrix")
   
   # Generating the kronecker product (repeatong the times!)
-  W <- model_data$year %>%
+  model_data$year %>%
     unique %>%
     length %>%
     diag %>%
     kronecker(W)
+}
+
+# Reading the data
+model_data <- read_data("data/multiple-imputation1.csv")
+
+# Checking which covariates are included
+which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
+
+
+# Distance network -------------------------------------------------------------
+SIGNIFICANCE_MODEL1 <- NULL
+for (Wnum in 1:nrow(networks)) {
+  
+  # Picking the network
+  Wname <- networks[Wnum, 1]
+  W <- select_network(Wname)
   
   # This table will store the values (and add asterisks at the end) on the values
   # of rho and the sifnificance level.
@@ -220,9 +243,10 @@ for (Wnum in 1:nrow(networks)) {
       # Name of the lagged variable
       art_lagged <- sprintf("%s_lagged", art)
       
-      # Generate the exposure data and lagged outcome
-      model_data[["rho"]]      <- as.matrix(W %*% model_data[[art_lagged]])
-      model_data[["y_lagged"]] <- model_data[[art_lagged]]
+      model_data[["rho"]]      <- as.matrix(W %*% model_data[[art_lagged]]) %>%
+        as.vector
+      model_data[["y_lagged"]] <- model_data[[art_lagged]] %>%
+        as.vector
 
       # Write down the model
       mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))
@@ -235,6 +259,8 @@ for (Wnum in 1:nrow(networks)) {
       # Run the model
       ans <- tryCatch(
         AER::tobit(mod, data=tmpdata),
+        # Run the model
+        # stats::glm(mod, data=tmpdata, family = poisson()),
         error   = function(e) e,
         warning = function(w) structure(w, class="warning")
         )
