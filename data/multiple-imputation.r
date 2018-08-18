@@ -4,8 +4,7 @@ library(magrittr)
 
 dat <- readr::read_csv("data/model_data.csv", na="<NA>") %>%
   unique %>%
-  arrange(entry, year) %>%
-  select(-`South-East Asia`)
+  arrange(entry, year)
 
 to_skip <- c(
   "country_name",
@@ -26,18 +25,10 @@ to_skip <- c(
   "year_signature",
   "year_ratification",
   "Years since Ratif.",
-  "Years since Sign."
+  "Years since Sign.",
+  colnames(dat)[grepl("^art[0-9]+exp", colnames(dat))],
+  "South-East Asia"
 )
-
-# Turning smoke to pcent
-dat %<>% mutate(
-  smoke_female = smoke_female/100,
-  smoke_male   = smoke_male/100
-)
-
-regions <- model.matrix(~0+who_region, dat) 
-colnames(regions) <- gsub("^who_region", "", colnames(regions))
-dat <- cbind(dat, regions[,-3]) # Reference: Eastern Mediterranean
 
 set.seed(17778841)
 

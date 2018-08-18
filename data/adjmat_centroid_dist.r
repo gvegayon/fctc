@@ -23,4 +23,5 @@ diag(adjmat_centroid_dist) <- 0
 adjmat_centroid_dist <- methods::as(adjmat_centroid_dist, "dgCMatrix")
 
 # saving
-save(adjmat_centroid_dist, file="data/adjmat_centroid_dist.rda")
+saveRDS(adjmat_centroid_dist, file="data/adjmat_centroid_dist.rds",
+        compress = TRUE)

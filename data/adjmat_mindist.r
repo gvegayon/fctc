@@ -1,5 +1,6 @@
 
 options(stringsAsFactors = FALSE)
+library(Matrix)
 rm(list=ls())
 
 load("data-raw/country_distance/country_min_dist.rda")
@@ -26,4 +27,4 @@ adjmat_mindist <- methods::as(adjmat_mindist, "dgCMatrix")
 summary(adjmat_mindist@x)
 
 # saving
-save(adjmat_mindist, file="data/adjmat_mindist.rda")
+saveRDS(adjmat_mindist, file="data/adjmat_mindist.rds")

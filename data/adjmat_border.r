@@ -66,4 +66,4 @@ adjmat_border <- edgelist_to_adjmat(
   w          = dat$value
 )
 
-save(adjmat_border, file="data/adjmat_border.rda")
+saveRDS(adjmat_border, file="data/adjmat_border.rds", compress=TRUE)

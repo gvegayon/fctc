@@ -13,11 +13,6 @@ library(AER)
 library(magrittr)
 library(dplyr)
 
-load("data/adjmats.rda")
-load("data/adjmat_border.rda")
-load("data/adjmat_mindist.rda")
-load("data/adjmat_centroid_dist.rda")
-
 # Function to create formulas
 makeformula <- function(x) {
   paste(paste(x, collapse=" + "))
@@ -42,13 +37,11 @@ common_covars <- c(
   "womens_rights",
   "logPopulation",
   "govtown",
-  "`Year 2014`",
-  "`Year 2016`",
+  # "`Year 2014`",
+  # "`Year 2016`",
   "health_exp"
   )
 
-
-                   
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13", "sum_art14")
 
 # List of networks (with pretty names) that will be used
@@ -103,36 +96,10 @@ models <- list(
     about  = "This specification includes 'Number of FCTC Bloomberg project'.")
 )
 
-
-# Preprocessing networks gl_posts and referrals
-g0 <- adjmat_gl_posts[as.character(2008:2010)] # 
-adjmat_gl_posts <- g0[[1]]
-for (g in g0[-1])
-  adjmat_gl_posts <- adjmat_gl_posts + g
-
-image(adjmat_gl_posts)
-nlinks(adjmat_gl_posts)/(nnodes(adjmat_gl_posts)*(nnodes(adjmat_gl_posts)-1))
-
-g0 <- adjmat_referrals # 
-adjmat_referrals <- g0[[1]]
-for (g in g0[-1])
-  adjmat_referrals <- adjmat_referrals + g
-
-adjmat_interest_group_comembership_twomode <-
-  adjmat_interest_group_comembership_twomode$`2010`
-
-image(adjmat_referrals)
-nlinks(adjmat_referrals)/(nnodes(adjmat_referrals)*(nnodes(adjmat_referrals)-1))
-
 # If i referred j, then i has an influence over j, hence we transpose to compute
 # exposures.
-adjmat_referrals <- t(adjmat_referrals)
 networks      <- matrix(networks, byrow = TRUE, ncol=2)
 asterisks     <- c(.05, .01, .001)
-
-# We will only work with static networs, this is, we will exclude the
-# bilateral investment network
-rm(adjmat_bilateral_investment_treaties)
 
 # The general model is
 # Y = rho W Y + X B + eps, where 
@@ -172,54 +139,11 @@ read_data <- function(fn) {
     as.data.frame
 }
 
-#' Selects the corresponding network to work with.
-#' @param Wnum Number of the network to work with
-select_network <- function(Wname) {
-  
-  
-  W <- get(Wname) #adjmat_tobacco_trade # adjmat_general_trade #adjmat_distance_static
-  
-  # Filtering data: The network must be accomodated to the observed data
-  ids <- sort(unique(model_data$entry))
-  
-  # Filling the missing entities
-  test <- ids[which(!(ids %in% colnames(W)))]
-  if (length(test)) {
-    W <- rbind(
-      W,
-      matrix(0, nrow=length(test), ncol=ncol(W),
-             dimnames = list(test, colnames(W)))
-    )
-    
-    W <- cbind(
-      W,
-      matrix(0, ncol=length(test), nrow=nrow(W),
-             dimnames = list(rownames(W), test))
-    )
-    
-  }
-  
-  W <- W[ids,ids]
-  
-  # Row normalization
-  W <- W/rowSums(W)
-  W@x[is.nan(W@x)] <- 0
-  W <- methods::as(W, "dgCMatrix")
-  
-  # Generating the kronecker product (repeatong the times!)
-  model_data$year %>%
-    unique %>%
-    length %>%
-    diag %>%
-    kronecker(W)
-}
-
 # Reading the data
-model_data <- read_data("data/multiple-imputation1.csv")
+model_data <- read_data("data/multiple-imputation2.csv")
 
 # Checking which covariates are included
 which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
-
 
 # Distance network -------------------------------------------------------------
 SIGNIFICANCE_MODEL1 <- NULL
@@ -227,7 +151,6 @@ for (Wnum in 1:nrow(networks)) {
   
   # Picking the network
   Wname <- networks[Wnum, 1]
-  W <- select_network(Wname)
   
   # This table will store the values (and add asterisks at the end) on the values
   # of rho and the sifnificance level.
@@ -240,13 +163,14 @@ for (Wnum in 1:nrow(networks)) {
     
     for (art in articles) {
       
-      # Name of the lagged variable
+      # Extracting lagged variable
       art_lagged <- sprintf("%s_lagged", art)
-      
-      model_data[["rho"]]      <- as.matrix(W %*% model_data[[art_lagged]]) %>%
-        as.vector
       model_data[["y_lagged"]] <- model_data[[art_lagged]] %>%
         as.vector
+      
+      # Extracting exposure variable
+      art_exp <- paste0(gsub("sum_", "", art), "exp_", gsub("adjmat_", "", Wname))
+      model_data[["rho"]] <- model_data[[art_exp]] %>% as.vector
 
       # Write down the model
       mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))

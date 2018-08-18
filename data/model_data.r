@@ -38,6 +38,8 @@ implementation_post2014 <- readr::read_csv("data/implementation-post2014.csv", n
 
 govtown          <- read.csv("data/govtown.csv", na = "<NA>")
 
+exposure         <- readr::read_csv("data/exposure.csv", na = "<NA>")
+
 # Imputation for implementation ------------------------------------------------
 
 # Merging two implementations
@@ -54,11 +56,13 @@ dat <- worldbank %>%
   left_join(political_shifts, by=c("date" = "year", "iso2c" = "entry")) %>%
   rename(entry = iso2c, year = date) %>%
   left_join(treaty_dates, by="entry") %>%
-  left_join(implementation, by=c("year", "entry")) %>%
+  right_join(implementation, by=c("year", "entry")) %>%
   left_join(bloomberg, by=c("year", "entry")) %>%
   left_join(govtown, by = "entry") %>%
   left_join(tobacco_prod, by = c("entry", "year")) %>%
   left_join(who_region, by = c("entry")) %>%
+  left_join(exposure, by = c("entry", "year")) %>%
+  filter(!is.na(entry)) %>%
   arrange(entry, year)
 
 # Bloomberg data should be filled with zeros instead of NAs
@@ -111,31 +115,31 @@ lapply(
 dat$no_report[is.na(dat$no_report)] <- 1L
 articles <- sprintf("sum_art%02i", articles_to_use)
 
-# Filling some missing data ----------------------------------------------------
-dat[dat$entry=="AI","who_region"] <- "Americas"
-dat[dat$entry=="AN","who_region"] <- "Americas"
-dat[dat$entry=="AS","who_region"] <- "Western Pacific"
-dat[dat$entry=="AW","who_region"] <- "Americas"
-dat[dat$entry=="BM","who_region"] <- "Americas"
-dat[dat$entry=="CK","who_region"] <- "Western Pacific"
-dat[dat$entry=="GF","who_region"] <- "Americas"
-dat[dat$entry=="GL","who_region"] <- "European"
-dat[dat$entry=="GU","who_region"] <- "Americas"
-dat[dat$entry=="HK","who_region"] <- "Western Pacific"
-dat[dat$entry=="JE","who_region"] <- "European"
-dat[dat$entry=="KY","who_region"] <- "Americas"
-dat[dat$entry=="ME","who_region"] <- "European"
-dat[dat$entry=="MO","who_region"] <- "Western Pacific"
-dat[dat$entry=="MQ","who_region"] <- "Americas"
-dat[dat$entry=="NU","who_region"] <- "Western Pacific"
-dat[dat$entry=="PR","who_region"] <- "Americas"
-dat[dat$entry=="PS","who_region"] <- "Eastern Mediterranean"
-dat[dat$entry=="RE","who_region"] <- "African"
-dat[dat$entry=="SS","who_region"] <- "African"
-dat[dat$entry=="TW","who_region"] <- "Western Pacific"
-dat[dat$entry=="VI","who_region"] <- "Americas"
-dat[dat$entry=="XK","who_region"] <- "European"
-dat[dat$entry=="LI","who_region"] <- "European"
+# # Filling some missing data ----------------------------------------------------
+# dat[dat$entry=="AI","who_region"] <- "Americas"
+# dat[dat$entry=="AN","who_region"] <- "Americas"
+# dat[dat$entry=="AS","who_region"] <- "Western Pacific"
+# dat[dat$entry=="AW","who_region"] <- "Americas"
+# dat[dat$entry=="BM","who_region"] <- "Americas"
+# dat[dat$entry=="CK","who_region"] <- "Western Pacific"
+# dat[dat$entry=="GF","who_region"] <- "Americas"
+# dat[dat$entry=="GL","who_region"] <- "European"
+# dat[dat$entry=="GU","who_region"] <- "Americas"
+# dat[dat$entry=="HK","who_region"] <- "Western Pacific"
+# dat[dat$entry=="JE","who_region"] <- "European"
+# dat[dat$entry=="KY","who_region"] <- "Americas"
+# dat[dat$entry=="ME","who_region"] <- "European"
+# dat[dat$entry=="MO","who_region"] <- "Western Pacific"
+# dat[dat$entry=="MQ","who_region"] <- "Americas"
+# dat[dat$entry=="NU","who_region"] <- "Western Pacific"
+# dat[dat$entry=="PR","who_region"] <- "Americas"
+# dat[dat$entry=="PS","who_region"] <- "Eastern Mediterranean"
+# dat[dat$entry=="RE","who_region"] <- "African"
+# dat[dat$entry=="SS","who_region"] <- "African"
+# dat[dat$entry=="TW","who_region"] <- "Western Pacific"
+# dat[dat$entry=="VI","who_region"] <- "Americas"
+# dat[dat$entry=="XK","who_region"] <- "European"
+# dat[dat$entry=="LI","who_region"] <- "European"
 
 
 # Imputing ---------------------------------------------------------------------
@@ -279,6 +283,17 @@ dat %<>%
   filter(!is.na(who_region)) %>%
   arrange(entry, year)
 
+
+# Turning smoke to pcent
+dat %<>% mutate(
+  smoke_female = smoke_female/100,
+  smoke_male   = smoke_male/100
+)
+
+# Dummies for WHO region
+regions <- model.matrix(~0+who_region, dat) 
+colnames(regions) <- gsub("^who_region", "", colnames(regions))
+dat <- cbind(dat, regions[,-3]) # Reference: Eastern Mediterranean
 
 write.csv(dat, "data/model_data.csv", row.names = FALSE, na = "<NA>")
 

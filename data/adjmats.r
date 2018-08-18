@@ -97,5 +97,8 @@ for (net in names(networks)) {
 }
 rm(nm, net, nicename, networks_to_use, networks)
 
-# Keeping diffnets
+# Keeping diffnets, and removing trade and distance networks
+rm(list = ls(pattern = "trade"))
+rm(list = ls(pattern = "adjmat_distance"))
+
 save.image(file = 'data/adjmats.rda')
