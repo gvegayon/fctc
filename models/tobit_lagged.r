@@ -80,19 +80,19 @@ models <- list(
   #   vars   = c("rho", "y_lagged", "no_report", common_covars),
   #   about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
   PolShift              = list(
-    vars   = c("rho", "pol_shift", common_covars),
+    vars   = c("rho", "y_lagged", "pol_shift", common_covars),
     about  = "This specification includes a variable capturing political shifts."),
   Bloomberg_amount      = list(
-    vars   = c("rho", "bloomberg_amount_pp", common_covars),
+    vars   = c("rho", "y_lagged", "bloomberg_amount_pp", common_covars),
     about  = "This specification includes 'percapita amount of Bloomberg funds'."),
   Bloomberg_count       = list(
-    vars   = c("rho", "bloomberg_count", common_covars),
+    vars   = c("rho", "y_lagged", "bloomberg_count", common_covars),
     about  = "This specification includes 'Number of Bloomberg project'."),
   Bloomberg_amount_fctc = list(
-    vars   = c("rho", "bloomberg_fctc_amount_pp", common_covars),
+    vars   = c("rho", "y_lagged", "bloomberg_fctc_amount_pp", common_covars),
     about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
   Bloomberg_count_fctc  = list(
-    vars   = c("rho", "bloomberg_fctc_count", common_covars),
+    vars   = c("rho", "y_lagged", "bloomberg_fctc_count", common_covars),
     about  = "This specification includes 'Number of FCTC Bloomberg project'.")
 )
 

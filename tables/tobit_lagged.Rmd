@@ -1,0 +1,60 @@
+---
+title: "Tobit Lagged"
+date: "August 20, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+printtab <- function(x) {
+  x <- readr::read_csv(x)
+  for (j in 1:ncol(x))
+    x[is.na(x[,j]),j] <- ""
+  knitr::kable(x)
+}
+```
+
+# Summary
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report_rhos.csv")
+```
+
+# Article 5
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report-art=05.csv")
+```
+
+# Article 6
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report-art=06.csv")
+```
+
+# Article 8
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report-art=08.csv")
+```
+
+# Article 11
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report-art=11.csv")
+```
+
+
+# Article 13
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report-art=13.csv")
+```
+
+# Article 14
+
+```{r , result='asis'}
+printtab("tobit_lagged_tabulate_model=Imp2010_report-art=14.csv")
+```
+
