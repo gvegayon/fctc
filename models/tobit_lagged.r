@@ -37,8 +37,8 @@ common_covars <- c(
   "womens_rights",
   "logPopulation",
   "govtown",
-  # "`Year 2014`",
-  # "`Year 2016`",
+  "`Year 2014`",
+  "`Year 2016`",
   "health_exp"
   )
 
@@ -47,7 +47,7 @@ articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art1
 # List of networks (with pretty names) that will be used
 networks      <- c(
   "adjmat_centroid_dist", "Centroid Distance",
-  "adjmat_mindist", "Minimal distance",
+  # "adjmat_mindist", "Minimal distance",
   "adjmat_general_trade", "General Trade",
   "adjmat_tobacco_trade", "Tobacco Trade",
   "adjmat_referrals", "GLOBALink Referrals",
@@ -221,7 +221,8 @@ for (data_path in list.files("data/", pattern="multiple.+[0-9][.]csv", full.name
           "models/tobit_lagged_%s-imputed%02i.rda",
           Wname,
           as.integer(stringr::str_extract(data_path, "[0-9]+(?=[.csv])"))
-          )
+          ),
+        compression_level = 9
         )
       
       message("Network ", Wname, " done.")

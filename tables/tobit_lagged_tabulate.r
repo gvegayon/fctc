@@ -1,6 +1,7 @@
 rm(list = ls())
 
 library(AER)
+library(magrittr)
 
 # Reading the models data (not the results themselfs) --------------------------
 
@@ -101,34 +102,61 @@ getAIC <- function(x) {
 
 # Function to get coefficients
 get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
-  env <- new.env()
   
   # Fetching the estimates
-  # list.files("models/", pattern=sprintf("tobit_lagged_%s-imputed[0-9]+[.]rda", netname))
-  lapply(
-    list.files(
-      path    = "models/",
-      pattern = sprintf("tobit_lagged_%s-imputed[0-9]+[.]rda", netname),
-      full.names = TRUE
-      ),
-    load,
-    envir = env
+  model_files <- list.files(
+    path    = "models/",
+    pattern = sprintf("tobit_lagged_%s-imputed[0-9]+[.]rda", netname),
+    full.names = TRUE
   )
   
-  # Merging all data
-  coefficients <- lapply(mget(ls(env), envir = env), function(m) {
-    if (is.character(m))
-      return(NULL)
-    coef(m)
-  }) %>% do.call(rbind, .)
+  models <- lapply(
+    model_files,
+    function(x) {
+      # Empty environment
+      env <- new.env()
+      
+      # Loading the data in the space
+      load(x, envir = env)
+      
+      # Extracting the required table
+      sprintf("tobit_lagged_%s_%i", depvar, modelnum) %>%
+        get(envir = env) 
+    }
+  )
   
-  load(sprintf("models/tobit_lagged_%s.rda", netname), envir = env)
+  names(models) <- model_files
   
-  estimates <- env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]
+  estimates <- lapply(models, function(x) {
+    tab <- coef(summary(x))
+    
+    # Getting the coef and error tables
+    cbind(estimate = tab[,"Estimate"], error = tab[,"Std. Error"])
+  })
   
+  # Aggregating coefficients and sd.
+  estimates <- list(
+    estimate = lapply(estimates, "[", i=, j= "estimate") %>% do.call(rbind, .),
+    error    = lapply(estimates, "[", i=, j= "error") %>% do.call(rbind, .)
+  ) %$%
+    Amelia::mi.meld(estimate, error) %>%
+    do.call(rbind, .) %>%
+    t %>%
+    set_colnames(c("Estimate", "Std. Error"))
+  
+  # Computing pvalues
+  estimates <- cbind(
+    estimates, 
+    "z value" = estimates[,1]/estimates[,2]
+  )
+  
+  estimates <- cbind(
+    estimates,
+    "Pr(>|z|)" = pnorm(-abs(estimates[,"z value"]))*2
+  )
+   
   # Retrieving the betas and sds
-  nobs <- length(estimates$y)
-  estimates <- summary(estimates)$coefficients[]
+  N <- length(models[[1]]$y)
 
   # Getting the 
   varnames <- varnames[varnames %in% fancy_varnames]
@@ -155,8 +183,8 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   model_obj_name <- sprintf("tobit_lagged_%s_%i", depvar, modelnum)
   ans <- rbind(
     tab,
-    matrix(nobs, ncol = 1, dimnames = list("N", netname)),
-    matrix(getAIC(env[[model_obj_name]]), ncol = 1, dimnames = list("AIC", netname))
+    matrix(N, ncol = 1, dimnames = list("N", netname))
+    # matrix(getAIC(env[[model_obj_name]]), ncol = 1, dimnames = list("AIC", netname))
     )
   
   ans
