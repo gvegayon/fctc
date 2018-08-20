@@ -76,9 +76,9 @@ models <- list(
       subset(x, no_report == 0L)
     },
     about  = "This specification includes the lagged number of items reported. Also, it only includes members that provided a reported on 2012."),
-  Imp2010_dummy_report  = list(
-    vars   = c("rho", "y_lagged", "no_report", common_covars),
-    about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
+  # Imp2010_dummy_report  = list(
+  #   vars   = c("rho", "y_lagged", "no_report", common_covars),
+  #   about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
   PolShift              = list(
     vars   = c("rho", "pol_shift", common_covars),
     about  = "This specification includes a variable capturing political shifts."),
@@ -139,85 +139,98 @@ read_data <- function(fn) {
     as.data.frame
 }
 
-# Reading the data
-model_data <- read_data("data/multiple-imputation2.csv")
-
-# Checking which covariates are included
-which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
-
 # Distance network -------------------------------------------------------------
-SIGNIFICANCE_MODEL1 <- NULL
-for (Wnum in 1:nrow(networks)) {
-  
-  # Picking the network
-  Wname <- networks[Wnum, 1]
-  
-  # This table will store the values (and add asterisks at the end) on the values
-  # of rho and the sifnificance level.
-  rho_asterisk_table <- NULL
-  rho_per_article    <- vector("numeric", length(articles))
-  names(rho_per_article) <- articles
-  
-  # Looping through the models
-  for (m in seq_along(models)) {
-    
-    for (art in articles) {
-      
-      # Extracting lagged variable
-      art_lagged <- sprintf("%s_lagged", art)
-      model_data[["y_lagged"]] <- model_data[[art_lagged]] %>%
-        as.vector
-      
-      # Extracting exposure variable
-      art_exp <- paste0(gsub("sum_", "", art), "exp_", gsub("adjmat_", "", Wname))
-      model_data[["rho"]] <- model_data[[art_exp]] %>% as.vector
 
-      # Write down the model
-      mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))
-      
-      # Filtering the data (if needed)
-      if (length(models[[m]]$filter))
-        tmpdata <- models[[m]]$filter(model_data)
-      else tmpdata <- model_data
-      
-      # Run the model
-      ans <- tryCatch(
-        AER::tobit(mod, data=tmpdata),
-        # Run the model
-        # stats::glm(mod, data=tmpdata, family = poisson()),
-        error   = function(e) e,
-        warning = function(w) structure(w, class="warning")
-        )
+for (data_path in list.files("data/", pattern="multiple.+[0-9][.]csv", full.names = TRUE)) {
+  
+  # Reading the data
+  model_data <- read_data(data_path)
+  localenvir <- new.env()
+  
+  local(
+    {
+    # Checking which covariates are included
+    which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
     
-      # Did it run?  
-      if (inherits(ans, "error")) {
-        message("!!! Error in network ", Wname, " article ", art, " model.")
-        next
-      }
+    SIGNIFICANCE_MODEL1 <- NULL
+    for (Wnum in 1:nrow(networks)) {
       
-      if (inherits(ans, "warning")) {
-        message("!!! WARNING in network ", Wname, " article ", art, " model.")
-        next
-      }
+      # Picking the network
+      Wname <- networks[Wnum, 1]
+      
+      # This table will store the values (and add asterisks at the end) on the values
+      # of rho and the sifnificance level.
+      rho_asterisk_table <- NULL
+      rho_per_article    <- vector("numeric", length(articles))
+      names(rho_per_article) <- articles
+      
+      # Looping through the models
+      for (m in seq_along(models)) {
         
-      
-      # Creating the object
-      assign(paste("tobit_lagged",art, m, sep="_"), ans, envir = .GlobalEnv)
-      message("Network ", Wname, " article ", art, " model ", m,  " done.")
-    }
+        for (art in articles) {
+          
+          # Extracting lagged variable
+          art_lagged <- sprintf("%s_lagged", art)
+          model_data[["y_lagged"]] <- model_data[[art_lagged]] %>%
+            as.vector
+          
+          # Extracting exposure variable
+          art_exp <- paste0(gsub("sum_", "", art), "exp_", gsub("adjmat_", "", Wname))
+          model_data[["rho"]] <- model_data[[art_exp]] %>% as.vector
     
-  }
-  
-  # Saving results -----------------------------------------------------------
-  save(
-    Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$"),
-    file = sprintf("models/tobit_lagged_%s.rda", Wname)
-    )
-  
-  message("Network ", Wname, " done.")
+          # Write down the model
+          mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))
+          
+          # Filtering the data (if needed)
+          if (length(models[[m]]$filter))
+            tmpdata <- models[[m]]$filter(model_data)
+          else tmpdata <- model_data
+          
+          # Run the model
+          ans <- tryCatch(
+            AER::tobit(mod, data=tmpdata),
+            # Run the model
+            # stats::glm(mod, data=tmpdata, family = poisson()),
+            error   = function(e) e,
+            warning = function(w) structure(w, class="warning")
+            )
+        
+          # Did it run?  
+          if (inherits(ans, "error")) {
+            message("!!! Error in network ", Wname, " article ", art, " model.")
+            next
+          }
+          
+          if (inherits(ans, "warning")) {
+            message("!!! WARNING in network ", Wname, " article ", art, " model.")
+            next
+          }
+            
+          
+          # Creating the object
+          assign(paste("tobit_lagged",art, m, sep="_"), ans, envir = localenvir)
+          message("Network ", Wname, " article ", art, " model ", m,  " done.")
+        }
+        
+      }
+      
+      # Saving results -----------------------------------------------------------
+      save(
+        Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$", envir = localenvir),
+        file = sprintf(
+          "models/tobit_lagged_%s-imputed%02i.rda",
+          Wname,
+          as.integer(stringr::str_extract(data_path, "[0-9]+(?=[.csv])"))
+          )
+        )
+      
+      message("Network ", Wname, " done.")
+    }
+  },
+  envir = localenvir
+  )
 }
 
 # Saving the models specifications
 save(models, networks, articles,
      file = sprintf("models/tobit_lagged_specifications.rda"))
-

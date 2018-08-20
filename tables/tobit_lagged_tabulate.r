@@ -104,6 +104,24 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   env <- new.env()
   
   # Fetching the estimates
+  # list.files("models/", pattern=sprintf("tobit_lagged_%s-imputed[0-9]+[.]rda", netname))
+  lapply(
+    list.files(
+      path    = "models/",
+      pattern = sprintf("tobit_lagged_%s-imputed[0-9]+[.]rda", netname),
+      full.names = TRUE
+      ),
+    load,
+    envir = env
+  )
+  
+  # Merging all data
+  coefficients <- lapply(mget(ls(env), envir = env), function(m) {
+    if (is.character(m))
+      return(NULL)
+    coef(m)
+  }) %>% do.call(rbind, .)
+  
   load(sprintf("models/tobit_lagged_%s.rda", netname), envir = env)
   
   estimates <- env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]
