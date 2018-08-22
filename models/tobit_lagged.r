@@ -93,7 +93,11 @@ models <- list(
     about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
   Bloomberg_count_fctc  = list(
     vars   = c("rho", "y_lagged", "bloomberg_fctc_count", common_covars),
-    about  = "This specification includes 'Number of FCTC Bloomberg project'.")
+    about  = "This specification includes 'Number of FCTC Bloomberg project'."),
+  Full     = list(
+    vars   = c("rho", "y_lagged", "bloomberg_fctc_count", "pol_shift", common_covars),
+    about  = "This specification includes Bloomberg FCTC count, Political Shifts, and a lagged number of items implemented."
+  )
 )
 
 # If i referred j, then i has an influence over j, hence we transpose to compute

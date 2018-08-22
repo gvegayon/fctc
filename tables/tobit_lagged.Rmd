@@ -15,46 +15,42 @@ printtab <- function(x) {
 }
 ```
 
-# Summary
+# Summary statistics
 
-```{r , result='asis'}
+```{r, results='asis'}
+printtab("descriptive_stats.csv")
+```
+
+# Pvalues for Network effects of final model
+
+```{r , results='asis'}
 printtab("tobit_lagged_tabulate_model=Imp2010_report_rhos.csv")
 ```
 
-# Article 5
+# Full model
 
-```{r , result='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report-art=05.csv")
+```{r , results='asis', comment=""}
+for (i in c("05", "06", "08", "11", "13", "14")) {
+  
+  cat("\n\n## Article ", as.integer(i), "\n\n\n", sep="")
+   
+  print(printtab(
+    sprintf("tobit_lagged_tabulate_model=Full-art=%s.csv", i)
+  ))
+  
+}
 ```
 
-# Article 6
+# Final model
 
-```{r , result='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report-art=06.csv")
+```{r , results='asis', comment=""}
+for (i in c("05", "06", "08", "11", "13", "14")) {
+  
+  cat("\n\n## Article ", as.integer(i), "\n\n\n", sep="")
+   
+  print(printtab(
+    sprintf("tobit_lagged_tabulate_model=Imp2010_report-art=%s.csv", i)
+  ))
+  
+}
 ```
-
-# Article 8
-
-```{r , result='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report-art=08.csv")
-```
-
-# Article 11
-
-```{r , result='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report-art=11.csv")
-```
-
-
-# Article 13
-
-```{r , result='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report-art=13.csv")
-```
-
-# Article 14
-
-```{r , result='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report-art=14.csv")
-```
-

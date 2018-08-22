@@ -27,7 +27,7 @@ to_skip <- c(
   "Years since Ratif.",
   "Years since Sign.",
   colnames(dat)[grepl("^art[0-9]+exp", colnames(dat))],
-  "South-East Asia"
+  "Eastern Mediterranean"
 )
 
 set.seed(17778841)

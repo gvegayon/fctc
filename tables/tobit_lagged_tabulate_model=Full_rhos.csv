@@ -7,9 +7,9 @@
 "","(0.37)","(0.23)","(0.16)","(0.09)","(0.09)"
 "Article 11","2.62 ***","0.39 ","0.08 ","0.17 ","0.31 "
 "","(0.60)","(0.49)","(0.33)","(0.20)","(0.20)"
-"Article 13","0.96 **","-0.05 ","-0.09 ","0.02 ","0.32 "
+"Article 13","0.97 **","-0.05 ","-0.08 ","0.02 ","0.32 "
 "","(0.45)","(0.47)","(0.31)","(0.21)","(0.21)"
-"Article 14","0.67 ","-0.03 ","0.97 ","0.05 ","0.51 "
-"","(1.06)","(0.92)","(0.62)","(0.42)","(0.39)"
+"Article 14","0.68 ","-0.03 ","0.99 ","0.05 ","0.51 "
+"","(1.06)","(0.92)","(0.63)","(0.42)","(0.39)"
 Standard Errors in parenthesis. Signif. codes: 0.01: '***' 0.05: '**' 0.10 '*'
-"Note: This specification includes 'Number of FCTC Bloomberg project'. "
+"Note: This specification includes Bloomberg FCTC count, Political Shifts, and a lagged number of items implemented. "

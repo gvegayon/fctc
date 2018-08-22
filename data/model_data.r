@@ -288,12 +288,13 @@ dat %<>%
 dat %<>% mutate(
   smoke_female = smoke_female/100,
   smoke_male   = smoke_male/100
+  
 )
 
 # Dummies for WHO region
 regions <- model.matrix(~0+who_region, dat) 
 colnames(regions) <- gsub("^who_region", "", colnames(regions))
-dat <- cbind(dat, regions[,-3]) # Reference: Eastern Mediterranean
+dat <- cbind(dat, regions) # Reference: Eastern Mediterranean
 
 write.csv(dat, "data/model_data.csv", row.names = FALSE, na = "<NA>")
 

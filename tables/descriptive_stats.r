@@ -9,13 +9,19 @@ library(dplyr)
 
 # Part 1: Party attributes -----------------------------------------------------
 
-model_data <- read.csv("data/model_data_unscaled.csv", na="<NA>", check.names = FALSE)
+model_data <- readr::read_csv("data/model_data.csv", na="<NA>")
 
+counter <- 1
 # Summarize computing mean and sd
 meanandsd <- function(x) {
   
+  x <- x[!is.na(x)]
+  
+  if (!length(x))
+    return("")
+  
   thousands <- function(y) {
-    if ( (log(y, 10) %/% 1) >= 3) {
+    if (all(y > 0) && (log(y, 10) %/% 1) >= 3) {
       if ((y %% 1e3) < 100) sprintf("%d,0%.2f", y %/% 1e3, y %% 1e3)
       else sprintf("%d,%.2f", y %/% 1e3, y %% 1e3)
       
@@ -33,27 +39,37 @@ pcents <- function(x) {
   sprintf("%.1f%%", sum(x, na.rm=TRUE)/length(x)*100)
 }
 
-ans <- group_by(model_data, Year = year) %>%
+ans <- model_data %>% 
+  # group_by(entry) %>%
+  # mutate(
+  #   bloomberg_count = sum(bloomberg_count)
+  # ) %>%
+  # select(entry, year, starts_with("bloomb")) %>% View
+  # ungroup %>%
+  group_by(Year = year) %>%
   summarise(
     `Number of Countries`                = n(),
     # Proportion of Regions
     Americas                             = pcents(Americas),
-    `Eastern Mediterranean`              = pcents(`Eastern Mediterranean`),
-    Europe                               = pcents(Europe),
-    Africa                               = pcents(Africa),
-    `Western Pacific`                    = pcents(`Western Pacific`),
+    African                              = pcents(African),
+    European                             = pcents(European),
     `Southeast Asia`                     = pcents(`South-East Asia`),
+    `Eastern Mediterranean`              = pcents(`Eastern Mediterranean`),
+    `Western Pacific`                    = pcents(`Western Pacific`),
     # Economic indicators
-    `Democracy`                          = meanandsd(democracy),
-    `GDP per capita`                     = meanandsd(GDP),
+    `Control of Corruption`              = meanandsd(ctrl_corrup),
+    `Rule of Law`                        = meanandsd(rule_of_law),
+    `Health Exp.`                        = meanandsd(health_exp),
+    `Women's Labor`                      = meanandsd(labor),
+    `Women's rights`                     = meanandsd(womens_rights),
+    `GDP per capita (thousands)`         = meanandsd(gdp_percapita_ppp/1e3),
     `Population (millions)`              = meanandsd(population/1e6),
-    `Womens Rights`                      = meanandsd(womens_rights),
     # Tobacco
     `Years since signing (in 2012)`      = meanandsd(`Years since Sign.`),
     `Years since ratification (in 2012)` = meanandsd(`Years since Ratif.`),
-    `Tobacco Production (tons)`          = meanandsd(tobac_prod),
-    `Smoking prevalence Female`          = meanandsd(perc_female_smoke),
-    `Smoking prevalence Male`            = meanandsd(perc_male_smoke),
+    `Tobacco Production (tons)`          = meanandsd(tobacco_prod),
+    `Smoking prevalence Female`          = meanandsd(smoke_female),
+    `Smoking prevalence Male`            = meanandsd(smoke_male),
     # Political shifts
     `% Political Shift`                  = pcents(pol_shift),
     `% Political Shift (missings)`       = pcents(!complete.cases(pol_shift)),
@@ -61,11 +77,20 @@ ans <- group_by(model_data, Year = year) %>%
     `# of Bloomberg projects`            = meanandsd(bloomberg_count),
     `USD Bloomberg projects`             = meanandsd(bloomberg_amount),
     `# of Bloomberg FCTC projects`       = meanandsd(bloomberg_fctc_count),
-    `USD Bloomberg FCTC projects`        = meanandsd(bloomberg_fctc_amount)
+    `USD Bloomberg FCTC projects`        = meanandsd(bloomberg_fctc_amount),
+    `# Items Implemented Art. 5`         = meanandsd(sum_art05),
+    `# Items Implemented Art. 6`         = meanandsd(sum_art06),
+    `# Items Implemented Art. 8`         = meanandsd(sum_art08),
+    `# Items Implemented Art. 11`        = meanandsd(sum_art11),
+    `# Items Implemented Art. 13`        = meanandsd(sum_art13),
+    `# Items Implemented Art. 14`        = meanandsd(sum_art14)
   )
 
 # Exporting in TAB
-write.table(t(ans), file="fig/diffusion_variables.tab", sep="\t", col.names = FALSE)
+cbind(colnames(ans), t(ans)) %>%
+  as_tibble %>%
+  set_colnames(c("Variable", 2010, 2012, 2014, 2016)) %>%
+  readr::write_csv("tables/descriptive_stats.csv")
 
 # Number of years since ratification -------------------------------------------
 dat <- subset(model_data, year == 2012)
