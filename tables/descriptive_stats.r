@@ -59,7 +59,7 @@ ans <- model_data %>%
     # Economic indicators
     `Control of Corruption`              = meanandsd(ctrl_corrup),
     `Rule of Law`                        = meanandsd(rule_of_law),
-    `Health Exp.`                        = meanandsd(health_exp),
+    `Health Exp. per capita (ppp)`       = meanandsd(health_exp),
     `Women's Labor`                      = meanandsd(labor),
     `Women's rights`                     = meanandsd(womens_rights),
     `GDP per capita (thousands)`         = meanandsd(gdp_percapita_ppp/1e3),
@@ -67,7 +67,7 @@ ans <- model_data %>%
     # Tobacco
     `Years since signing (in 2012)`      = meanandsd(`Years since Sign.`),
     `Years since ratification (in 2012)` = meanandsd(`Years since Ratif.`),
-    `Tobacco Production (tons)`          = meanandsd(tobacco_prod),
+    `Tobacco Prod. (thousands tons)`     = meanandsd(tobacco_prod/1e3),
     `Smoking prevalence Female`          = meanandsd(smoke_female),
     `Smoking prevalence Male`            = meanandsd(smoke_male),
     # Political shifts
@@ -75,9 +75,9 @@ ans <- model_data %>%
     `% Political Shift (missings)`       = pcents(!complete.cases(pol_shift)),
     # Bloomberg Initiative
     `# of Bloomberg projects`            = meanandsd(bloomberg_count),
-    `USD Bloomberg projects`             = meanandsd(bloomberg_amount),
+    `USD Bloomberg projects (thousands)`             = meanandsd(bloomberg_amount/1e3),
     `# of Bloomberg FCTC projects`       = meanandsd(bloomberg_fctc_count),
-    `USD Bloomberg FCTC projects`        = meanandsd(bloomberg_fctc_amount),
+    `USD Bloomberg FCTC projects (thousands)`        = meanandsd(bloomberg_fctc_amount/1e3),
     `# Items Implemented Art. 5`         = meanandsd(sum_art05),
     `# Items Implemented Art. 6`         = meanandsd(sum_art06),
     `# Items Implemented Art. 8`         = meanandsd(sum_art08),
