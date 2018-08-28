@@ -19,31 +19,30 @@ networks <- networks[networks[,1] != "adjmat_mindist",]
 # Changing the varnames of the models
 fancy_varnames <- c(
   `Lagged Exposure (rho)` = "rho", 
-  # `Gov. Ownership`        = "govtown",
-  `Tobacco Prod. per capita`= "tobac_prod_pp",
-  # `Years since Sign.`     = "`Years since Sign.`", 
-  `Years since Ratif.`    = "`Years since Ratif.`",
-  `GDP per capita (ppp)`  = "gdp_percapita_ppp",
-  `Control of Corruption` = "ctrl_corrup",
-  `Rule of Law`           = "rule_of_law",
-  `% Female Smoke`        = "smoke_female",
-  `% Male Smoke`          = "smoke_male",
-  `Health Exp. per capita (ppp)` = "health_exp",
-  `Women's Labor`         = "labor",
-  `Women's rights`        = "womens_rights",
-  `Population`            = "logPopulation",
+  `Lagged Y (Number of Items)` = "y_lagged",
   Americas                = "Americas",
   African                 = "African",
   European                = "European",
-  `Western Pacific`       = "`Western Pacific`",
   `South-East Asia`       = "`South-East Asia`",
-  `Lagged Y (Number of Items)` = "y_lagged",
+  `Western Pacific`       = "`Western Pacific`",
+  `GDP per capita (ppp)`  = "gdp_percapita_ppp",
+  `Tobacco Prod. per capita`= "tobac_prod_pp",
+  `Women's rights`        = "womens_rights",
+  `Women's Labor`         = "labor",
+  `Log Population`        = "logPopulation",
   PolShift                = "pol_shift",
-  `Government Ownership`  = "govtown",
   `Bloomberg $$$ PP`      = "bloomberg_amount_pp",
   `Bloomberg #`           = "bloomberg_count",
   `Bloomberg FCTC $$$ PP` = "bloomberg_fctc_amount_pp",
   `Bloomberg FCTC #`      = "bloomberg_fctc_count",
+  `Government Ownership`  = "govtown",
+  `Control of Corruption` = "ctrl_corrup",
+  `Rule of Law`           = "rule_of_law",
+  `Health Exp. per capita (ppp)` = "health_exp",
+  `Years since Sign.`     = "`Years since Sign.`",
+  `Years since Ratif.`    = "`Years since Ratif.`",
+  `% Female Smoke`        = "smoke_female",
+  `% Male Smoke`          = "smoke_male",
   `No report`             = "no_report",
   `(Intercept)`           = "(Intercept)",
   `Year 2014`             = "`Year 2014`",
@@ -159,7 +158,7 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   N <- length(models[[1]]$y)
 
   # Getting the 
-  varnames <- varnames[varnames %in% fancy_varnames]
+  varnames <- fancy_varnames[fancy_varnames %in% varnames]
   ans <- estimates[varnames,,drop=FALSE]
   
   pvals <- ans[,"Pr(>|z|)"]
