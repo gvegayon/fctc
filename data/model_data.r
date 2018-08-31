@@ -23,7 +23,16 @@ who_region <- readr::read_csv("data/party_attributes.csv", na = "<NA>") %>%
   select(entry, who_region, continent) %>% unique
 
 worldbank <- readr::read_csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
-qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
+
+wb_country_codes <- worldbank %>%
+  select(iso3c, iso2c) %>%
+  unique
+
+qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>") %>%
+  rename(POLITY = fh_ipolity2) %>%
+  left_join(wb_country_codes, by = "iso3c") %>%
+  rename(entry = iso2c) %>%
+  select(-iso3c)
 
 tobacco_prod <- readr::read_csv("data/tobacco_prod.csv")
 
@@ -62,6 +71,7 @@ dat <- worldbank %>%
   left_join(tobacco_prod, by = c("entry", "year")) %>%
   left_join(who_region, by = c("entry")) %>%
   left_join(exposure, by = c("entry", "year")) %>%
+  left_join(qog, by = c("entry", "year")) %>%
   filter(!is.na(entry)) %>%
   arrange(entry, year)
 

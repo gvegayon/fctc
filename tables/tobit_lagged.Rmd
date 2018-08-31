@@ -7,8 +7,12 @@ output: word_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
-printtab <- function(x) {
+printtab <- function(x, skipNAs = FALSE) {
   x <- readr::read_csv(x)
+  
+  if (skipNAs)
+    x <- x[!is.na(x[,1]),]
+  
   for (j in 1:ncol(x))
     x[is.na(x[,j]),j] <- ""
   knitr::kable(x)
@@ -24,21 +28,7 @@ printtab("descriptive_stats.csv")
 # Pvalues for Network effects of final model
 
 ```{r , results='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report_rhos.csv")
-```
-
-# Full model
-
-```{r , results='asis', comment=""}
-for (i in c("05", "06", "08", "11", "13", "14")) {
-  
-  cat("\n\n## Article ", as.integer(i), "\n\n\n", sep="")
-   
-  print(printtab(
-    sprintf("tobit_lagged_tabulate_model=Full-art=%s.csv", i)
-  ))
-  
-}
+printtab("tobit_lagged_tabulate_model=Imp2010_report_rhos.csv", skipNAs = TRUE)
 ```
 
 # Final model
@@ -49,7 +39,7 @@ for (i in c("05", "06", "08", "11", "13", "14")) {
   cat("\n\n## Article ", as.integer(i), "\n\n\n", sep="")
    
   print(printtab(
-    sprintf("tobit_lagged_tabulate_model=Imp2010_report-art=%s.csv", i)
+    sprintf("tobit_lagged_tabulate_model=Imp2010_report-art=%s.csv", i), skipNAs = TRUE
   ))
   
 }

@@ -25,21 +25,22 @@ common_covars <- c(
   "European",
   "`Western Pacific`",
   "`South-East Asia`",
-  # "democracy",
+  "POLITY",
   "ctrl_corrup",
   "rule_of_law",
-  "gdp_percapita_ppp",
+  "logGDP_percapita_ppp",
   "`Years since Ratif.`",
-  "tobac_prod_pp",
+  "`Years since Sign.`",
+  "logTobac_prod_pp",
   "smoke_female",
   "smoke_male",
   "labor",
   "womens_rights",
-  "logPopulation",
+  # "logPopulation",
   "govtown",
   "`Year 2014`",
   "`Year 2016`",
-  "health_exp"
+  "logHealth_exp"
   )
 
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13", "sum_art14")
@@ -191,7 +192,7 @@ for (data_path in list.files("data/", pattern="multiple.+[0-9][.]csv", full.name
           else tmpdata <- model_data
           
           # Run the model
-          ans <- tryCatch(
+          ans <<- tryCatch(
             AER::tobit(mod, data=tmpdata),
             # Run the model
             # stats::glm(mod, data=tmpdata, family = poisson()),

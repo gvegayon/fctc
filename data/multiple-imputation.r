@@ -86,10 +86,18 @@ rescale_data <- function(dat) {
   dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
   dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
   dat$logPopulation            <- log(dat$population)
+  dat$logTobac_prod_pp         <- log(dat$tobac_prod_pp)
+  dat$logHealth_exp            <- log(dat$health_exp)
+  dat$logGDP_percapita_ppp     <- log(dat$gdp_percapita_ppp)
+
+  # Replacing infinite values with NAs
+  replace_not_finite <- function(x) {
+    ifelse(!is.finite(x), NA, x)
+  }
+  dat <- dat %>%
+    mutate_if(is.numeric, replace_not_finite)
   
-  for (v in colnames(dat))
-    if (is.double(dat[[v]])) 
-      dat[[v]] <- dat[[v]]/sd(dat[[v]], na.rm = TRUE)
+  
   
   #   {
   #   cat(sprintf("%30s: Yes\n", v))
