@@ -78,7 +78,7 @@ ans <- model_data %>%
     `Health Exp. per capita (ppp)`       = meanandsd(health_exp),
     # Tobacco
     # `Years since signing (in 2012)`      = meanandsd(`Years since Sign.`),
-    `Years since ratification (in 2012)` = meanandsd(`Years since Ratif.`),
+    `Years since Ratification` = meanandsd(`Years since Ratif.`),
     # Bloomberg Initiative
     `# Items Implemented Art. 5`         = meanandsd(sum_art05),
     `# Items Implemented Art. 6`         = meanandsd(sum_art06),

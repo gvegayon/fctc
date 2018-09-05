@@ -41,6 +41,8 @@ common_covars <- c(
   "`Year 2014`",
   "`Year 2016`",
   "logHealth_exp"
+  # "`Year 2014`*`Years since Ratif.`",
+  # "`Year 2016`*`Years since Ratif.`"
   )
 
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13", "sum_art14")
@@ -120,28 +122,15 @@ asterisks     <- c(.05, .01, .001)
 read_data <- function(fn) {
   
   # Reading the data in
-  x <- readr::read_csv(fn)
+  x <- suppressMessages({readr::read_csv(fn)})
   x <- x %>%
     mutate(
       entry = if_else(is.na(entry), "NA", entry)
     )
   
-  # Year fixed effects: 2010 as reference
-  year0_1           <- model.matrix(~0+factor(year), x)
-  colnames(year0_1) <- gsub(".+([0-9]{4})$", "Year \\1", colnames(year0_1))
-  x        <- cbind(x, year0_1[,-1]) 
-  
   x %>%
     arrange(entry, year) %>%
     group_by(entry) %>%
-    mutate(
-      sum_art05_lagged = lag(sum_art05),
-      sum_art06_lagged = lag(sum_art06),
-      sum_art08_lagged = lag(sum_art08),
-      sum_art11_lagged = lag(sum_art11),
-      sum_art13_lagged = lag(sum_art13),
-      sum_art14_lagged = lag(sum_art14)
-    ) %>%
     filter(year >= 2012, n() >= 3) %>%
     ungroup %>%
     as.data.frame

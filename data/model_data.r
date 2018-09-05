@@ -265,8 +265,8 @@ dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
 # was an event that happened before. But, the implementation level of 2010 can
 # certainly affect signature and ratification as it is a posterior event. Therefore
 # we truncate these variables at 0.
-dat$`Years since Ratif.` <- with(dat, 2014L - year_ratification)
-dat$`Years since Sign.`  <- with(dat, 2014L - year_signature)
+dat$`Years since Ratif.` <- with(dat, year - year_ratification)
+dat$`Years since Sign.`  <- with(dat, year - year_signature)
 
 dat$`Years since Ratif.`[dat$`Years since Ratif.` < 0] <- 0L
 dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L

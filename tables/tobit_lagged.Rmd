@@ -19,6 +19,11 @@ printtab <- function(x, skipNAs = FALSE) {
 }
 ```
 
+```{r, fig.align='center'}
+knitr::include_graphics("../fig/corr_years_since_ratif_and_implementation.png")
+```
+
+
 # Summary statistics
 
 ```{r, results='asis'}
