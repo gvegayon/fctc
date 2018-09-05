@@ -1,7 +1,7 @@
 ---
 title: "Tobit Lagged"
-date: "August 20, 2018"
-output: html_document
+date: "`r Sys.Date()`"
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
@@ -28,8 +28,22 @@ printtab("descriptive_stats.csv")
 # Pvalues for Network effects of final model
 
 ```{r , results='asis'}
-printtab("tobit_lagged_tabulate_model=Imp2010_report_rhos.csv", skipNAs = TRUE)
+printtab("tobit_lagged_tabulate_model=Full_rhos.csv", skipNAs = TRUE)
 ```
+
+<!-- # Final model -->
+
+<!-- ```{r , results='asis', comment=""} -->
+<!-- for (i in c("05", "06", "08", "11", "13", "14")) { -->
+
+<!--   cat("\n\n## Article ", as.integer(i), "\n\n\n", sep="") -->
+
+<!--   print(printtab( -->
+<!--     sprintf("tobit_lagged_tabulate_model=Imp2010_report-art=%s.csv", i), skipNAs = TRUE -->
+<!--   )) -->
+
+<!-- } -->
+<!-- ``` -->
 
 # Final model
 
@@ -44,4 +58,3 @@ for (i in c("05", "06", "08", "11", "13", "14")) {
   
 }
 ```
-
