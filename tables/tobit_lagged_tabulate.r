@@ -156,7 +156,7 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   )
    
   # Retrieving the betas and sds
-  N <- length(models[[1]]$y)
+  N <- nrow(models[[1]]$y)
 
   # Getting the 
   varnames <- fancy_varnames[fancy_varnames %in% varnames]

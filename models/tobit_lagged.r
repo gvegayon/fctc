@@ -65,9 +65,9 @@ networks      <- c(
 # - filter (optional): A function that will be applied prior to run the model.
 # - about (optional): A brief description
 models <- list(
-  Baseline              = list(
-    vars = c("rho", common_covars),
-    about  = "This is the baseline specification."),
+  # Baseline              = list(
+  #   vars = c("rho", common_covars),
+  #   about  = "This is the baseline specification."),
   Imp2010               = list(
     vars = c("rho", "y_lagged", common_covars),
     about  = "This specification includes the lagged number of items reported."),
@@ -80,24 +80,27 @@ models <- list(
   # Imp2010_dummy_report  = list(
   #   vars   = c("rho", "y_lagged", "no_report", common_covars),
   #   about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
-  PolShift              = list(
-    vars   = c("rho", "y_lagged", "pol_shift", common_covars),
-    about  = "This specification includes a variable capturing political shifts."),
-  Bloomberg_amount      = list(
-    vars   = c("rho", "y_lagged", "bloomberg_amount_pp", common_covars),
-    about  = "This specification includes 'percapita amount of Bloomberg funds'."),
-  Bloomberg_count       = list(
-    vars   = c("rho", "y_lagged", "bloomberg_count", common_covars),
-    about  = "This specification includes 'Number of Bloomberg project'."),
-  Bloomberg_amount_fctc = list(
-    vars   = c("rho", "y_lagged", "bloomberg_fctc_amount_pp", common_covars),
-    about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
-  Bloomberg_count_fctc  = list(
-    vars   = c("rho", "y_lagged", "bloomberg_fctc_count", common_covars),
-    about  = "This specification includes 'Number of FCTC Bloomberg project'."),
+  # PolShift              = list(
+  #   vars   = c("rho", "y_lagged", "pol_shift", common_covars),
+  #   about  = "This specification includes a variable capturing political shifts."),
+  # Bloomberg_amount      = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_amount_pp", common_covars),
+  #   about  = "This specification includes 'percapita amount of Bloomberg funds'."),
+  # Bloomberg_count       = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_count", common_covars),
+  #   about  = "This specification includes 'Number of Bloomberg project'."),
+  # Bloomberg_amount_fctc = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_fctc_amount_pp", common_covars),
+  #   about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
+  # Bloomberg_count_fctc  = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_fctc_count", common_covars),
+  #   about  = "This specification includes 'Number of FCTC Bloomberg project'."),
   Full     = list(
     vars   = c("rho", "y_lagged", "bloomberg_fctc_count", "pol_shift", common_covars),
-    about  = "This specification includes Bloomberg FCTC count, Political Shifts, and a lagged number of items implemented."
+    about  = "This specification includes Bloomberg FCTC count, Political Shifts, and a lagged number of items implemented.",
+    filter = function(x) {
+      subset(x, no_report == 0L)
+    }
   )
 )
 
