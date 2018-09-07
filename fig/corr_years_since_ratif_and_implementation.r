@@ -51,3 +51,39 @@ barplot(
 par(op)
 
 dev.off()
+
+library(dplyr)
+library(tidyr)
+
+fig <- dat %>%
+  group_by(year) %>%
+  summarise(
+    sum_art05 = cor(`Years since Ratif.`, sum_art05, use="pairwise.complete"),
+    sum_art06 = cor(`Years since Ratif.`, sum_art06, use="pairwise.complete"),
+    sum_art08 = cor(`Years since Ratif.`, sum_art08, use="pairwise.complete"),
+    sum_art11 = cor(`Years since Ratif.`, sum_art11, use="pairwise.complete"),
+    sum_art13 = cor(`Years since Ratif.`, sum_art13, use="pairwise.complete"),
+    sum_art14 = cor(`Years since Ratif.`, sum_art14, use="pairwise.complete")
+  ) %>% 
+  ungroup %>%
+  gather(key = "Article", value = "Correlation", -year) %>%
+  mutate(
+    Article = stringr::str_remove(Article, ".+_art0?"),
+    year    = jitter(year)
+  ) %>% 
+  rename(Year=year) %>%
+  ggplot(., aes(x=Year, y=Correlation)) +
+  geom_point(aes(col = Article), size=4)  +
+  ggtitle("Correlation levels between 'Years since Ratif' and\nImplementation levels by Year") + 
+  theme(
+    axis.title.x = element_text(size=15),
+    axis.title.y = element_text(size=15),
+    axis.text    = element_text(size=15),
+    legend.text  = element_text(size=15),
+    legend.title = element_text(size=15),
+    title = element_text(size=15)
+    ) +
+  scale_color_brewer(type = "qual")
+    
+  
+ggsave("fig/corr_years_since_ratif_and_implementation.png", plot = fig)
