@@ -79,6 +79,14 @@ models <- list(
       subset(x, no_report == 0L)
     },
     about  = "This specification includes the lagged number of items reported. Also, it only includes members that provided a reported on 2012."),
+  SuplementalMaterial = list(
+    vars = c("rho", "y_lagged", "bloomberg_fctc_count", "pol_shift",
+             common_covars, "ctrl_corrup", "rule_of_law", "womens_rights"),
+    filter = function(x) {
+      subset(x, no_report == 0L)
+    },
+    about  = "This specification includes the lagged number of items reported, and the following covariates not included in the final analysis: Control of Corruption, Rule of Law, and Womens' rights. Also, it only includes members that provided a reported on 2012."
+  ),
   # Imp2010_dummy_report  = list(
   #   vars   = c("rho", "y_lagged", "no_report", common_covars),
   #   about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
