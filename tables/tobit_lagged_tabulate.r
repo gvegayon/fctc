@@ -1,6 +1,7 @@
 rm(list = ls())
 
 library(AER)
+library(magrittr)
 
 # Reading the models data (not the results themselfs) --------------------------
 
@@ -18,31 +19,31 @@ networks <- networks[networks[,1] != "adjmat_mindist",]
 # Changing the varnames of the models
 fancy_varnames <- c(
   `Lagged Exposure (rho)` = "rho", 
-  # `Gov. Ownership`        = "govtown",
-  `Tobacco Prod. PP`      = "tobac_prod_pp",
-  # `Years since Sign.`     = "`Years since Sign.`", 
-  `Years since Ratif.`    = "`Years since Ratif.`",
-  `GDP pp`                = "gdp_percapita_ppp",
-  `Control of Corruption` = "ctrl_corrup",
-  `Rule of Law`           = "rule_of_law",
-  `% Female Smoke`        = "smoke_female",
-  `% Male Smoke`          = "smoke_male",
-  `Health Exp.`           = "health_exp",
-  `Women's Labor`         = "labor",
-  `Women's rights`        = "womens_rights",
-  `Population`            = "logPopulation",
+  `Lagged Y (Number of Items)` = "y_lagged",
   Americas                = "Americas",
   African                 = "African",
   European                = "European",
-  `Western Pacific`       = "`Western Pacific`",
   `South-East Asia`       = "`South-East Asia`",
-  `Lagged Y (Number of Items)` = "y_lagged",
+  `Western Pacific`       = "`Western Pacific`",
+  `Democracy (POLITY)`    = "POLITY",
+  `GDP per capita (ppp)`  = "logGDP_percapita_ppp",
+  `Tobacco Prod. per capita`= "logTobac_prod_pp",
+  `% Female Smoke`        = "smoke_female",
+  `% Male Smoke`          = "smoke_male",
+  `Women's Labor`         = "labor",
+  `Women's rights`        = "womens_rights",
+  `Log Population`        = "logPopulation",
   PolShift                = "pol_shift",
-  `Government Ownership`  = "govtown",
   `Bloomberg $$$ PP`      = "bloomberg_amount_pp",
   `Bloomberg #`           = "bloomberg_count",
   `Bloomberg FCTC $$$ PP` = "bloomberg_fctc_amount_pp",
   `Bloomberg FCTC #`      = "bloomberg_fctc_count",
+  `Government Ownership`  = "govtown",
+  `Control of Corruption` = "ctrl_corrup",
+  `Rule of Law`           = "rule_of_law",
+  `Health Exp. per capita (ppp)` = "logHealth_exp",
+  `Years since Sign.`     = "`Years since Sign.`",
+  `Years since Ratif.`    = "`Years since Ratif.`",
   `No report`             = "no_report",
   `(Intercept)`           = "(Intercept)",
   `Year 2014`             = "`Year 2014`",
@@ -101,19 +102,64 @@ getAIC <- function(x) {
 
 # Function to get coefficients
 get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
-  env <- new.env()
   
   # Fetching the estimates
-  load(sprintf("models/tobit_lagged_%s.rda", netname), envir = env)
+  model_files <- list.files(
+    path    = "models/",
+    pattern = sprintf("tobit_lagged_%s-imputed[0-9]+[.]rda", netname),
+    full.names = TRUE
+  )
   
-  estimates <- env[[sprintf("tobit_lagged_%s_%i", depvar, modelnum)]]
+  models <- lapply(
+    model_files,
+    function(x) {
+      # Empty environment
+      env <- new.env()
+      
+      # Loading the data in the space
+      load(x, envir = env)
+      
+      # Extracting the required table
+      sprintf("tobit_lagged_%s_%i", depvar, modelnum) %>%
+        get(envir = env) 
+    }
+  )
   
+  names(models) <- model_files
+  
+  estimates <- lapply(models, function(x) {
+    tab <- coef(summary(x))
+    
+    # Getting the coef and error tables
+    cbind(estimate = tab[,"Estimate"], error = tab[,"Std. Error"])
+  })
+  
+  # Aggregating coefficients and sd.
+  estimates <- list(
+    estimate = lapply(estimates, "[", i=, j= "estimate") %>% do.call(rbind, .),
+    error    = lapply(estimates, "[", i=, j= "error") %>% do.call(rbind, .)
+  ) %$%
+    Amelia::mi.meld(estimate, error) %>%
+    do.call(rbind, .) %>%
+    t %>%
+    set_colnames(c("Estimate", "Std. Error"))
+  
+  # Computing pvalues
+  estimates <- cbind(
+    estimates, 
+    "z value" = estimates[,1]/estimates[,2]
+  )
+  
+  estimates <- cbind(
+    estimates,
+    "Pr(>|z|)" = pnorm(-abs(estimates[,"z value"]))*2
+  )
+   
   # Retrieving the betas and sds
-  nobs <- length(estimates$y)
-  estimates <- summary(estimates)$coefficients[]
+  N <- nrow(models[[1]]$y)
 
   # Getting the 
-  varnames <- varnames[varnames %in% fancy_varnames]
+  varnames <- fancy_varnames[fancy_varnames %in% varnames]
   ans <- estimates[varnames,,drop=FALSE]
   
   pvals <- ans[,"Pr(>|z|)"]
@@ -137,8 +183,8 @@ get_coefs <- function(netname, depvar, varnames, modelnum=1, digits = 2) {
   model_obj_name <- sprintf("tobit_lagged_%s_%i", depvar, modelnum)
   ans <- rbind(
     tab,
-    matrix(nobs, ncol = 1, dimnames = list("N", netname)),
-    matrix(getAIC(env[[model_obj_name]]), ncol = 1, dimnames = list("AIC", netname))
+    matrix(N, ncol = 1, dimnames = list("N", netname))
+    # matrix(getAIC(env[[model_obj_name]]), ncol = 1, dimnames = list("AIC", netname))
     )
   
   ans

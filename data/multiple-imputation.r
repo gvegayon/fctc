@@ -27,7 +27,7 @@ to_skip <- c(
   "Years since Ratif.",
   "Years since Sign.",
   colnames(dat)[grepl("^art[0-9]+exp", colnames(dat))],
-  "South-East Asia"
+  "Eastern Mediterranean"
 )
 
 set.seed(17778841)
@@ -86,10 +86,34 @@ rescale_data <- function(dat) {
   dat$bloomberg_amount_pp      <- with(dat, bloomberg_amount/population)
   dat$bloomberg_fctc_amount_pp <- with(dat, bloomberg_fctc_amount/population)
   dat$logPopulation            <- log(dat$population)
+  dat$logTobac_prod_pp         <- log(dat$tobac_prod_pp)
+  dat$logHealth_exp            <- log(dat$health_exp)
+  dat$logGDP_percapita_ppp     <- log(dat$gdp_percapita_ppp)
+
+  # Replacing infinite values with NAs
+  replace_not_finite <- function(x) {
+    ifelse(!is.finite(x), NA, x)
+  }
+  dat <- dat %>%
+    mutate_if(is.numeric, replace_not_finite)
   
-  for (v in colnames(dat))
-    if (is.double(dat[[v]])) 
-      dat[[v]] <- dat[[v]]/sd(dat[[v]], na.rm = TRUE)
+  # Adding lags
+  # Year fixed effects: 2010 as reference
+  year0_1           <- model.matrix(~0+factor(year), dat)
+  colnames(year0_1) <- gsub(".+([0-9]{4})$", "Year \\1", colnames(year0_1))
+  dat      <- cbind(dat, year0_1[,-1]) 
+  
+  dat %>%
+    arrange(entry, year) %>%
+    group_by(entry) %>%
+    mutate(
+      sum_art05_lagged = lag(sum_art05),
+      sum_art06_lagged = lag(sum_art06),
+      sum_art08_lagged = lag(sum_art08),
+      sum_art11_lagged = lag(sum_art11),
+      sum_art13_lagged = lag(sum_art13),
+      sum_art14_lagged = lag(sum_art14)
+    )
   
   #   {
   #   cat(sprintf("%30s: Yes\n", v))
@@ -98,7 +122,7 @@ rescale_data <- function(dat) {
   #   # dat[[v]] <- dat[[v]]/sd(dat[[v]])
   
   # Including interest on policy (subscribed to GL posts) ------------------------
-  dat
+  # dat
 }
 
 ans$imputations <- ans$imputations %>% lapply(rescale_data)

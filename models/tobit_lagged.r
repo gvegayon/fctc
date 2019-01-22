@@ -25,21 +25,24 @@ common_covars <- c(
   "European",
   "`Western Pacific`",
   "`South-East Asia`",
-  # "democracy",
-  "ctrl_corrup",
-  "rule_of_law",
-  "gdp_percapita_ppp",
+  "POLITY",
+  # "ctrl_corrup",
+  # "rule_of_law",
+  "logGDP_percapita_ppp",
   "`Years since Ratif.`",
-  "tobac_prod_pp",
+  # "`Years since Sign.`",
+  "logTobac_prod_pp",
   "smoke_female",
   "smoke_male",
   "labor",
-  "womens_rights",
-  "logPopulation",
+  # "womens_rights",
+  # "logPopulation",
   "govtown",
-  # "`Year 2014`",
-  # "`Year 2016`",
-  "health_exp"
+  "`Year 2014`",
+  "`Year 2016`",
+  "logHealth_exp"
+  # "`Year 2014`*`Years since Ratif.`",
+  # "`Year 2016`*`Years since Ratif.`"
   )
 
 articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art13", "sum_art14")
@@ -47,7 +50,7 @@ articles      <- c("sum_art05", "sum_art06", "sum_art08", "sum_art11", "sum_art1
 # List of networks (with pretty names) that will be used
 networks      <- c(
   "adjmat_centroid_dist", "Centroid Distance",
-  "adjmat_mindist", "Minimal distance",
+  # "adjmat_mindist", "Minimal distance",
   "adjmat_general_trade", "General Trade",
   "adjmat_tobacco_trade", "Tobacco Trade",
   "adjmat_referrals", "GLOBALink Referrals",
@@ -64,9 +67,9 @@ networks      <- c(
 # - filter (optional): A function that will be applied prior to run the model.
 # - about (optional): A brief description
 models <- list(
-  Baseline              = list(
-    vars = c("rho", common_covars),
-    about  = "This is the baseline specification."),
+  # Baseline              = list(
+  #   vars = c("rho", common_covars),
+  #   about  = "This is the baseline specification."),
   Imp2010               = list(
     vars = c("rho", "y_lagged", common_covars),
     about  = "This specification includes the lagged number of items reported."),
@@ -76,24 +79,39 @@ models <- list(
       subset(x, no_report == 0L)
     },
     about  = "This specification includes the lagged number of items reported. Also, it only includes members that provided a reported on 2012."),
-  Imp2010_dummy_report  = list(
-    vars   = c("rho", "y_lagged", "no_report", common_covars),
-    about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
-  PolShift              = list(
-    vars   = c("rho", "pol_shift", common_covars),
-    about  = "This specification includes a variable capturing political shifts."),
-  Bloomberg_amount      = list(
-    vars   = c("rho", "bloomberg_amount_pp", common_covars),
-    about  = "This specification includes 'percapita amount of Bloomberg funds'."),
-  Bloomberg_count       = list(
-    vars   = c("rho", "bloomberg_count", common_covars),
-    about  = "This specification includes 'Number of Bloomberg project'."),
-  Bloomberg_amount_fctc = list(
-    vars   = c("rho", "bloomberg_fctc_amount_pp", common_covars),
-    about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
-  Bloomberg_count_fctc  = list(
-    vars   = c("rho", "bloomberg_fctc_count", common_covars),
-    about  = "This specification includes 'Number of FCTC Bloomberg project'.")
+  SuplementalMaterial = list(
+    vars = c("rho", "y_lagged", "bloomberg_fctc_count", "pol_shift",
+             common_covars, "ctrl_corrup", "rule_of_law", "womens_rights"),
+    filter = function(x) {
+      subset(x, no_report == 0L)
+    },
+    about  = "This specification includes the lagged number of items reported, and the following covariates not included in the final analysis: Control of Corruption, Rule of Law, and Womens' rights. Also, it only includes members that provided a reported on 2012."
+  ),
+  # Imp2010_dummy_report  = list(
+  #   vars   = c("rho", "y_lagged", "no_report", common_covars),
+  #   about  = "This specification includes a dummy equal to 1 when the member did not provided a report on 2012."),
+  # PolShift              = list(
+  #   vars   = c("rho", "y_lagged", "pol_shift", common_covars),
+  #   about  = "This specification includes a variable capturing political shifts."),
+  # Bloomberg_amount      = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_amount_pp", common_covars),
+  #   about  = "This specification includes 'percapita amount of Bloomberg funds'."),
+  # Bloomberg_count       = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_count", common_covars),
+  #   about  = "This specification includes 'Number of Bloomberg project'."),
+  # Bloomberg_amount_fctc = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_fctc_amount_pp", common_covars),
+  #   about  = "This specification includes 'percapita amount of FCTC Bloomberg funds'."),
+  # Bloomberg_count_fctc  = list(
+  #   vars   = c("rho", "y_lagged", "bloomberg_fctc_count", common_covars),
+  #   about  = "This specification includes 'Number of FCTC Bloomberg project'."),
+  Full     = list(
+    vars   = c("rho", "y_lagged", "bloomberg_fctc_count", "pol_shift", common_covars),
+    about  = "This specification includes Bloomberg FCTC count, Political Shifts, and a lagged number of items implemented.",
+    filter = function(x) {
+      subset(x, no_report == 0L)
+    }
+  )
 )
 
 # If i referred j, then i has an influence over j, hence we transpose to compute
@@ -112,112 +130,113 @@ asterisks     <- c(.05, .01, .001)
 read_data <- function(fn) {
   
   # Reading the data in
-  x <- readr::read_csv(fn)
+  x <- suppressMessages({readr::read_csv(fn)})
   x <- x %>%
     mutate(
       entry = if_else(is.na(entry), "NA", entry)
     )
   
-  # Year fixed effects: 2010 as reference
-  year0_1           <- model.matrix(~0+factor(year), x)
-  colnames(year0_1) <- gsub(".+([0-9]{4})$", "Year \\1", colnames(year0_1))
-  x        <- cbind(x, year0_1[,-1]) 
-  
   x %>%
     arrange(entry, year) %>%
     group_by(entry) %>%
-    mutate(
-      sum_art05_lagged = lag(sum_art05),
-      sum_art06_lagged = lag(sum_art06),
-      sum_art08_lagged = lag(sum_art08),
-      sum_art11_lagged = lag(sum_art11),
-      sum_art13_lagged = lag(sum_art13),
-      sum_art14_lagged = lag(sum_art14)
-    ) %>%
     filter(year >= 2012, n() >= 3) %>%
     ungroup %>%
     as.data.frame
 }
 
-# Reading the data
-model_data <- read_data("data/multiple-imputation2.csv")
-
-# Checking which covariates are included
-which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
-
 # Distance network -------------------------------------------------------------
-SIGNIFICANCE_MODEL1 <- NULL
-for (Wnum in 1:nrow(networks)) {
-  
-  # Picking the network
-  Wname <- networks[Wnum, 1]
-  
-  # This table will store the values (and add asterisks at the end) on the values
-  # of rho and the sifnificance level.
-  rho_asterisk_table <- NULL
-  rho_per_article    <- vector("numeric", length(articles))
-  names(rho_per_article) <- articles
-  
-  # Looping through the models
-  for (m in seq_along(models)) {
-    
-    for (art in articles) {
-      
-      # Extracting lagged variable
-      art_lagged <- sprintf("%s_lagged", art)
-      model_data[["y_lagged"]] <- model_data[[art_lagged]] %>%
-        as.vector
-      
-      # Extracting exposure variable
-      art_exp <- paste0(gsub("sum_", "", art), "exp_", gsub("adjmat_", "", Wname))
-      model_data[["rho"]] <- model_data[[art_exp]] %>% as.vector
 
-      # Write down the model
-      mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))
-      
-      # Filtering the data (if needed)
-      if (length(models[[m]]$filter))
-        tmpdata <- models[[m]]$filter(model_data)
-      else tmpdata <- model_data
-      
-      # Run the model
-      ans <- tryCatch(
-        AER::tobit(mod, data=tmpdata),
-        # Run the model
-        # stats::glm(mod, data=tmpdata, family = poisson()),
-        error   = function(e) e,
-        warning = function(w) structure(w, class="warning")
-        )
+for (data_path in list.files("data/", pattern="multiple.+[0-9][.]csv", full.names = TRUE)) {
+  
+  # Reading the data
+  model_data <- read_data(data_path)
+  localenvir <- new.env()
+  
+  local(
+    {
+    # Checking which covariates are included
+    which(!(gsub("`", "", common_covars) %in% colnames(model_data)))
     
-      # Did it run?  
-      if (inherits(ans, "error")) {
-        message("!!! Error in network ", Wname, " article ", art, " model.")
-        next
-      }
+    SIGNIFICANCE_MODEL1 <- NULL
+    for (Wnum in 1:nrow(networks)) {
       
-      if (inherits(ans, "warning")) {
-        message("!!! WARNING in network ", Wname, " article ", art, " model.")
-        next
-      }
+      # Picking the network
+      Wname <- networks[Wnum, 1]
+      
+      # This table will store the values (and add asterisks at the end) on the values
+      # of rho and the sifnificance level.
+      rho_asterisk_table <- NULL
+      rho_per_article    <- vector("numeric", length(articles))
+      names(rho_per_article) <- articles
+      
+      # Looping through the models
+      for (m in seq_along(models)) {
         
-      
-      # Creating the object
-      assign(paste("tobit_lagged",art, m, sep="_"), ans, envir = .GlobalEnv)
-      message("Network ", Wname, " article ", art, " model ", m,  " done.")
-    }
+        for (art in articles) {
+          
+          # Extracting lagged variable
+          art_lagged <- sprintf("%s_lagged", art)
+          model_data[["y_lagged"]] <- model_data[[art_lagged]] %>%
+            as.vector
+          
+          # Extracting exposure variable
+          art_exp <- paste0(gsub("sum_", "", art), "exp_", gsub("adjmat_", "", Wname))
+          model_data[["rho"]] <- model_data[[art_exp]] %>% as.vector
     
-  }
-  
-  # Saving results -----------------------------------------------------------
-  save(
-    Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$"),
-    file = sprintf("models/tobit_lagged_%s.rda", Wname)
-    )
-  
-  message("Network ", Wname, " done.")
+          # Write down the model
+          mod <- as.formula(paste0(art, " ~ ", makeformula(models[[m]]$vars)))
+          
+          # Filtering the data (if needed)
+          if (length(models[[m]]$filter))
+            tmpdata <- models[[m]]$filter(model_data)
+          else tmpdata <- model_data
+          
+          # Run the model
+          ans <<- tryCatch(
+            AER::tobit(mod, data=tmpdata),
+            # Run the model
+            # stats::glm(mod, data=tmpdata, family = poisson()),
+            error   = function(e) e,
+            warning = function(w) structure(w, class="warning")
+            )
+        
+          # Did it run?  
+          if (inherits(ans, "error")) {
+            message("!!! Error in network ", Wname, " article ", art, " model.")
+            next
+          }
+          
+          if (inherits(ans, "warning")) {
+            message("!!! WARNING in network ", Wname, " article ", art, " model.")
+            next
+          }
+            
+          
+          # Creating the object
+          assign(paste("tobit_lagged",art, m, sep="_"), ans, envir = localenvir)
+          message("Network ", Wname, " article ", art, " model ", m,  " done.")
+        }
+        
+      }
+      
+      # Saving results -----------------------------------------------------------
+      save(
+        Wname, list = ls(pattern = "tobit_lagged_sum.+[0-9]$", envir = localenvir),
+        file = sprintf(
+          "models/tobit_lagged_%s-imputed%02i.rda",
+          Wname,
+          as.integer(stringr::str_extract(data_path, "[0-9]+(?=[.csv])"))
+          ),
+        compression_level = 9
+        )
+      
+      message("Network ", Wname, " done.")
+    }
+  },
+  envir = localenvir
+  )
 }
 
 # Saving the models specifications
 save(models, networks, articles,
      file = sprintf("models/tobit_lagged_specifications.rda"))
-

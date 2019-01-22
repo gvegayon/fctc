@@ -23,7 +23,16 @@ who_region <- readr::read_csv("data/party_attributes.csv", na = "<NA>") %>%
   select(entry, who_region, continent) %>% unique
 
 worldbank <- readr::read_csv("data-raw/worldbank/worldbank.csv", na = "<NA>")
-qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>")
+
+wb_country_codes <- worldbank %>%
+  select(iso3c, iso2c) %>%
+  unique
+
+qog <- readr::read_csv("data-raw/quality_of_government/qog.csv", na = "<NA>") %>%
+  rename(POLITY = fh_ipolity2) %>%
+  left_join(wb_country_codes, by = "iso3c") %>%
+  rename(entry = iso2c) %>%
+  select(-iso3c)
 
 tobacco_prod <- readr::read_csv("data/tobacco_prod.csv")
 
@@ -62,6 +71,7 @@ dat <- worldbank %>%
   left_join(tobacco_prod, by = c("entry", "year")) %>%
   left_join(who_region, by = c("entry")) %>%
   left_join(exposure, by = c("entry", "year")) %>%
+  left_join(qog, by = c("entry", "year")) %>%
   filter(!is.na(entry)) %>%
   arrange(entry, year)
 
@@ -255,8 +265,8 @@ dat$year_signature <- with(dat, ifelse(is.na(year_signature), year_ratification,
 # was an event that happened before. But, the implementation level of 2010 can
 # certainly affect signature and ratification as it is a posterior event. Therefore
 # we truncate these variables at 0.
-dat$`Years since Ratif.` <- with(dat, 2014L - year_ratification)
-dat$`Years since Sign.`  <- with(dat, 2014L - year_signature)
+dat$`Years since Ratif.` <- with(dat, year - year_ratification)
+dat$`Years since Sign.`  <- with(dat, year - year_signature)
 
 dat$`Years since Ratif.`[dat$`Years since Ratif.` < 0] <- 0L
 dat$`Years since Sign.`[dat$`Years since Sign.` < 0]   <- 0L
@@ -288,12 +298,13 @@ dat %<>%
 dat %<>% mutate(
   smoke_female = smoke_female/100,
   smoke_male   = smoke_male/100
+  
 )
 
 # Dummies for WHO region
 regions <- model.matrix(~0+who_region, dat) 
 colnames(regions) <- gsub("^who_region", "", colnames(regions))
-dat <- cbind(dat, regions[,-3]) # Reference: Eastern Mediterranean
+dat <- cbind(dat, regions) # Reference: Eastern Mediterranean
 
 write.csv(dat, "data/model_data.csv", row.names = FALSE, na = "<NA>")
 
